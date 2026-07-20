@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Input & Controls Manager - Fixed Showcase Camera (Stationary Background)
+   Input & Controls Manager - Fixed Showcase Camera (Proper Alignment)
    ========================================================================== */
 
 class Controls {
@@ -80,11 +80,11 @@ class Controls {
     }
   }
 
-  // Fixed Showcase Camera: Background Wall Stays Stationary, Only NaDream Spins!
+  // Fixed Showcase Camera: Positioned at Z = -7.5 looking down -Z at NaDream (Z = -14) and Photo Wall (Z = -20)
   updateShowcaseCamera(targetPosition, time) {
     const eyeX = targetPosition.x;
-    const eyeY = targetPosition.y + 2.2;
-    const eyeZ = targetPosition.z - 5.2; // Fixed Camera Position in front!
+    const eyeY = targetPosition.y + 2.0;
+    const eyeZ = targetPosition.z + 6.5; // Z = -7.5 when target is Z = -14
 
     this.camera.position.set(eyeX, eyeY, eyeZ);
     this.camera.lookAt(targetPosition.x, targetPosition.y + 1.8, targetPosition.z);

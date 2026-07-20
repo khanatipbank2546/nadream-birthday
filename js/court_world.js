@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Photo Gallery Wall Background (Global Window)
+   3D Indoor Badminton Complex - Photo Gallery Wall (Aligned & Bright)
    ========================================================================== */
 
 class CourtWorld {
@@ -12,7 +12,7 @@ class CourtWorld {
 
     this.initLighting();
     this.initBadmintonComplex();
-    this.initPhotoGalleryWall(); // New Feature Wall with Framed Photos!
+    this.initPhotoGalleryWall(); // Photo Wall behind Room 1 Center!
     this.initSecretDoorBarriers();
     this.initQuestMarkers();
   }
@@ -57,74 +57,75 @@ class CourtWorld {
   }
 
   initLighting() {
-    const ambient = new THREE.AmbientLight(0x3a4a60, 0.85);
+    const ambient = new THREE.AmbientLight(0x506078, 1.1);
     this.scene.add(ambient);
 
-    const sunLight = new THREE.DirectionalLight(0xfffae6, 0.95);
+    const sunLight = new THREE.DirectionalLight(0xfffae6, 1.2);
     sunLight.position.set(10, 35, 15);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     this.scene.add(sunLight);
 
-    this.scene.fog = new THREE.FogExp2(0x1a202c, 0.008);
+    // Dedicated Bright Room 1 Spotlight for NaDream Showcase
+    const showcaseLight = new THREE.PointLight(0xfffae6, 2.5, 40);
+    showcaseLight.position.set(0, 8, -12);
+    this.scene.add(showcaseLight);
+
+    this.scene.fog = new THREE.FogExp2(0x1a202c, 0.005);
   }
 
-  // Feature Wall behind NaDream decorated with framed photo posters & memories!
+  // Feature Wall behind NaDream inside Room 1 (Z = -20 facing +Z)
   initPhotoGalleryWall() {
     const wallGroup = new THREE.Group();
-    const wallZ = 4.2; // Placed right behind NaDream's floating position (Z = 0)
+    const wallZ = -20.0; // Placed inside Room 1 behind NaDream (Z = -14)
 
     // 1. Cozy Feature Wall Panel
-    const wallGeo = new THREE.PlaneGeometry(16, 9);
+    const wallGeo = new THREE.PlaneGeometry(20, 10);
     const wallCanvas = document.createElement('canvas');
     wallCanvas.width = 1024;
-    wallCanvas.height = 576;
+    wallCanvas.height = 512;
     const wCtx = wallCanvas.getContext('2d');
 
-    // Warm Dark Slate Wood Texture
-    const wallGrad = wCtx.createLinearGradient(0, 0, 1024, 576);
+    const wallGrad = wCtx.createLinearGradient(0, 0, 1024, 512);
     wallGrad.addColorStop(0, '#1e293b');
     wallGrad.addColorStop(0.5, '#0f172a');
     wallGrad.addColorStop(1.0, '#1a202c');
     wCtx.fillStyle = wallGrad;
-    wCtx.fillRect(0, 0, 1024, 576);
+    wCtx.fillRect(0, 0, 1024, 512);
 
-    // Paneling Lines
-    wCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    wCtx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     wCtx.lineWidth = 4;
     for (let x = 0; x < 1024; x += 64) {
       wCtx.beginPath();
       wCtx.moveTo(x, 0);
-      wCtx.lineTo(x, 576);
+      wCtx.lineTo(x, 512);
       wCtx.stroke();
     }
 
     const wallTex = new THREE.CanvasTexture(wallCanvas);
     const wallMat = new THREE.MeshToonMaterial({ map: wallTex, side: THREE.DoubleSide });
     const wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(0, 4.5, wallZ);
+    wallMesh.position.set(0, 5.0, wallZ);
     wallGroup.add(wallMesh);
 
     // 2. Framed Photo Posters of NaDream & Badminton Memories!
     const photos = [
-      { x: 0, y: 5.4, w: 5.2, h: 2.8, title: '👑 NaDream Birthday 🎂', color: '#ffd700' }, // Center Main Poster
-      { x: -4.5, y: 5.8, w: 2.8, h: 2.2, title: '🏸 Badminton Queen', color: '#00f5d4' },  // Top Left Frame
-      { x: 4.5, y: 5.8, w: 2.8, h: 2.2, title: '✨ July 20th 2569', color: '#ff6b9b' },    // Top Right Frame
-      { x: -4.2, y: 3.0, w: 2.6, h: 2.0, title: '🏸 Quest with Bank', color: '#9d4edd' },  // Bottom Left Frame
-      { x: 4.2, y: 3.0, w: 2.6, h: 2.0, title: '🎉 Happy Birthday!', color: '#ff8c00' }    // Bottom Right Frame
+      { x: 0, y: 5.6, w: 5.8, h: 3.0, title: '👑 NaDream Birthday 🎂', color: '#ffd700' },
+      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, title: '🏸 Badminton Queen', color: '#00f5d4' },
+      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, title: '✨ July 20th 2569', color: '#ff6b9b' },
+      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, title: '🏸 Quest with Bank', color: '#9d4edd' },
+      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, title: '🎉 Happy Birthday!', color: '#ff8c00' }
     ];
 
     photos.forEach(p => {
       const pGroup = new THREE.Group();
       
-      // Gold/Silver Outer Frame
       const frameGeo = new THREE.BoxGeometry(p.w + 0.2, p.h + 0.2, 0.08);
       const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.3 });
       const frameMesh = new THREE.Mesh(frameGeo, frameMat);
       pGroup.add(frameMesh);
 
-      // Photo Canvas Texture
       const pCanvas = document.createElement('canvas');
       pCanvas.width = 512;
       pCanvas.height = 384;
@@ -133,22 +134,19 @@ class CourtWorld {
       pCtx.fillStyle = '#0f172a';
       pCtx.fillRect(0, 0, 512, 384);
 
-      // Polaroid Inner Border
       pCtx.fillStyle = '#ffffff';
       pCtx.fillRect(16, 16, 480, 310);
 
-      // Photo Art Content
       const photoGrad = pCtx.createLinearGradient(0, 0, 512, 384);
       photoGrad.addColorStop(0, p.color);
       photoGrad.addColorStop(1, '#1e293b');
       pCtx.fillStyle = photoGrad;
       pCtx.fillRect(24, 24, 464, 250);
 
-      // Icon & Title
       pCtx.fillStyle = '#ffffff';
-      pCtx.font = 'bold 38px Arial';
+      pCtx.font = 'bold 44px Arial';
       pCtx.textAlign = 'center';
-      pCtx.fillText('🏸', 256, 120);
+      pCtx.fillText('🏸', 256, 125);
 
       pCtx.font = 'bold 28px Prompt, Arial';
       pCtx.fillStyle = '#1e293b';
@@ -160,20 +158,9 @@ class CourtWorld {
       pMesh.position.z = 0.05;
       pGroup.add(pMesh);
 
-      pGroup.position.set(p.x, p.y, wallZ - 0.1);
+      pGroup.position.set(p.x, p.y, wallZ + 0.1);
       wallGroup.add(pGroup);
     });
-
-    // 3. Warm Spotlights shining down on the Photo Wall
-    const spotlight1 = new THREE.SpotLight(0xffe066, 1.8, 15, Math.PI / 4, 0.5);
-    spotlight1.position.set(-3, 8.5, wallZ - 2.5);
-    spotlight1.target = wallMesh;
-    this.scene.add(spotlight1);
-
-    const spotlight2 = new THREE.SpotLight(0xffe066, 1.8, 15, Math.PI / 4, 0.5);
-    spotlight2.position.set(3, 8.5, wallZ - 2.5);
-    spotlight2.target = wallMesh;
-    this.scene.add(spotlight2);
 
     this.scene.add(wallGroup);
   }

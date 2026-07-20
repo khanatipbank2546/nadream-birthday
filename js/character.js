@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Character Controller - NaDream Avatar (Bangs Removed, Pulled-Back Hair)
+   3D Character Controller - NaDream Avatar (Robust Cross-Browser Fix)
    ========================================================================== */
 
 class CharacterController {
@@ -7,8 +7,8 @@ class CharacterController {
     this.scene = scene;
     this.group = new THREE.Group();
     
-    // Position & Movement Parameters
-    this.position = new THREE.Vector3(0, 0, 0);
+    // Position & Movement Parameters (Room 1 Center at Z = -14)
+    this.position = new THREE.Vector3(0, 0, -14);
     this.rotation = 0; // Radians
     this.speed = 0.085;
     this.isMoving = false;
@@ -33,7 +33,7 @@ class CharacterController {
     this.scene.add(this.group);
   }
 
-  // Custom Blue/Navy & White Abstract Wave T-Shirt (Exact match for Photo 5!)
+  // Custom Blue/Navy & White Abstract Wave T-Shirt (Photo 5 Match)
   createTshirtTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -109,7 +109,6 @@ class CharacterController {
     return new THREE.CanvasTexture(canvas);
   }
 
-  // 3D Thin Metallic Wire Glasses (Photos 1, 3, 4)
   createGlasses() {
     const glassesGroup = new THREE.Group();
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
@@ -148,6 +147,7 @@ class CharacterController {
     return glassesGroup;
   }
 
+  // Cross-browser safe canvas nametag
   createNametag() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -155,13 +155,11 @@ class CharacterController {
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = 'rgba(15, 16, 22, 0.88)';
-    ctx.beginPath();
-    ctx.roundRect(16, 16, 480, 96, 48);
-    ctx.fill();
+    ctx.fillRect(16, 16, 480, 96);
 
     ctx.strokeStyle = '#ffd700';
     ctx.lineWidth = 6;
-    ctx.stroke();
+    ctx.strokeRect(16, 16, 480, 96);
 
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 44px Arial, Prompt';
@@ -183,7 +181,6 @@ class CharacterController {
     const shoeMaterial = new THREE.MeshToonMaterial({ color: 0xffffff });
     const bagMaterial = new THREE.MeshToonMaterial({ color: 0xf4f4f0 });
 
-    // 1. HEAD, FACE & WIRE GLASSES (Clean forehead, NO BANGS!)
     const headGroup = new THREE.Group();
     const faceTex = this.createFaceTexture();
     const faceMaterial = new THREE.MeshToonMaterial({ map: faceTex });
@@ -193,17 +190,14 @@ class CharacterController {
     headMesh.rotation.y = -Math.PI / 2;
     headGroup.add(headMesh);
 
-    // Hair Cap - Positioned higher up & back so FOREHEAD IS COMPLETELY CLEAN & EXPOSED (NO BANGS!)
     const hairCapGeo = new THREE.SphereGeometry(0.57, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.2);
     const hairCap = new THREE.Mesh(hairCapGeo, hairMaterial);
     hairCap.position.set(0, 0.12, -0.09);
     headGroup.add(hairCap);
 
-    // 3D Thin Wire Glasses
     const glasses = this.createGlasses();
     headGroup.add(glasses);
 
-    // Sleek Rear Ponytail
     const ponytailGroup = new THREE.Group();
     const ponytailGeo = new THREE.ConeGeometry(0.22, 0.75, 16);
     const ponytailMesh = new THREE.Mesh(ponytailGeo, hairMaterial);
@@ -218,7 +212,6 @@ class CharacterController {
     headGroup.position.set(0, 1.85, 0);
     this.group.add(headGroup);
 
-    // 2. TORSO & BLUE/WHITE WAVE SPORT T-SHIRT (PHOTO 5 MATCH)
     const tshirtTex = this.createTshirtTexture();
     const tshirtMat = new THREE.MeshToonMaterial({ map: tshirtTex });
 
@@ -227,7 +220,6 @@ class CharacterController {
     torsoMesh.position.set(0, 1.05, 0);
     this.group.add(torsoMesh);
 
-    // 3. WHITE TOTE BAG
     const bagGroup = new THREE.Group();
     const bagGeo = new THREE.BoxGeometry(0.18, 0.65, 0.5);
     const bagMesh = new THREE.Mesh(bagGeo, bagMaterial);
@@ -235,7 +227,6 @@ class CharacterController {
     bagGroup.add(bagMesh);
     this.group.add(bagGroup);
 
-    // 4. ARMS & BLACK ATHLETIC SHORTS
     const armGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.75, 16);
     this.leftArm = new THREE.Mesh(armGeo, tshirtMat);
     this.leftArm.position.set(-0.55, 0.95, 0);
@@ -245,7 +236,6 @@ class CharacterController {
     this.rightArm.position.set(0.55, 0.95, 0);
     this.group.add(this.rightArm);
 
-    // Black Shorts & Legs
     const leftLegGroup = new THREE.Group();
     const shortsLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.42, 16), shortsMaterial);
     shortsLeft.position.y = -0.2;
@@ -277,20 +267,20 @@ class CharacterController {
 
     const shoeRight = new THREE.Mesh(shoeGeo, shoeMaterial);
     shoeRight.position.set(0, -0.85, 0.06);
-    rightLegGroup.add(rightShoe);
+    rightLegGroup.add(shoeRight);
 
     rightLegGroup.position.set(0.25, 0.8, 0);
     this.rightLeg = rightLegGroup;
     this.group.add(rightLegGroup);
 
-    // 5. FLOATING NAMETAG
     this.nametag = this.createNametag();
     this.group.add(this.nametag);
+    
+    this.group.position.copy(this.position);
   }
 
-  // Zero-Gravity Levitation Floating Pose
   setFloatingPose(elapsedTime) {
-    const floatY = 2.5 + Math.sin(elapsedTime * 2.5) * 0.4;
+    const floatY = 2.2 + Math.sin(elapsedTime * 2.5) * 0.3;
     this.position.y = floatY;
 
     this.leftArm.rotation.z = Math.PI / 4 + Math.sin(elapsedTime * 2) * 0.15;
@@ -308,7 +298,6 @@ class CharacterController {
     this.group.position.copy(this.position);
   }
 
-  // Superhero Burst & Landing Pose
   setLandingPose(progress) {
     const startY = 4.5;
     this.position.y = startY * (1 - progress);
@@ -342,7 +331,6 @@ class CharacterController {
     }
   }
 
-  // Camera-Relative Movement Update
   update(delta, keysPressed, joystickVector, cameraAngleY = 0, activeBarrierZ = -1000) {
     let inputX = 0;
     let inputZ = 0;
@@ -361,7 +349,6 @@ class CharacterController {
       this.jump();
     }
 
-    // 1. Gravity Physics
     if (!this.isGrounded) {
       this.position.y += this.velocityY * delta;
       this.velocityY += this.gravity * delta;
@@ -373,7 +360,6 @@ class CharacterController {
       }
     }
 
-    // 2. Movement Vector Math
     if (inputX !== 0 || inputZ !== 0) {
       this.isMoving = true;
 

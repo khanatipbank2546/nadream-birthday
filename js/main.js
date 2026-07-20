@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Application Entry Point - Independent 360° Character Rotation Fix
+   Main Application Entry Point - Photo Gallery Wall Hide & Game Loop
    ========================================================================== */
 
 class Game {
@@ -12,7 +12,7 @@ class Game {
     this.cutsceneTimer = 0;
     this.currentMonthIdx = 0;
 
-    this.isCutsceneActive = false; // Secret door cutscene state
+    this.isCutsceneActive = false;
     this.secretDoorZ = 0;
     this.secretDoorTimer = 0;
 
@@ -35,7 +35,6 @@ class Game {
       200
     );
 
-    // High-Graphics Laptop / PC WebGL Renderer
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
@@ -96,13 +95,18 @@ class Game {
             window.soundEngine.playClick();
           }
           loadingScreen.classList.add('fade-out');
+          
+          // Hide Photo Gallery Wall when starting game!
+          if (this.courtWorld) {
+            this.courtWorld.hidePhotoGalleryWall();
+          }
+
           this.startIntroCutscene();
         };
       }
     }, 50);
   }
 
-  // 5-Phase Intro Cutscene Execution Sequence
   startIntroCutscene() {
     this.gameState = 'FLOATING';
     this.cutsceneTimer = 0;
@@ -126,17 +130,15 @@ class Game {
     const date20 = document.getElementById('date-20-highlight');
     const burstFlare = document.getElementById('burst-flare');
 
-    // Step 1: NaDream Levitates up (0s - 1.2s)
     setTimeout(() => {
       this.gameState = 'CALENDAR_TEAR';
       
-      // Step 2: Rapid Calendar Month Tearing Sequence (1.2s - 3.8s)
       const tearInterval = setInterval(() => {
         if (this.currentMonthIdx < months.length) {
           if (monthTitleEl) monthTitleEl.innerText = months[this.currentMonthIdx];
           if (calendarCard) {
             calendarCard.classList.remove('flip-tear');
-            void calendarCard.offsetWidth; // Trigger reflow
+            void calendarCard.offsetWidth;
             calendarCard.classList.add('flip-tear');
           }
           if (window.soundEngine) window.soundEngine.playCalendarTear();
@@ -144,18 +146,15 @@ class Game {
         } else {
           clearInterval(tearInterval);
 
-          // Step 3: Zooming to Date 20 (July 20th 2569)
           if (monthTitleEl) monthTitleEl.innerText = '✨ 20 กรกฎาคม 2569 (วันเกิด NaDream!) ✨';
           if (date20) date20.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
           setTimeout(() => {
-            // Step 4: Burst Through Date 20 Flare Explosion
             if (burstFlare) burstFlare.classList.remove('hidden');
             if (window.soundEngine) window.soundEngine.playLandingImpact();
             this.gameState = 'BURST_LAND';
 
             setTimeout(() => {
-              // Step 5: Superhero Landing onto Room 1 Floor & Start Playing!
               if (calendarOverlay) calendarOverlay.classList.add('hidden');
               if (burstFlare) burstFlare.classList.add('hidden');
               this.gameState = 'PLAYING';
@@ -182,25 +181,19 @@ class Game {
     const elapsedTime = this.clock.getElapsedTime();
 
     if (this.gameState === 'SHOWCASE') {
-      // Camera Orbit around Room 1
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
-      
-      // Independent 360° Character Mesh Rotation (Shows front, ponytail, back & side profiles!)
       this.character.group.rotation.y += 0.008;
 
     } else if (this.gameState === 'FLOATING' || this.gameState === 'CALENDAR_TEAR') {
-      // Zero-Gravity Levitation Pose + Independent 360° Rotation
       this.character.setFloatingPose(elapsedTime);
       this.character.group.rotation.y += 0.008;
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
 
     } else if (this.gameState === 'BURST_LAND') {
-      // Superhero Burst Landing Animation
       this.cutsceneTimer += delta * 2.5;
       this.character.setLandingPose(Math.min(1.0, this.cutsceneTimer));
 
     } else if (this.isCutsceneActive) {
-      // Secret Door Opening Cutscene
       this.secretDoorTimer += delta;
       this.controls.updateCutsceneCamera(this.secretDoorZ, this.secretDoorTimer / 2.5);
 
@@ -209,7 +202,6 @@ class Game {
       }
 
     } else if (this.gameState === 'PLAYING') {
-      // 3rd Person Gameplay
       const activeBarrierZ = this.courtWorld.getActiveBarrierZ();
       this.character.update(
         delta, 

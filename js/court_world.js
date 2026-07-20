@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Photo Gallery Wall (Aligned & Bright)
+   3D Indoor Badminton Complex - Photo Gallery Wall & Crisp Lighting
    ========================================================================== */
 
 class CourtWorld {
@@ -7,12 +7,13 @@ class CourtWorld {
     this.scene = scene;
     this.doors = [];
     this.questMarkers = [];
+    this.photoGalleryWallGroup = null;
 
     this.sharedCourtTexture = this.createSharedCourtTexture();
 
     this.initLighting();
     this.initBadmintonComplex();
-    this.initPhotoGalleryWall(); // Photo Wall behind Room 1 Center!
+    this.initPhotoGalleryWall();
     this.initSecretDoorBarriers();
     this.initQuestMarkers();
   }
@@ -56,31 +57,31 @@ class CourtWorld {
     return texture;
   }
 
+  // Crisp Balanced Lighting (No white color washout or blooming!)
   initLighting() {
-    const ambient = new THREE.AmbientLight(0x506078, 1.1);
+    const ambient = new THREE.AmbientLight(0x405068, 0.85);
     this.scene.add(ambient);
 
-    const sunLight = new THREE.DirectionalLight(0xfffae6, 1.2);
+    const sunLight = new THREE.DirectionalLight(0xfffae6, 0.9);
     sunLight.position.set(10, 35, 15);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     this.scene.add(sunLight);
 
-    // Dedicated Bright Room 1 Spotlight for NaDream Showcase
-    const showcaseLight = new THREE.PointLight(0xfffae6, 2.5, 40);
-    showcaseLight.position.set(0, 8, -12);
-    this.scene.add(showcaseLight);
+    // Warm Room 1 Showcase Light
+    this.showcaseLight = new THREE.PointLight(0xfff0c2, 1.4, 30);
+    this.showcaseLight.position.set(0, 7, -12);
+    this.scene.add(this.showcaseLight);
 
     this.scene.fog = new THREE.FogExp2(0x1a202c, 0.005);
   }
 
   // Feature Wall behind NaDream inside Room 1 (Z = -20 facing +Z)
   initPhotoGalleryWall() {
-    const wallGroup = new THREE.Group();
-    const wallZ = -20.0; // Placed inside Room 1 behind NaDream (Z = -14)
+    this.photoGalleryWallGroup = new THREE.Group();
+    const wallZ = -20.0;
 
-    // 1. Cozy Feature Wall Panel
     const wallGeo = new THREE.PlaneGeometry(20, 10);
     const wallCanvas = document.createElement('canvas');
     wallCanvas.width = 1024;
@@ -107,9 +108,8 @@ class CourtWorld {
     const wallMat = new THREE.MeshToonMaterial({ map: wallTex, side: THREE.DoubleSide });
     const wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 5.0, wallZ);
-    wallGroup.add(wallMesh);
+    this.photoGalleryWallGroup.add(wallMesh);
 
-    // 2. Framed Photo Posters of NaDream & Badminton Memories!
     const photos = [
       { x: 0, y: 5.6, w: 5.8, h: 3.0, title: '👑 NaDream Birthday 🎂', color: '#ffd700' },
       { x: -5.2, y: 6.0, w: 3.2, h: 2.4, title: '🏸 Badminton Queen', color: '#00f5d4' },
@@ -159,10 +159,17 @@ class CourtWorld {
       pGroup.add(pMesh);
 
       pGroup.position.set(p.x, p.y, wallZ + 0.1);
-      wallGroup.add(pGroup);
+      this.photoGalleryWallGroup.add(pGroup);
     });
 
-    this.scene.add(wallGroup);
+    this.scene.add(this.photoGalleryWallGroup);
+  }
+
+  // Hide Photo Gallery Wall when starting gameplay!
+  hidePhotoGalleryWall() {
+    if (this.photoGalleryWallGroup) {
+      this.scene.remove(this.photoGalleryWallGroup);
+    }
   }
 
   initBadmintonComplex() {

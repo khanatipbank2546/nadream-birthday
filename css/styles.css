@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton RPG - Laptop PC High-Graphics & Calendar Cutscene
+   3D Indoor Badminton RPG - Badminton Poster Aesthetic & PC HD Visuals
    ========================================================================== */
 
 :root {
@@ -45,7 +45,10 @@ html, body {
   display: block;
 }
 
-/* Loading & Pre-Game 360° Showcase Screen Overlay */
+/* ==========================================================================
+   Pre-Game Badminton Poster Screen (No Box Card, Front NaDream Focus!)
+   ========================================================================== */
+
 .loading-screen {
   position: fixed;
   top: 0;
@@ -55,9 +58,10 @@ html, body {
   background: transparent;
   z-index: 200;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 60px;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 20px;
   pointer-events: none;
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
@@ -67,60 +71,74 @@ html, body {
   visibility: hidden;
 }
 
-.showcase-banner-card {
+/* Badminton Poster Top Header */
+.poster-top-header {
   pointer-events: auto;
   text-align: center;
-  width: 90%;
-  max-width: 480px;
-  padding: 28px;
-  background: var(--glass-bg);
-  border: 2px solid var(--primary-gold);
-  backdrop-filter: blur(18px);
-  border-radius: 28px;
-  box-shadow: 0 0 50px rgba(255, 215, 0, 0.35);
-  animation: floatCard 3s infinite ease-in-out;
+  margin-top: 10px;
+  animation: fadeInDown 1s ease-out;
 }
 
-@keyframes floatCard {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+@keyframes fadeInDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-.badge-header {
+.poster-badge {
   display: inline-block;
-  padding: 4px 14px;
+  padding: 6px 18px;
   background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
   color: #fff;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  box-shadow: 0 0 20px rgba(255, 107, 155, 0.5);
   margin-bottom: 12px;
 }
 
-.loading-title {
+.poster-title {
   font-family: var(--font-accent);
-  font-size: 2.2rem;
+  font-size: 3.2rem;
   font-weight: 900;
-  background: linear-gradient(135deg, var(--primary-gold), var(--primary-cyan), var(--accent-pink));
+  background: linear-gradient(135deg, var(--primary-gold), var(--primary-cyan), #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
+  text-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+  letter-spacing: 1px;
 }
 
-.loading-subtitle {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-bottom: 22px;
+.poster-subtitle {
+  color: #e2e8f0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  margin-top: 6px;
+}
+
+/* Badminton Poster Bottom Footer & Start Button */
+.poster-bottom-footer {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 .progress-bar-container {
   width: 100%;
   height: 10px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(8px);
 }
 
 .progress-bar-fill {
@@ -133,22 +151,22 @@ html, body {
 
 .start-btn {
   width: 100%;
-  padding: 16px 32px;
-  font-size: 1.25rem;
-  font-weight: 800;
+  padding: 16px 36px;
+  font-size: 1.3rem;
+  font-weight: 900;
   font-family: var(--font-thai);
   color: #000;
   background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+  box-shadow: 0 0 35px rgba(255, 215, 0, 0.9);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .start-btn:hover {
-  transform: translateY(-3px) scale(1.04);
-  box-shadow: 0 0 45px rgba(255, 215, 0, 1.0);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 0 50px rgba(255, 215, 0, 1.0);
 }
 
 /* ==========================================================================

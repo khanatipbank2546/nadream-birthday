@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Sound Engine - Badminton Court 3D RPG Audio & Cutscene SFX (Global Window)
+   Sound Engine - Badminton Court 3D RPG Audio & Synthesized Lo-Fi Synth
    ========================================================================== */
 
 class SoundEngine {
@@ -8,6 +8,7 @@ class SoundEngine {
     this.isMuted = false;
     this.bgmTimer = null;
     this.isBGMPlaying = false;
+    this.crackleNode = null;
   }
 
   init() {
@@ -52,6 +53,114 @@ class SoundEngine {
     }, delay * 1000);
   }
 
+  // Synthesized Lo-Fi Electric Piano Note (Warm Mellow EP Sound)
+  playLoFiChordNote(freq, duration = 1.2, volume = 0.12, delay = 0) {
+    if (this.isMuted || !this.ctx) return;
+    setTimeout(() => {
+      try {
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+
+        // Mellow Low-Pass Filter for Lo-Fi warmth
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(750, this.ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(volume, this.ctx.currentTime + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      } catch (e) {}
+    }, delay * 1000);
+  }
+
+  // Vinyl Crackle Background Ambience
+  startVinylCrackle() {
+    if (this.isMuted || !this.ctx || this.crackleNode) return;
+    try {
+      const bufferSize = this.ctx.sampleRate * 2;
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        if (Math.random() < 0.003) {
+          output[i] = (Math.random() * 2 - 1) * 0.3;
+        } else {
+          output[i] = (Math.random() * 2 - 1) * 0.01;
+        }
+      }
+
+      this.crackleNode = this.ctx.createBufferSource();
+      this.crackleNode.buffer = buffer;
+      this.crackleNode.loop = true;
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+
+      this.crackleNode.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      this.crackleNode.start();
+    } catch (e) {}
+  }
+
+  // Built-in Lo-Fi Chill Hop Music Beat Loop
+  startBGM() {
+    if (this.isMuted) return;
+    this.init();
+    if (this.isBGMPlaying) return;
+    this.isBGMPlaying = true;
+
+    this.startVinylCrackle();
+
+    // Lo-Fi Jazz Chord Progressions: Cmaj7 -> Am7 -> Dm7 -> G7
+    const chords = [
+      // Cmaj7 (C4, E4, G4, B4) + Bass C3
+      { bass: 130.81, notes: [261.63, 329.63, 392.00, 493.88], delay: 0 },
+      // Am7 (A3, C4, E4, G4) + Bass A2
+      { bass: 110.00, notes: [220.00, 261.63, 329.63, 392.00], delay: 2.2 },
+      // Dm7 (D3, F4, A4, C5) + Bass D3
+      { bass: 146.83, notes: [293.66, 349.23, 440.00, 523.25], delay: 4.4 },
+      // G7 (G3, B3, D4, F4) + Bass G2
+      { bass: 98.00, notes: [196.00, 246.94, 293.66, 349.23], delay: 6.6 }
+    ];
+
+    const playLoFiLoop = () => {
+      if (!this.isBGMPlaying || this.isMuted) return;
+
+      chords.forEach(c => {
+        // Sub-bass note
+        this.playLoFiChordNote(c.bass, 2.0, 0.15, c.delay);
+        // EP Chord Notes
+        c.notes.forEach(n => {
+          this.playLoFiChordNote(n, 1.8, 0.08, c.delay + Math.random() * 0.03);
+        });
+      });
+
+      this.bgmTimer = setTimeout(playLoFiLoop, 8800);
+    };
+
+    playLoFiLoop();
+  }
+
+  stopBGM() {
+    this.isBGMPlaying = false;
+    if (this.bgmTimer) clearTimeout(this.bgmTimer);
+    if (this.crackleNode) {
+      try { this.crackleNode.stop(); } catch (e) {}
+      this.crackleNode = null;
+    }
+  }
+
   playJump() {
     this.init();
     if (this.isMuted || !this.ctx) return;
@@ -74,7 +183,6 @@ class SoundEngine {
     } catch (e) {}
   }
 
-  // Calendar Page Tearing / Swishing SFX
   playCalendarTear() {
     this.init();
     if (this.isMuted || !this.ctx) return;
@@ -106,7 +214,6 @@ class SoundEngine {
     } catch (e) {}
   }
 
-  // Superhero Landing Impact SFX
   playLandingImpact() {
     this.init();
     if (this.isMuted || !this.ctx) return;
@@ -140,38 +247,6 @@ class SoundEngine {
   playClick() {
     this.init();
     this.playNote(700, 'triangle', 0.08, 0.15);
-  }
-
-  startBGM() {
-    if (this.isMuted) return;
-    this.init();
-    if (this.isBGMPlaying) return;
-    this.isBGMPlaying = true;
-
-    const melody = [
-      { note: 329.63, duration: 0.3, time: 0 },
-      { note: 392.00, duration: 0.3, time: 0.35 },
-      { note: 440.00, duration: 0.4, time: 0.7 },
-      { note: 523.25, duration: 0.5, time: 1.15 },
-      { note: 440.00, duration: 0.3, time: 1.7 },
-      { note: 392.00, duration: 0.3, time: 2.05 },
-      { note: 329.63, duration: 0.6, time: 2.4 }
-    ];
-
-    const playLoop = () => {
-      if (!this.isBGMPlaying || this.isMuted) return;
-      melody.forEach(item => {
-        this.playNote(item.note, 'sine', item.duration, 0.09, item.time);
-      });
-      this.bgmTimer = setTimeout(playLoop, 3800);
-    };
-
-    playLoop();
-  }
-
-  stopBGM() {
-    this.isBGMPlaying = false;
-    if (this.bgmTimer) clearTimeout(this.bgmTimer);
   }
 
   playHappyBirthday() {

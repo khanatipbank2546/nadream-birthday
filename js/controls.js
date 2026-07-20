@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Input & Controls Manager - D-Pad, Touch Joystick & Toggle Button (Global Window)
+   Input & Controls Manager - Front NaDream Showcase Camera & Controls
    ========================================================================== */
 
 class Controls {
@@ -14,8 +14,8 @@ class Controls {
     this.cameraMode = '3rd';
     this.cameraDistance = 9.0;
     this.cameraHeight = 4.5;
-    this.cameraAngleY = 0; // Yaw orbit angle
-    this.cameraAngleX = 0.25; // Pitch angle
+    this.cameraAngleY = 0;
+    this.cameraAngleX = 0.25;
 
     this.showcaseAngle = 0;
 
@@ -24,9 +24,7 @@ class Controls {
 
     this.bindKeyboardEvents();
     this.bindMouseEvents();
-    this.bindTouchControls();
     this.bindCameraToggle();
-    this.bindTouchControlsToggle();
   }
 
   bindKeyboardEvents() {
@@ -69,120 +67,10 @@ class Controls {
     });
   }
 
-  bindTouchControls() {
-    // 1. Mobile Virtual Joystick
-    const joystickBase = document.getElementById('joystick-base');
-    const joystickStick = document.getElementById('joystick-stick');
-    if (joystickBase && joystickStick) {
-      let touchId = null;
-      let baseRect = null;
-
-      const handleTouchStart = (e) => {
-        if (touchId !== null) return;
-        const touch = e.changedTouches[0];
-        touchId = touch.identifier;
-        baseRect = joystickBase.getBoundingClientRect();
-        updateJoystick(touch);
-      };
-
-      const handleTouchMove = (e) => {
-        for (let i = 0; i < e.changedTouches.length; i++) {
-          if (e.changedTouches[i].identifier === touchId) {
-            updateJoystick(e.changedTouches[i]);
-            break;
-          }
-        }
-      };
-
-      const handleTouchEnd = (e) => {
-        for (let i = 0; i < e.changedTouches.length; i++) {
-          if (e.changedTouches[i].identifier === touchId) {
-            touchId = null;
-            this.joystickVector = { x: 0, y: 0 };
-            joystickStick.style.transform = 'translate(-50%, -50%)';
-            break;
-          }
-        }
-      };
-
-      const updateJoystick = (touch) => {
-        const centerX = baseRect.left + baseRect.width / 2;
-        const centerY = baseRect.top + baseRect.height / 2;
-
-        let deltaX = touch.clientX - centerX;
-        let deltaY = touch.clientY - centerY;
-        const maxRadius = baseRect.width / 2;
-
-        const dist = Math.hypot(deltaX, deltaY);
-        if (dist > maxRadius) {
-          deltaX = (deltaX / dist) * maxRadius;
-          deltaY = (deltaY / dist) * maxRadius;
-        }
-
-        joystickStick.style.transform = `translate(calc(-50% + ${deltaX}px), calc(-50% + ${deltaY}px))`;
-
-        this.joystickVector = {
-          x: deltaX / maxRadius,
-          y: deltaY / maxRadius
-        };
-      };
-
-      joystickBase.addEventListener('touchstart', handleTouchStart, { passive: true });
-      window.addEventListener('touchmove', handleTouchMove, { passive: true });
-      window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    }
-
-    // 2. PUBG Mobile / ROV Style Directional D-Pad Touch Buttons
-    const bindDPadBtn = (elementId, keyCode) => {
-      const btn = document.getElementById(elementId);
-      if (!btn) return;
-
-      const press = (e) => {
-        if (e) e.preventDefault();
-        this.keysPressed[keyCode] = true;
-        btn.classList.add('active');
-      };
-      const release = (e) => {
-        if (e) e.preventDefault();
-        this.keysPressed[keyCode] = false;
-        btn.classList.remove('active');
-      };
-
-      btn.addEventListener('touchstart', press, { passive: false });
-      btn.addEventListener('touchend', release, { passive: false });
-      btn.addEventListener('mousedown', press);
-      btn.addEventListener('mouseup', release);
-    };
-
-    bindDPadBtn('dpad-up', 'KeyW');
-    bindDPadBtn('dpad-down', 'KeyS');
-    bindDPadBtn('dpad-left', 'KeyA');
-    bindDPadBtn('dpad-right', 'KeyD');
-
-    // 3. Mobile Jump Button
-    const mobileJumpBtn = document.getElementById('mobile-jump-btn');
-    if (mobileJumpBtn) {
-      mobileJumpBtn.addEventListener('click', () => {
-        if (this.character) this.character.jump();
-      });
-    }
-  }
-
   bindCameraToggle() {
     const toggleBtn = document.getElementById('camera-toggle-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => this.toggleCameraView());
-    }
-  }
-
-  bindTouchControlsToggle() {
-    const touchToggleBtn = document.getElementById('touch-toggle-btn');
-    const mobileControls = document.getElementById('mobile-controls');
-
-    if (touchToggleBtn && mobileControls) {
-      touchToggleBtn.addEventListener('click', () => {
-        mobileControls.classList.toggle('hidden-force');
-      });
     }
   }
 
@@ -194,16 +82,17 @@ class Controls {
     }
   }
 
+  // Front & Center Showcase Camera Orbit around Floating NaDream
   updateShowcaseCamera(targetPosition, time) {
-    this.showcaseAngle = time * 0.0008;
-    const dist = 7.5;
-    const height = 3.2;
+    this.showcaseAngle = time * 0.0006;
+    const dist = 5.2; // Front & Center focus!
+    const height = 2.2;
 
     const eyeX = targetPosition.x + Math.sin(this.showcaseAngle) * dist;
     const eyeZ = targetPosition.z + Math.cos(this.showcaseAngle) * dist;
 
     this.camera.position.set(eyeX, targetPosition.y + height, eyeZ);
-    this.camera.lookAt(targetPosition.x, targetPosition.y + 1.6, targetPosition.z);
+    this.camera.lookAt(targetPosition.x, targetPosition.y + 1.8, targetPosition.z);
   }
 
   updateCutsceneCamera(doorZPos, cutsceneProgress) {

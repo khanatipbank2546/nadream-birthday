@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Entry Point - Guaranteed Rating Modal & 6-Second Photo Preview
+   Main Entry Point - Mini-Game Engine & Grand Birthday Finale Cutscene
    ========================================================================== */
 
 class Game {
@@ -7,7 +7,7 @@ class Game {
     this.canvas = document.getElementById('webgl-canvas');
     this.clock = new THREE.Clock();
 
-    // Game States: 'SHOWCASE', 'FLOATING', 'CALENDAR_TEAR', 'BURST_LAND', 'PLAYING', 'PHOTO_PREVIEW', 'GIFT_BOX_CUTSCENE'
+    // Game States: 'SHOWCASE', 'FLOATING', 'CALENDAR_TEAR', 'BURST_LAND', 'PLAYING', 'PHOTO_PREVIEW', 'GIFT_BOX_CUTSCENE', 'FINALE'
     this.gameState = 'SHOWCASE';
     this.cutsceneTimer = 0;
     this.currentMonthIdx = 0;
@@ -65,6 +65,9 @@ class Game {
       this.bankNPC = new window.BankNPC(this.scene, new THREE.Vector3(0, 0, -152));
       this.questManager = new window.QuestManager(this.courtWorld, this.bankNPC);
       this.controls = new window.Controls(this.camera, this.canvas, this.character);
+      
+      // Global Mini-Game Engine
+      window.miniGameEngine = new window.MiniGameEngine();
     } catch (e) {
       console.error("Safeguarded Entity Init:", e);
     }
@@ -207,7 +210,6 @@ class Game {
     if (window.soundEngine) window.soundEngine.playClick();
   }
 
-  // Grand Gift Box Spawn Cutscene
   startGiftBoxSpawnCutscene(boxPos) {
     this.gameState = 'GIFT_BOX_SPAWN';
     this.previewArtPos.copy(boxPos);
@@ -220,7 +222,6 @@ class Game {
     }, 1500);
   }
 
-  // Grand Gift Box Opening Lid Popping Cutscene
   startGiftBoxOpeningCutscene(roomNum, callback) {
     this.gameState = 'GIFT_BOX_OPENING';
     this.giftBoxRoomIdx = roomNum - 1;
@@ -228,6 +229,43 @@ class Game {
     this.giftBoxCallback = callback;
 
     if (window.soundEngine) window.soundEngine.playDoorUnlock();
+  }
+
+  // Grand Birthday Finale Cutscene (Room 5 Complete)
+  startGrandBirthdayFinale() {
+    this.gameState = 'FINALE';
+
+    // 1. Dim Room Lighting Subtly
+    if (this.scene) {
+      this.scene.background = new THREE.Color(0x0a0d14);
+      this.scene.fog = new THREE.FogExp2(0x0a0d14, 0.012);
+    }
+
+    // 2. Open Secret Door #5
+    if (this.courtWorld) {
+      this.courtWorld.unlockBarrier(5);
+    }
+
+    // 3. Play Birthday Music
+    if (window.soundEngine) {
+      window.soundEngine.startBGM();
+    }
+
+    // 4. Bank NPC Walks Out Carrying Birthday Cake with Candlelight to NaDream!
+    if (this.bankNPC && this.character) {
+      const targetPos = new THREE.Vector3(
+        this.character.position.x,
+        this.character.position.y,
+        this.character.position.z - 2.5
+      );
+
+      this.bankNPC.walkToPlayer(targetPos, () => {
+        // Arrived! Open HBD Modal Popup!
+        if (window.showNPCModal) {
+          window.showNPCModal();
+        }
+      });
+    }
   }
 
   animate() {
@@ -260,7 +298,7 @@ class Game {
 
     } else if (this.gameState === 'PHOTO_PREVIEW') {
       this.previewTimer += delta;
-      const progress = Math.min(1.0, this.previewTimer / 6.0); // 6 Seconds Orbit!
+      const progress = Math.min(1.0, this.previewTimer / 6.0);
 
       if (this.controls) {
         this.controls.updatePhotoPreviewCamera(this.previewArtPos, progress);
@@ -301,6 +339,11 @@ class Game {
           this.giftBoxCallback = null;
           cb();
         }
+      }
+
+    } else if (this.gameState === 'FINALE') {
+      if (this.controls && this.bankNPC) {
+        this.controls.updateShowcaseCamera(this.bankNPC.position, elapsedTime * 1000);
       }
 
     } else if (this.gameState === 'PLAYING') {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D NPC Generator - Bank Character in Grand Winner's Sanctuary (Global Window)
+   3D NPC Generator - Bank Character with Birthday Cake (Global Window)
    ========================================================================== */
 
 class BankNPC {
@@ -8,7 +8,16 @@ class BankNPC {
     this.position = position;
     this.group = new THREE.Group();
     this.nametag = null;
+    this.leftArm = null;
     this.rightArm = null;
+    this.leftLeg = null;
+    this.rightLeg = null;
+    this.cakeGroup = null;
+
+    this.isWalking = false;
+    this.walkCycle = 0;
+    this.walkTarget = null;
+    this.onArriveCallback = null;
 
     this.buildNPC();
     this.group.position.copy(this.position);
@@ -74,23 +83,68 @@ class BankNPC {
     return sprite;
   }
 
-  createRacket() {
-    const racketGroup = new THREE.Group();
-    
-    const handle = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.04, 0.04, 0.8, 12),
-      new THREE.MeshToonMaterial({ color: 0x1e2029 })
-    );
-    handle.position.y = 0.4;
-    racketGroup.add(handle);
+  createBirthdayCake() {
+    const cakeGroup = new THREE.Group();
 
-    const frameGeo = new THREE.TorusGeometry(0.32, 0.03, 8, 24);
-    const frameMat = new THREE.MeshToonMaterial({ color: 0x00f5d4 });
-    const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.y = 1.1;
-    racketGroup.add(frame);
+    // 2-tier Cake
+    const tier1Geo = new THREE.CylinderGeometry(0.5, 0.5, 0.35, 24);
+    const tier1Mat = new THREE.MeshToonMaterial({ color: 0xff6b9b });
+    const tier1 = new THREE.Mesh(tier1Geo, tier1Mat);
+    tier1.position.y = 0.175;
+    cakeGroup.add(tier1);
 
-    return racketGroup;
+    const tier2Geo = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 24);
+    const tier2Mat = new THREE.MeshToonMaterial({ color: 0xffd700 });
+    const tier2 = new THREE.Mesh(tier2Geo, tier2Mat);
+    tier2.position.y = 0.5;
+    cakeGroup.add(tier2);
+
+    // Candles with Glowing Flames
+    for (let i = 0; i < 3; i++) {
+      const angle = (i / 3) * Math.PI * 2;
+      const rx = Math.cos(angle) * 0.18;
+      const rz = Math.sin(angle) * 0.18;
+
+      const candleMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.03, 0.03, 0.22, 12),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      candleMesh.position.set(rx, 0.76, rz);
+      cakeGroup.add(candleMesh);
+
+      const flameMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.06, 12, 12),
+        new THREE.MeshBasicMaterial({ color: 0xffa500 })
+      );
+      flameMesh.position.set(rx, 0.9, rz);
+      cakeGroup.add(flameMesh);
+    }
+
+    // Warm Glowing Candlelight PointLight
+    const candleLight = new THREE.PointLight(0xffaa00, 3.5, 14);
+    candleLight.position.set(0, 1.0, 0);
+    cakeGroup.add(candleLight);
+
+    return cakeGroup;
+  }
+
+  attachBirthdayCake() {
+    if (!this.cakeGroup) {
+      this.cakeGroup = this.createBirthdayCake();
+      this.cakeGroup.position.set(0, 0.9, 0.65);
+      this.group.add(this.cakeGroup);
+    }
+    this.cakeGroup.visible = true;
+
+    // Pose arms forward to carry cake
+    if (this.leftArm) {
+      this.leftArm.rotation.x = -Math.PI / 3;
+      this.leftArm.rotation.z = -0.2;
+    }
+    if (this.rightArm) {
+      this.rightArm.rotation.x = -Math.PI / 3;
+      this.rightArm.rotation.z = 0.2;
+    }
   }
 
   buildNPC() {
@@ -146,6 +200,7 @@ class BankNPC {
     leftLegGroup.add(shoeLeft);
 
     leftLegGroup.position.set(-0.25, 0.8, 0);
+    this.leftLeg = leftLegGroup;
     this.group.add(leftLegGroup);
 
     const rightLegGroup = new THREE.Group();
@@ -162,24 +217,23 @@ class BankNPC {
     rightLegGroup.add(shoeRight);
 
     rightLegGroup.position.set(0.25, 0.8, 0);
+    this.rightLeg = rightLegGroup;
     this.group.add(rightLegGroup);
 
-    // 4. ARMS & BADMINTON RACKET
+    // 4. ARMS
     const armGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.75, 16);
-    const leftArm = new THREE.Mesh(armGeo, tshirtMaterial);
-    leftArm.position.set(-0.55, 0.95, 0);
-    this.group.add(leftArm);
+    const leftArmGroup = new THREE.Group();
+    const leftArmMesh = new THREE.Mesh(armGeo, tshirtMaterial);
+    leftArmMesh.position.y = -0.35;
+    leftArmGroup.add(leftArmMesh);
+    leftArmGroup.position.set(-0.55, 1.3, 0);
+    this.leftArm = leftArmGroup;
+    this.group.add(leftArmGroup);
 
     const rightArmGroup = new THREE.Group();
     const rightArmMesh = new THREE.Mesh(armGeo, tshirtMaterial);
     rightArmMesh.position.y = -0.35;
     rightArmGroup.add(rightArmMesh);
-
-    const racket = this.createRacket();
-    racket.position.set(0, -0.7, 0.3);
-    racket.rotation.x = Math.PI / 4;
-    rightArmGroup.add(racket);
-
     rightArmGroup.position.set(0.55, 1.3, 0);
     this.rightArm = rightArmGroup;
     this.group.add(rightArmGroup);
@@ -189,12 +243,44 @@ class BankNPC {
     this.group.add(this.nametag);
   }
 
+  walkToPlayer(targetPos, onArrive) {
+    this.walkTarget = targetPos;
+    this.onArriveCallback = onArrive;
+    this.isWalking = true;
+    this.attachBirthdayCake();
+  }
+
   update(time) {
-    if (this.rightArm) {
-      this.rightArm.rotation.z = Math.sin(time * 0.004) * 0.2 - 0.3;
-    }
-    if (this.nametag) {
-      this.nametag.position.y = 3.2 + Math.sin(time * 0.003) * 0.08;
+    if (this.isWalking && this.walkTarget) {
+      const speed = 0.045;
+      const dirZ = this.walkTarget.z - this.position.z;
+      const dirX = this.walkTarget.x - this.position.x;
+      const dist = Math.hypot(dirX, dirZ);
+
+      if (dist > 1.2) {
+        this.position.z += (dirZ / dist) * speed;
+        this.position.x += (dirX / dist) * speed;
+        this.group.position.copy(this.position);
+
+        this.walkCycle += 0.12;
+        const swing = Math.sin(this.walkCycle) * 0.4;
+        if (this.leftLeg) this.leftLeg.rotation.x = swing;
+        if (this.rightLeg) this.rightLeg.rotation.x = -swing;
+      } else {
+        this.isWalking = false;
+        if (this.leftLeg) this.leftLeg.rotation.x = 0;
+        if (this.rightLeg) this.rightLeg.rotation.x = 0;
+
+        if (this.onArriveCallback) {
+          const cb = this.onArriveCallback;
+          this.onArriveCallback = null;
+          cb();
+        }
+      }
+    } else {
+      if (this.nametag) {
+        this.nametag.position.y = 3.2 + Math.sin(time * 0.003) * 0.08;
+      }
     }
   }
 }

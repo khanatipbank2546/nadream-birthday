@@ -13,8 +13,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet with Cache-Buster v=110.0 -->
-  <link rel="stylesheet" href="css/styles.css?v=110.0">
+  <!-- Custom Stylesheet with Cache-Buster v=111.0 -->
+  <link rel="stylesheet" href="css/styles.css?v=111.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -195,13 +195,28 @@
     </div>
   </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=110.0 -->
-  <script src="js/audio.js?v=110.0"></script>
-  <script src="js/character.js?v=110.0"></script>
-  <script src="js/npc_bank.js?v=110.0"></script>
-  <script src="js/court_world.js?v=110.0"></script>
-  <script src="js/quests.js?v=110.0"></script>
-  <script src="js/controls.js?v=110.0"></script>
-  <script src="js/main.js?v=110.0"></script>
+  <!-- Mini-Games Mission Modal (State 1 to State 5 & FIFA Cards) -->
+  <div id="minigame-modal" class="modal-backdrop hidden">
+    <div class="minigame-card">
+      <div class="minigame-header">
+        <div>
+          <div id="minigame-title" class="minigame-title">🧩 ภารกิจประจำด่าน</div>
+          <div id="minigame-subtitle" class="minigame-subtitle">ทำภารกิจให้สำเร็จเพื่อเปิดประตูถัดไป!</div>
+        </div>
+        <button id="minigame-giveup-btn" class="btn-giveup">🏳️ ยอมแพ้ (ข้ามผ่านภารกิจ)</button>
+      </div>
+      <div id="minigame-container" class="minigame-container"></div>
+    </div>
+  </div>
+
+  <!-- Standard Order Scripts with Cache-Buster v=111.0 -->
+  <script src="js/audio.js?v=111.0"></script>
+  <script src="js/character.js?v=111.0"></script>
+  <script src="js/npc_bank.js?v=111.0"></script>
+  <script src="js/court_world.js?v=111.0"></script>
+  <script src="js/minigames.js?v=111.0"></script>
+  <script src="js/quests.js?v=111.0"></script>
+  <script src="js/controls.js?v=111.0"></script>
+  <script src="js/main.js?v=111.0"></script>
 </body>
 </html>

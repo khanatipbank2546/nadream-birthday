@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Automatic Advancement, Pad #2 Reveal & Arrow Rotation
+   Quest Manager - State 1-5 Mini-Games Trigger & Grand Birthday Finale
    ========================================================================== */
 
 class QuestManager {
@@ -16,6 +16,9 @@ class QuestManager {
     this.activeTargetPos = new THREE.Vector3(0, 0, 0);
     this.isNearTarget = false;
     this.isProcessingCutscene = false;
+
+    // Store all 10 rated photos with scores and rating order
+    this.ratedPhotos = [];
 
     this.initHUD();
     this.startRoomQuest(1);
@@ -71,11 +74,30 @@ class QuestManager {
       } else if (this.roomSubState === 'ART_2') {
         if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปภาพ #2`;
       } else if (this.roomSubState === 'GIFT_BOX') {
-        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint กล่องของขวัญกลางห้องเพื่อปลดล็อคประตู!`;
+        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint กล่องของขวัญกลางห้องเพื่อทำภารกิจด่าน!`;
       }
     } else {
-      if (this.questTitleEl) this.questTitleEl.innerText = `👑 เดินเข้าสู่ห้องโถงแชมเปียน เพื่อพูดคุยกับ Bank!`;
+      if (this.questTitleEl) this.questTitleEl.innerText = `👑 ร่วมฉลองวันเกิด Happy Birthday กับ Bank! 🎂🎉`;
       this.activeTargetPos.set(0, 0, -152);
+    }
+  }
+
+  recordPhotoRating(artFrame, score) {
+    if (!artFrame || !artFrame.userData) return;
+    const finalScore = score || 5;
+
+    // Check if already recorded
+    const existing = this.ratedPhotos.find(p => p.artIndex === artFrame.userData.artIndex);
+    if (existing) {
+      existing.score = finalScore;
+    } else {
+      this.ratedPhotos.push({
+        artIndex: artFrame.userData.artIndex,
+        cleanTitle: artFrame.userData.cleanTitle,
+        imagePath: artFrame.userData.imagePath,
+        score: finalScore,
+        orderIndex: this.ratedPhotos.length + 1
+      });
     }
   }
 
@@ -91,8 +113,6 @@ class QuestManager {
           const dist = Math.hypot(playerPos.x - pad.userData.xPos, playerPos.z - pad.userData.zPos);
           
           if (dist < 2.5) {
-            // AUTOMATIC TRIGGER UPON STEPPING ON THE CHECKPOINT PAD!
-            // INSTANTLY HIDE THE CHECKPOINT PAD!
             pad.visible = false;
             this.hideActionPrompt();
             this.isProcessingCutscene = true;
@@ -100,20 +120,20 @@ class QuestManager {
             const artFrame = this.courtWorld.artFrames[artIdx];
             if (artFrame && window.game) {
               window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
-                // AT 6 SECONDS: AUTOMATICALLY ATTACH 3D GOLD STARS & ADVANCE QUEST STATE!
                 if (artFrame.userData.addStarBadge) {
                   artFrame.userData.addStarBadge(5);
                 }
+                this.recordPhotoRating(artFrame, 5);
 
                 this.isProcessingCutscene = false;
                 this.advanceRoomSubState();
 
-                // Open Rating Modal for optional star adjustment
                 if (window.showStarRatingModal) {
                   window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
                     if (artFrame.userData.addStarBadge) {
                       artFrame.userData.addStarBadge(ratedScore || 5);
                     }
+                    this.recordPhotoRating(artFrame, ratedScore || 5);
                   });
                 }
               });
@@ -138,20 +158,38 @@ class QuestManager {
 
             if (window.game) {
               window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
-                this.courtWorld.unlockBarrier(this.currentRoom);
-                if (window.soundEngine) window.soundEngine.playQuestComplete();
+                // GIFT BOX CUTSCENE FINISHED -> START MINI-GAME MISSION!
+                if (window.miniGameEngine) {
+                  window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
+                    if (this.currentRoom <= 4) {
+                      this.courtWorld.unlockBarrier(this.currentRoom);
+                      if (window.soundEngine) window.soundEngine.playQuestComplete();
 
-                this.currentQuestIndex++;
-                this.currentRoom++;
+                      this.currentQuestIndex++;
+                      this.currentRoom++;
+                      this.startRoomQuest(this.currentRoom);
+                      this.isProcessingCutscene = false;
 
-                if (this.currentRoom <= 5) {
-                  this.startRoomQuest(this.currentRoom);
+                    } else if (this.currentRoom === 5) {
+                      // ROOM 5 FINISHED -> GRAND BIRTHDAY FINALE WITH BANK NPC!
+                      this.currentQuestIndex = 5;
+                      this.currentRoom = 6;
+                      this.roomSubState = 'COMPLETE';
+                      this.updateTrackerText();
+
+                      if (window.game && window.game.startGrandBirthdayFinale) {
+                        window.game.startGrandBirthdayFinale();
+                      }
+                      this.isProcessingCutscene = false;
+                    }
+                  });
                 } else {
-                  this.roomSubState = 'COMPLETE';
-                  this.updateTrackerText();
+                  this.courtWorld.unlockBarrier(this.currentRoom);
+                  this.currentQuestIndex++;
+                  this.currentRoom++;
+                  if (this.currentRoom <= 5) this.startRoomQuest(this.currentRoom);
+                  this.isProcessingCutscene = false;
                 }
-
-                this.isProcessingCutscene = false;
               });
             }
             return;
@@ -206,6 +244,8 @@ class QuestManager {
             if (artFrame.userData.addStarBadge) {
               artFrame.userData.addStarBadge(5);
             }
+            this.recordPhotoRating(artFrame, 5);
+
             this.isProcessingCutscene = false;
             this.advanceRoomSubState();
 
@@ -214,6 +254,7 @@ class QuestManager {
                 if (artFrame.userData.addStarBadge) {
                   artFrame.userData.addStarBadge(ratedScore || 5);
                 }
+                this.recordPhotoRating(artFrame, ratedScore || 5);
               });
             }
           });
@@ -227,20 +268,30 @@ class QuestManager {
 
         if (window.game) {
           window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
-            this.courtWorld.unlockBarrier(this.currentRoom);
-            if (window.soundEngine) window.soundEngine.playQuestComplete();
+            if (window.miniGameEngine) {
+              window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
+                if (this.currentRoom <= 4) {
+                  this.courtWorld.unlockBarrier(this.currentRoom);
+                  if (window.soundEngine) window.soundEngine.playQuestComplete();
 
-            this.currentQuestIndex++;
-            this.currentRoom++;
+                  this.currentQuestIndex++;
+                  this.currentRoom++;
+                  this.startRoomQuest(this.currentRoom);
+                  this.isProcessingCutscene = false;
 
-            if (this.currentRoom <= 5) {
-              this.startRoomQuest(this.currentRoom);
-            } else {
-              this.roomSubState = 'COMPLETE';
-              this.updateTrackerText();
+                } else if (this.currentRoom === 5) {
+                  this.currentQuestIndex = 5;
+                  this.currentRoom = 6;
+                  this.roomSubState = 'COMPLETE';
+                  this.updateTrackerText();
+
+                  if (window.game && window.game.startGrandBirthdayFinale) {
+                    window.game.startGrandBirthdayFinale();
+                  }
+                  this.isProcessingCutscene = false;
+                }
+              });
             }
-
-            this.isProcessingCutscene = false;
           });
         }
       }
@@ -253,7 +304,6 @@ class QuestManager {
     if (this.roomSubState === 'ART_1') {
       this.roomSubState = 'ART_2';
 
-      // Hide Pad #1 (Left Wall), Show Pad #2 (Right Wall)
       const pad1Index = (this.currentRoom - 1) * 2;
       const pad2Index = pad1Index + 1;
 
@@ -264,7 +314,6 @@ class QuestManager {
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = true;
         const p = this.courtWorld.checkpointPads[pad2Index].userData;
-        // DIRECTLY UPDATE TARGET POS SO ARROW IMMEDIATELY POINTS TO PAD #2 ON RIGHT WALL!
         this.activeTargetPos.set(p.xPos, 0, p.zPos);
       }
 
@@ -273,17 +322,14 @@ class QuestManager {
     } else if (this.roomSubState === 'ART_2') {
       this.roomSubState = 'GIFT_BOX';
 
-      // Hide Pad #2 (Right Wall)
       const pad2Index = (this.currentRoom - 1) * 2 + 1;
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = false;
       }
 
-      // Reveal 3D Gift Box AND Gift Box Floor Standing Pad under it!
       this.courtWorld.showGiftBoxForRoom(this.currentRoom - 1);
       const box = this.courtWorld.questMarkers[this.currentRoom - 1];
       if (box) {
-        // DIRECTLY UPDATE TARGET POS SO ARROW IMMEDIATELY POINTS TO GIFT BOX IN ROOM CENTER!
         this.activeTargetPos.set(box.position.x, 0, box.position.z);
       }
 

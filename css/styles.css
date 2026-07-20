@@ -700,3 +700,429 @@ html, body {
   font-size: 0.92rem;
   cursor: pointer;
 }
+
+/* ==========================================================================
+   Mini-Games Mission Styles (State 1 - State 5)
+   ========================================================================== */
+
+.minigame-card {
+  width: 92%;
+  max-width: 780px;
+  background: linear-gradient(135deg, rgba(20, 24, 36, 0.96), rgba(10, 12, 20, 0.96));
+  border: 2px solid var(--primary-cyan);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 0 50px rgba(0, 245, 212, 0.4);
+  color: #ffffff;
+}
+
+.minigame-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 12px;
+}
+
+.minigame-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-gold);
+}
+
+.minigame-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.btn-giveup {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-family: var(--font-thai);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(230, 57, 70, 0.6);
+  transition: transform 0.2s;
+}
+
+.btn-giveup:hover {
+  transform: scale(1.05);
+}
+
+/* State 1: Jigsaw Puzzle */
+.jigsaw-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.jigsaw-sample-box {
+  width: 180px;
+  text-align: center;
+}
+
+.jigsaw-sample-img {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid var(--primary-gold);
+}
+
+.jigsaw-play-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.jigsaw-board {
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  border-radius: 14px;
+  border: 2px dashed var(--primary-cyan);
+}
+
+.jigsaw-slot {
+  width: 80px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.jigsaw-pieces-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 360px;
+  min-height: 80px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.jigsaw-piece {
+  width: 80px;
+  height: 60px;
+  background-size: 320px 180px;
+  border-radius: 6px;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.jigsaw-piece.selected {
+  border-color: var(--primary-gold);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--primary-gold);
+}
+
+/* State 2: Spot the Difference */
+.spot-diff-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spot-header-status {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-cyan);
+}
+
+.spot-counter {
+  color: var(--primary-gold);
+  font-size: 1.3rem;
+}
+
+.spot-img-container {
+  position: relative;
+  max-width: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid var(--primary-gold);
+}
+
+.spot-diff-img {
+  width: 100%;
+  display: block;
+}
+
+.spot-overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.spot-found-marker {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 3px solid #00f5d4;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px #00f5d4;
+  animation: pulseMarker 1s infinite alternate;
+}
+
+@keyframes pulseMarker {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.spot-miss-marker {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e63946;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: fadeOutMiss 0.6s forwards;
+}
+
+@keyframes fadeOutMiss {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+/* State 3: Card Matching Memory */
+.memory-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.memory-status-bar {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-cyan);
+}
+
+.memory-counter {
+  color: var(--primary-gold);
+  font-size: 1.3rem;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 90px);
+  gap: 12px;
+}
+
+.memory-card {
+  width: 90px;
+  height: 110px;
+  perspective: 600px;
+  cursor: pointer;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease;
+}
+
+.memory-card.flipped .card-inner, .memory-card.matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #3a86ff, #8338ec);
+  border: 2px solid var(--primary-gold);
+  font-size: 2.2rem;
+}
+
+.card-back {
+  background-size: cover;
+  background-position: center;
+  border: 3px solid var(--primary-cyan);
+  transform: rotateY(180deg);
+}
+
+.memory-card.matched .card-back {
+  border-color: var(--primary-gold);
+  box-shadow: 0 0 20px var(--primary-gold);
+}
+
+/* State 4: Sliding Tile Puzzle */
+.sliding-wrapper {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.sliding-sample-box {
+  width: 180px;
+  text-align: center;
+}
+
+.sliding-sample-img {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid var(--primary-gold);
+}
+
+.sliding-board {
+  display: grid;
+  grid-template-columns: repeat(3, 90px);
+  grid-template-rows: repeat(3, 90px);
+  gap: 4px;
+  background: #000;
+  padding: 6px;
+  border-radius: 14px;
+  border: 3px solid var(--primary-gold);
+}
+
+.sliding-tile {
+  width: 90px;
+  height: 90px;
+  background-size: 270px 270px;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.sliding-tile.empty {
+  background: #111 !important;
+  border: 1px dashed #444;
+  cursor: default;
+}
+
+/* State 5: FIFA Ultimate Team Card Presentation */
+.fifa-reveal-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.fifa-gold-card {
+  width: 260px;
+  height: 380px;
+  background: linear-gradient(135deg, #ffd700, #ff8c00, #b37d00);
+  border-radius: 24px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border: 4px solid #ffffff;
+}
+
+.fifa-gold-card.flip-in {
+  animation: fifaFlip 0.6s ease-out;
+}
+
+@keyframes fifaFlip {
+  0% { transform: scale(0.5) rotateY(90deg); opacity: 0; }
+  100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+
+.fifa-badge-rating {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  color: #000;
+  text-align: center;
+}
+
+.fifa-score {
+  font-family: var(--font-accent);
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fifa-pos {
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.fifa-photo-img {
+  width: 170px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 3px solid #000;
+  margin-top: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+.fifa-card-info {
+  text-align: center;
+  color: #000;
+  width: 100%;
+}
+
+.fifa-photo-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.fifa-stars-row {
+  font-size: 1.2rem;
+  margin: 2px 0;
+}
+
+.fifa-rank-tag {
+  font-size: 0.75rem;
+  font-weight: 800;
+  background: #000;
+  color: var(--primary-gold);
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.fifa-confirm-btn {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
+  color: #000;
+  border: none;
+  border-radius: 40px;
+  font-family: var(--font-thai);
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+  transition: transform 0.2s;
+}
+
+.fifa-confirm-btn:hover {
+  transform: scale(1.05);
+}
+

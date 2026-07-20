@@ -22,13 +22,15 @@ class MiniGameEngine {
     this.subtitleEl = document.getElementById('minigame-subtitle');
     this.containerEl = document.getElementById('minigame-container');
     this.giveUpBtn = document.getElementById('minigame-giveup-btn');
+    this.closeBtn = document.getElementById('minigame-close-btn');
 
-    if (this.giveUpBtn) {
-      this.giveUpBtn.onclick = () => {
-        if (window.soundEngine) window.soundEngine.playClick();
-        this.finishMiniGame(true); // Passed via Give Up / Skip
-      };
-    }
+    const handleSkip = () => {
+      if (window.soundEngine) window.soundEngine.playClick();
+      this.finishMiniGame(true);
+    };
+
+    if (this.giveUpBtn) this.giveUpBtn.onclick = handleSkip;
+    if (this.closeBtn) this.closeBtn.onclick = handleSkip;
   }
 
   startMiniGame(roomNum, ratedPhotos, onComplete) {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Entry Point - 6-Second Photo Preview Cutscene & 3D Star Badges
+   Main Entry Point - Guaranteed Rating Modal & 6-Second Photo Preview
    ========================================================================== */
 
 class Game {
@@ -343,6 +343,8 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
     img.src = encodeURI(imagePath);
     title.innerText = cleanTitleText;
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '99999';
 
     let currentRating = 5;
 
@@ -390,6 +392,7 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
 
     const handleConfirm = () => {
       modal.classList.add('hidden');
+      modal.style.display = 'none';
       if (window.soundEngine) window.soundEngine.playQuestComplete();
       if (onConfirmCallback) onConfirmCallback(currentRating);
     };

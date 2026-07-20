@@ -146,24 +146,22 @@ class CharacterController {
     canvas.height = 128;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = 'rgba(15, 16, 22, 0.9)';
-    ctx.fillRect(16, 16, 480, 96);
+    // 100% Transparent Background (No black box, No gold border)
+    ctx.clearRect(0, 0, 512, 128);
 
-    ctx.strokeStyle = '#ffd700';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(16, 16, 480, 96);
-
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 12;
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 42px Arial, Prompt';
+    ctx.font = 'bold 48px Prompt, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('👑 NaDream 👑', 256, 64);
+    ctx.fillText('NaDream', 256, 64);
 
     const texture = new THREE.CanvasTexture(canvas);
     const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(3.0, 0.75, 1);
-    sprite.position.set(0, 3.1, 0);
+    sprite.scale.set(2.8, 0.7, 1);
+    sprite.position.set(0, 2.9, 0);
     return sprite;
   }
 

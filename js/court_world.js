@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - 10 Exact Thai Photo File Mappings & 3D Stars
+   3D Indoor Badminton Complex - Exact Thai Photo Titles & 3D Gold Stars
    ========================================================================== */
 
 class CourtWorld {
@@ -165,31 +165,31 @@ class CourtWorld {
   }
 
   initArtGalleryPhotos() {
-    // 10 Exact Thai Photo Filenames from User Screenshot
-    const photoFiles = [
-      'pic/เจ๊สมคิด.jpg',
-      'pic/แช้มแรกป่ะ.jpg',
-      'pic/ณเดช.jpg',
-      'pic/เด็กใหม่.jpg',
-      'pic/นิ้วเกิน.jpg',
-      'pic/พี่หล่อไหมน้อง.jpg',
-      'pic/แพ้ทุกเกมครับ555.jpg',
-      'pic/ยิ้มกระชากกระเป๋า.jpg',
-      'pic/เล-กง เล-โก้.jpg',
-      'pic/เสื้อเทพ.jpg'
+    // 10 Exact Thai Photo Filenames & Explicit Plaque Titles
+    const photoItems = [
+      { path: 'pic/เจ๊สมคิด.jpg', title: 'เจ๊สมคิด' },
+      { path: 'pic/แช้มแรกป่ะ.jpg', title: 'แช้มแรกป่ะ' },
+      { path: 'pic/ณเดช.jpg', title: 'ณเดช' },
+      { path: 'pic/เด็กใหม่.jpg', title: 'เด็กใหม่' },
+      { path: 'pic/นิ้วเกิน.jpg', title: 'นิ้วเกิน' },
+      { path: 'pic/พี่หล่อไหมน้อง.jpg', title: 'พี่หล่อไหมน้อง' },
+      { path: 'pic/แพ้ทุกเกมครับ555.jpg', title: 'แพ้ทุกเกมครับ555' },
+      { path: 'pic/ยิ้มกระชากกระเป๋า.jpg', title: 'ยิ้มกระชากกระเป๋า' },
+      { path: 'pic/เล-กง เล-โก้.jpg', title: 'เล-กง เล-โก้' },
+      { path: 'pic/เสื้อเทพ.jpg', title: 'เสื้อเทพ' }
     ];
 
     const roomDepth = 28;
 
     for (let r = 0; r < 5; r++) {
       const roomCenterZ = -r * roomDepth - roomDepth / 2;
-      const leftPicPath = photoFiles[r * 2];
-      const rightPicPath = photoFiles[r * 2 + 1];
+      const leftItem = photoItems[r * 2];
+      const rightItem = photoItems[r * 2 + 1];
 
-      const leftFrame = this.createWallArtFrame(-18.45, 4.5, roomCenterZ, Math.PI / 2, leftPicPath, r * 2 + 1);
+      const leftFrame = this.createWallArtFrame(-18.45, 4.5, roomCenterZ, Math.PI / 2, leftItem.path, leftItem.title, r * 2 + 1);
       this.artFrames.push(leftFrame);
 
-      const rightFrame = this.createWallArtFrame(18.45, 4.5, roomCenterZ, -Math.PI / 2, rightPicPath, r * 2 + 2);
+      const rightFrame = this.createWallArtFrame(18.45, 4.5, roomCenterZ, -Math.PI / 2, rightItem.path, rightItem.title, r * 2 + 2);
       this.artFrames.push(rightFrame);
     }
   }
@@ -198,8 +198,8 @@ class CourtWorld {
   create3DStarMesh() {
     const shape = new THREE.Shape();
     const points = 5;
-    const outerRadius = 0.28;
-    const innerRadius = 0.11;
+    const outerRadius = 0.32;
+    const innerRadius = 0.13;
 
     for (let i = 0; i < points * 2; i++) {
       const r = (i % 2 === 0) ? outerRadius : innerRadius;
@@ -211,24 +211,21 @@ class CourtWorld {
     }
     shape.closePath();
 
-    const extrudeSettings = { depth: 0.08, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
+    const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.04, bevelThickness: 0.04 };
     const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const mat = new THREE.MeshStandardMaterial({ 
       color: 0xffd700, 
       metalness: 0.95, 
       roughness: 0.1, 
       emissive: 0xffd700, 
-      emissiveIntensity: 0.8 
+      emissiveIntensity: 0.9 
     });
     return new THREE.Mesh(geo, mat);
   }
 
-  createWallArtFrame(xPos, yPos, zPos, rotationY, imagePath, artIndex) {
+  createWallArtFrame(xPos, yPos, zPos, rotationY, imagePath, displayTitle, artIndex) {
     const artGroup = new THREE.Group();
-
-    // Exact raw filename without extension (e.g. "เจ๊สมคิด", "แช้มแรกป่ะ", "ณเดช")
-    const fileNameFull = imagePath.split('/').pop();
-    const cleanTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
+    const cleanTitle = displayTitle;
 
     const frameGeo = new THREE.BoxGeometry(3.1, 4.0, 0.12);
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
@@ -249,8 +246,8 @@ class CourtWorld {
       artGroup.add(picMesh);
     });
 
-    // Plaque Mesh
-    const plaqueGeo = new THREE.BoxGeometry(2.6, 0.5, 0.08);
+    // Plaque Mesh displaying exact Thai Title (e.g. "เจ๊สมคิด", "แช้มแรกป่ะ")
+    const plaqueGeo = new THREE.BoxGeometry(2.8, 0.52, 0.08);
     let plaqueMesh = null;
     let plaqueTex = null;
 
@@ -263,12 +260,12 @@ class CourtWorld {
       pCtx.fillStyle = '#0f172a';
       pCtx.fillRect(0, 0, 512, 96);
       pCtx.strokeStyle = '#ffd700';
-      pCtx.lineWidth = 4;
+      pCtx.lineWidth = 5;
       pCtx.strokeRect(4, 4, 504, 88);
 
       const titleText = starsScore > 0 ? `${cleanTitle} (${'★'.repeat(starsScore)})` : cleanTitle;
       pCtx.fillStyle = '#ffffff';
-      pCtx.font = 'bold 26px Prompt, Arial';
+      pCtx.font = 'bold 30px Prompt, Arial';
       pCtx.textAlign = 'center';
       pCtx.textBaseline = 'middle';
       pCtx.fillText(titleText, 256, 48);
@@ -310,13 +307,13 @@ class CourtWorld {
         starBadgeGroup = new THREE.Group();
 
         const count = Math.max(1, Math.min(5, score));
-        const spacing = 0.58;
+        const spacing = 0.62;
         const startX = -((count - 1) * spacing) / 2;
 
         for (let i = 0; i < count; i++) {
           const starMesh = this.create3DStarMesh();
-          starMesh.position.set(startX + i * spacing, 2.28, 0.12);
-          starMesh.position.y += Math.sin((i / (count - 1 || 1)) * Math.PI) * 0.16;
+          starMesh.position.set(startX + i * spacing, 2.35, 0.14);
+          starMesh.position.y += Math.sin((i / (count - 1 || 1)) * Math.PI) * 0.18;
           starBadgeGroup.add(starMesh);
         }
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Automatic Step Trigger & Instant Checkpoint Pad Hiding
+   Quest Manager - Instant Pad #2 Activation & Arrow Direction Update
    ========================================================================== */
 
 class QuestManager {
@@ -92,7 +92,6 @@ class QuestManager {
           
           if (dist < 2.5) {
             // AUTOMATIC TRIGGER UPON STEPPING ON THE CHECKPOINT PAD!
-            // INSTANTLY HIDE THE CHECKPOINT PAD!
             pad.visible = false;
             this.hideActionPrompt();
             this.isProcessingCutscene = true;
@@ -108,6 +107,10 @@ class QuestManager {
                     this.isProcessingCutscene = false;
                     this.advanceRoomSubState();
                   });
+                } else {
+                  if (artFrame.userData.addStarBadge) artFrame.userData.addStarBadge(5);
+                  this.isProcessingCutscene = false;
+                  this.advanceRoomSubState();
                 }
               });
             }
@@ -125,8 +128,6 @@ class QuestManager {
           const dist = Math.hypot(playerPos.x - boxPad.userData.xPos, playerPos.z - boxPad.userData.zPos);
           
           if (dist < 2.5) {
-            // AUTOMATIC TRIGGER UPON STEPPING ON THE GIFT BOX PAD!
-            // INSTANTLY HIDE THE GIFT BOX PAD!
             boxPad.visible = false;
             this.hideActionPrompt();
             this.isProcessingCutscene = true;
@@ -158,7 +159,6 @@ class QuestManager {
         }
       }
     } else {
-      // Near Bank NPC in Grand Hall
       const dist = Math.hypot(playerPos.x - 0, playerPos.z - (-152));
       if (dist < 3.5) {
         this.showActionPrompt(`🏸 พูดคุยกับ Bank (Happy Birthday!)`);
@@ -185,7 +185,6 @@ class QuestManager {
   }
 
   handleActionClick() {
-    // Optional click handler if player clicks prompt before stepping on pad
     if (this.isProcessingCutscene) return;
 
     if (this.currentRoom <= 5) {
@@ -208,6 +207,10 @@ class QuestManager {
                 this.isProcessingCutscene = false;
                 this.advanceRoomSubState();
               });
+            } else {
+              if (artFrame.userData.addStarBadge) artFrame.userData.addStarBadge(5);
+              this.isProcessingCutscene = false;
+              this.advanceRoomSubState();
             }
           });
         }
@@ -246,16 +249,18 @@ class QuestManager {
     if (this.roomSubState === 'ART_1') {
       this.roomSubState = 'ART_2';
 
-      // Ensure Pad #1 is hidden and Pad #2 (Right Wall) is shown
+      // Hide Pad #1 (Left Wall), Show Pad #2 (Right Wall)
       const pad1Index = (this.currentRoom - 1) * 2;
       const pad2Index = pad1Index + 1;
 
       if (this.courtWorld.checkpointPads[pad1Index]) {
         this.courtWorld.checkpointPads[pad1Index].visible = false;
       }
+
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = true;
         const p = this.courtWorld.checkpointPads[pad2Index].userData;
+        // DIRECTLY UPDATE TARGET POS SO ARROW IMMEDIATELY POINTS TO PAD #2 ON RIGHT WALL!
         this.activeTargetPos.set(p.xPos, 0, p.zPos);
       }
 
@@ -264,7 +269,7 @@ class QuestManager {
     } else if (this.roomSubState === 'ART_2') {
       this.roomSubState = 'GIFT_BOX';
 
-      // Ensure Pad #2 is hidden
+      // Hide Pad #2 (Right Wall)
       const pad2Index = (this.currentRoom - 1) * 2 + 1;
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = false;
@@ -274,6 +279,7 @@ class QuestManager {
       this.courtWorld.showGiftBoxForRoom(this.currentRoom - 1);
       const box = this.courtWorld.questMarkers[this.currentRoom - 1];
       if (box) {
+        // DIRECTLY UPDATE TARGET POS SO ARROW IMMEDIATELY POINTS TO GIFT BOX IN ROOM CENTER!
         this.activeTargetPos.set(box.position.x, 0, box.position.z);
       }
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Mini-Games Engine - Non-blocking Toast Banners & Guaranteed Cutscene Callbacks
+   Mini-Games Engine - Instant 0ms Completion (No Popups / No Banners)
    ========================================================================== */
 
 class MiniGameEngine {
@@ -56,23 +56,6 @@ class MiniGameEngine {
       this.initSlidingPuzzleState4();
     } else if (roomNum === 5) {
       this.initFIFACardRevealState5();
-    }
-  }
-
-  showSuccessBanner(msg, callback) {
-    if (this.containerEl) {
-      const banner = document.createElement('div');
-      banner.className = 'minigame-success-banner';
-      banner.innerHTML = `<h3>${msg}</h3>`;
-      this.containerEl.appendChild(banner);
-
-      if (window.soundEngine) window.soundEngine.playQuestComplete();
-
-      setTimeout(() => {
-        if (callback) callback();
-      }, 900);
-    } else {
-      if (callback) callback();
     }
   }
 
@@ -192,9 +175,8 @@ class MiniGameEngine {
     }
 
     if (isComplete) {
-      this.showSuccessBanner("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จเรียบร้อย!", () => {
-        this.finishMiniGame(false);
-      });
+      // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
+      this.finishMiniGame(false);
     }
   }
 
@@ -260,9 +242,8 @@ class MiniGameEngine {
             if (window.soundEngine) window.soundEngine.playClick();
 
             if (foundCount >= 5) {
-              this.showSuccessBanner("🎉 เก่งมากๆ! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!", () => {
-                this.finishMiniGame(false);
-              });
+              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
+              this.finishMiniGame(false);
             }
           }
         }
@@ -353,9 +334,8 @@ class MiniGameEngine {
             lockBoard = false;
 
             if (matchedPairs >= 6) {
-              this.showSuccessBanner("🎉 สุดยอด! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!", () => {
-                this.finishMiniGame(false);
-              });
+              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
+              this.finishMiniGame(false);
             }
           } else {
             setTimeout(() => {
@@ -458,9 +438,8 @@ class MiniGameEngine {
             }
 
             if (isSolved) {
-              this.showSuccessBanner("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!", () => {
-                this.finishMiniGame(false);
-              });
+              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
+              this.finishMiniGame(false);
             }
           }
         };

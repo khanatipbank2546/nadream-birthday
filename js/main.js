@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Application Entry Point - 3D Badminton RPG & Cutscene Engine
+   Main Application Entry Point - Mobile WebGL & Cutscene Engine (Global Window)
    ========================================================================== */
 
 class Game {
@@ -7,8 +7,8 @@ class Game {
     this.canvas = document.getElementById('webgl-canvas');
     this.clock = new THREE.Clock();
 
-    this.isGameStarted = false; // Pre-game 360 showcase state
-    this.isCutsceneActive = false; // Secret door cutscene state
+    this.isGameStarted = false;
+    this.isCutsceneActive = false;
     this.cutsceneTimer = 0;
     this.cutsceneDoorZ = 0;
 
@@ -22,7 +22,7 @@ class Game {
 
   initScene() {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x1a202c); // Cozy Indoor Stadium Atmosphere
+    this.scene.background = new THREE.Color(0x1a202c);
 
     this.camera = new THREE.PerspectiveCamera(
       55,
@@ -31,11 +31,19 @@ class Game {
       200
     );
 
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas,
-      antialias: true,
-      powerPreference: 'high-performance'
-    });
+    // Mobile WebGL Compatible Renderer settings
+    try {
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: this.canvas,
+        antialias: true,
+        powerPreference: 'default',
+        precision: 'mediump',
+        failIfMajorPerformanceCaveat: false
+      });
+    } catch (e) {
+      this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas });
+    }
+
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
@@ -83,7 +91,7 @@ class Game {
         clearInterval(interval);
         if (startBtn) startBtn.classList.remove('hidden');
 
-        startBtn.onclick = () => {
+        const launchGame = () => {
           if (window.soundEngine) {
             window.soundEngine.startBGM();
             window.soundEngine.playClick();
@@ -91,11 +99,13 @@ class Game {
           loadingScreen.classList.add('fade-out');
           this.isGameStarted = true;
         };
+
+        startBtn.onclick = launchGame;
+        loadingScreen.onclick = launchGame;
       }
-    }, 80);
+    }, 60);
   }
 
-  // Trigger 2.5-second Secret Door & Light Beams Cutscene
   startDoorCutscene(roomNumber) {
     const doorZPositions = [-28, -56, -84, -112, -140];
     this.cutsceneDoorZ = doorZPositions[roomNumber - 1];
@@ -110,21 +120,18 @@ class Game {
     const elapsedTime = this.clock.getElapsedTime();
 
     if (!this.isGameStarted) {
-      // Pre-Game 360° Showcase Mode
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
       this.character.group.rotation.y += 0.005;
 
     } else if (this.isCutsceneActive) {
-      // Secret Door Cutscene Mode
       this.cutsceneTimer += delta;
       this.controls.updateCutsceneCamera(this.cutsceneDoorZ, this.cutsceneTimer / 2.5);
 
       if (this.cutsceneTimer >= 2.5) {
-        this.isCutsceneActive = false; // Return control to player!
+        this.isCutsceneActive = false;
       }
 
     } else {
-      // Gameplay Mode: Camera-Relative Movement
       const activeBarrierZ = this.courtWorld.getActiveBarrierZ();
       this.character.update(
         delta, 

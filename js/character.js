@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Character Controller - Camera-Relative Movement & Natural Pace (Global Window)
+   3D Character Controller - FIXED Movement Direction Math (Global Window)
    ========================================================================== */
 
 class CharacterController {
@@ -235,7 +235,7 @@ class CharacterController {
     }
   }
 
-  // Camera-Relative Movement Update
+  // Camera-Relative Movement Update (FIXED Forward Vector Math!)
   update(delta, keysPressed, joystickVector, cameraAngleY = 0, activeBarrierZ = -1000) {
     let inputX = 0;
     let inputZ = 0;
@@ -266,13 +266,13 @@ class CharacterController {
       }
     }
 
-    // 2. Camera-Relative Vector Math
+    // 2. FIXED Camera-Relative Movement Vector Math
     if (inputX !== 0 || inputZ !== 0) {
       this.isMoving = true;
 
-      // Forward and Right vectors in World Space based on camera angle Y
-      const fwdX = -Math.sin(cameraAngleY);
-      const fwdZ = -Math.cos(cameraAngleY);
+      // Correct forward and right vectors relative to camera Y angle
+      const fwdX = Math.sin(cameraAngleY);
+      const fwdZ = Math.cos(cameraAngleY);
       const rightX = Math.cos(cameraAngleY);
       const rightZ = -Math.sin(cameraAngleY);
 
@@ -294,7 +294,7 @@ class CharacterController {
       const nextX = this.position.x + moveDirX * this.speed;
       const nextZ = this.position.z + moveDirZ * this.speed;
 
-      // Spacious Room Bounds Checking (X between -17.5m and +17.5m)
+      // Room Bounds Checking
       if (nextX >= -17.5 && nextX <= 17.5) {
         this.position.x = nextX;
       }

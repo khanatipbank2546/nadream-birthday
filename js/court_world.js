@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Photo Gallery Wall & Crisp Lighting
+   3D Indoor Badminton Complex - Grand 3D Gift Box & Photo Gallery
    ========================================================================== */
 
 class CourtWorld {
@@ -7,57 +7,70 @@ class CourtWorld {
     this.scene = scene;
     this.doors = [];
     this.questMarkers = [];
+    this.checkpointPads = [];
+    this.artFrames = [];
     this.photoGalleryWallGroup = null;
+    this.activePathArrow = null;
 
     this.sharedCourtTexture = this.createSharedCourtTexture();
+    this.textureLoader = new THREE.TextureLoader();
 
-    this.initLighting();
-    this.initBadmintonComplex();
-    this.initPhotoGalleryWall();
-    this.initSecretDoorBarriers();
-    this.initQuestMarkers();
+    try {
+      this.initLighting();
+      this.initBadmintonComplex();
+      this.initPhotoGalleryWall();
+      this.initArtGalleryPhotos();
+      this.initSecretDoorBarriers();
+      this.initGiftBoxQuestMarkers();
+      this.initCheckpointPadsAndArrows();
+    } catch (err) {
+      console.error("CourtWorld Init Error handled gracefully:", err);
+    }
   }
 
   createSharedCourtTexture() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 2048;
-    const ctx = canvas.getContext('2d');
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 2048;
+      const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#0b8457';
-    ctx.fillRect(0, 0, 1024, 2048);
+      ctx.fillStyle = '#0b8457';
+      ctx.fillRect(0, 0, 1024, 2048);
 
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 20;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 20;
 
-    ctx.strokeRect(24, 24, 976, 2000);
-    ctx.strokeRect(72, 24, 880, 2000);
+      ctx.strokeRect(24, 24, 976, 2000);
+      ctx.strokeRect(72, 24, 880, 2000);
 
-    ctx.beginPath();
-    ctx.moveTo(24, 1024);
-    ctx.lineTo(1000, 1024);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(24, 1024);
+      ctx.lineTo(1000, 1024);
+      ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(24, 728);
-    ctx.lineTo(1000, 728);
-    ctx.moveTo(24, 1320);
-    ctx.lineTo(1000, 1320);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(24, 728);
+      ctx.lineTo(1000, 728);
+      ctx.moveTo(24, 1320);
+      ctx.lineTo(1000, 1320);
+      ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(512, 24);
-    ctx.lineTo(512, 728);
-    ctx.moveTo(512, 1320);
-    ctx.lineTo(512, 2024);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(512, 24);
+      ctx.lineTo(512, 728);
+      ctx.moveTo(512, 1320);
+      ctx.lineTo(512, 2024);
+      ctx.stroke();
 
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.anisotropy = 16;
-    return texture;
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.anisotropy = 16;
+      return texture;
+    } catch (e) {
+      return null;
+    }
   }
 
-  // Crisp Balanced Lighting (No white color washout or blooming!)
   initLighting() {
     const ambient = new THREE.AmbientLight(0x405068, 0.85);
     this.scene.add(ambient);
@@ -69,7 +82,6 @@ class CourtWorld {
     sunLight.shadow.mapSize.height = 2048;
     this.scene.add(sunLight);
 
-    // Warm Room 1 Showcase Light
     this.showcaseLight = new THREE.PointLight(0xfff0c2, 1.4, 30);
     this.showcaseLight.position.set(0, 7, -12);
     this.scene.add(this.showcaseLight);
@@ -77,7 +89,6 @@ class CourtWorld {
     this.scene.fog = new THREE.FogExp2(0x1a202c, 0.005);
   }
 
-  // Feature Wall behind NaDream inside Room 1 (Z = -20 facing +Z)
   initPhotoGalleryWall() {
     this.photoGalleryWallGroup = new THREE.Group();
     const wallZ = -20.0;
@@ -110,15 +121,15 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
-    const photos = [
-      { x: 0, y: 5.6, w: 5.8, h: 3.0, title: '👑 NaDream Birthday 🎂', color: '#ffd700' },
-      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, title: '🏸 Badminton Queen', color: '#00f5d4' },
-      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, title: '✨ July 20th 2569', color: '#ff6b9b' },
-      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, title: '🏸 Quest with Bank', color: '#9d4edd' },
-      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, title: '🎉 Happy Birthday!', color: '#ff8c00' }
+    const bgPhotos = [
+      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/พี่หล่อไหมน้อง.jfif' },
+      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เจ๊สมคิด.jfif' },
+      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เด็กใหม่.jfif' },
+      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/เสื้อเทพ.jfif' },
+      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/แพ้ครับ555.jfif' }
     ];
 
-    photos.forEach(p => {
+    bgPhotos.forEach(p => {
       const pGroup = new THREE.Group();
       
       const frameGeo = new THREE.BoxGeometry(p.w + 0.2, p.h + 0.2, 0.08);
@@ -126,37 +137,18 @@ class CourtWorld {
       const frameMesh = new THREE.Mesh(frameGeo, frameMat);
       pGroup.add(frameMesh);
 
-      const pCanvas = document.createElement('canvas');
-      pCanvas.width = 512;
-      pCanvas.height = 384;
-      const pCtx = pCanvas.getContext('2d');
-
-      pCtx.fillStyle = '#0f172a';
-      pCtx.fillRect(0, 0, 512, 384);
-
-      pCtx.fillStyle = '#ffffff';
-      pCtx.fillRect(16, 16, 480, 310);
-
-      const photoGrad = pCtx.createLinearGradient(0, 0, 512, 384);
-      photoGrad.addColorStop(0, p.color);
-      photoGrad.addColorStop(1, '#1e293b');
-      pCtx.fillStyle = photoGrad;
-      pCtx.fillRect(24, 24, 464, 250);
-
-      pCtx.fillStyle = '#ffffff';
-      pCtx.font = 'bold 44px Arial';
-      pCtx.textAlign = 'center';
-      pCtx.fillText('🏸', 256, 125);
-
-      pCtx.font = 'bold 28px Prompt, Arial';
-      pCtx.fillStyle = '#1e293b';
-      pCtx.fillText(p.title, 256, 300);
-
-      const pTex = new THREE.CanvasTexture(pCanvas);
-      const pMat = new THREE.MeshBasicMaterial({ map: pTex });
-      const pMesh = new THREE.Mesh(new THREE.PlaneGeometry(p.w, p.h), pMat);
-      pMesh.position.z = 0.05;
-      pGroup.add(pMesh);
+      const picGeo = new THREE.PlaneGeometry(p.w, p.h);
+      this.textureLoader.load(p.path, (tex) => {
+        const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+        const picMesh = new THREE.Mesh(picGeo, picMat);
+        picMesh.position.z = 0.05;
+        pGroup.add(picMesh);
+      }, undefined, () => {
+        const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
+        const picMesh = new THREE.Mesh(picGeo, fallbackMat);
+        picMesh.position.z = 0.05;
+        pGroup.add(picMesh);
+      });
 
       pGroup.position.set(p.x, p.y, wallZ + 0.1);
       this.photoGalleryWallGroup.add(pGroup);
@@ -165,10 +157,210 @@ class CourtWorld {
     this.scene.add(this.photoGalleryWallGroup);
   }
 
-  // Hide Photo Gallery Wall when starting gameplay!
   hidePhotoGalleryWall() {
     if (this.photoGalleryWallGroup) {
       this.scene.remove(this.photoGalleryWallGroup);
+    }
+  }
+
+  initArtGalleryPhotos() {
+    const photoFiles = [
+      'pic/ยิ้มกระชากกระเป๋า.jfif',
+      'pic/นิ้วเกิน.jfif',
+      'pic/แช้มแรกป่ะ.jfif',
+      'pic/เสื้อเทพ.jfif',
+      'pic/ณเดช.jfif',
+      'pic/เล-กง เล-โก้.jfif',
+      'pic/พี่หล่อไหมน้อง.jfif',
+      'pic/เด็กใหม่.jfif',
+      'pic/เจ๊สมคิด.jfif',
+      'pic/แพ้ครับ555.jfif'
+    ];
+
+    const roomDepth = 28;
+
+    for (let r = 0; r < 5; r++) {
+      const roomCenterZ = -r * roomDepth - roomDepth / 2;
+      const leftPicPath = photoFiles[r * 2];
+      const rightPicPath = photoFiles[r * 2 + 1];
+
+      const leftFrame = this.createWallArtFrame(-18.45, 4.5, roomCenterZ, Math.PI / 2, leftPicPath, r * 2 + 1);
+      this.artFrames.push(leftFrame);
+
+      const rightFrame = this.createWallArtFrame(18.45, 4.5, roomCenterZ, -Math.PI / 2, rightPicPath, r * 2 + 2);
+      this.artFrames.push(rightFrame);
+    }
+  }
+
+  createWallArtFrame(xPos, yPos, zPos, rotationY, imagePath, artIndex) {
+    const artGroup = new THREE.Group();
+
+    const fileNameFull = imagePath.split('/').pop();
+    const cleanTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
+
+    const frameGeo = new THREE.BoxGeometry(3.1, 4.0, 0.12);
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
+    const frameMesh = new THREE.Mesh(frameGeo, frameMat);
+    artGroup.add(frameMesh);
+
+    const picGeo = new THREE.PlaneGeometry(2.8, 3.6);
+    this.textureLoader.load(imagePath, (tex) => {
+      const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+      const picMesh = new THREE.Mesh(picGeo, picMat);
+      picMesh.position.z = 0.07;
+      artGroup.add(picMesh);
+    }, undefined, () => {
+      const fallbackMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
+      const picMesh = new THREE.Mesh(picGeo, fallbackMat);
+      picMesh.position.z = 0.07;
+      artGroup.add(picMesh);
+    });
+
+    const plaqueGeo = new THREE.BoxGeometry(2.6, 0.45, 0.08);
+    const plaqueCanvas = document.createElement('canvas');
+    plaqueCanvas.width = 512;
+    plaqueCanvas.height = 96;
+    const pCtx = plaqueCanvas.getContext('2d');
+
+    pCtx.fillStyle = '#0f172a';
+    pCtx.fillRect(0, 0, 512, 96);
+    pCtx.strokeStyle = '#ffd700';
+    pCtx.lineWidth = 4;
+    pCtx.strokeRect(4, 4, 504, 88);
+
+    pCtx.fillStyle = '#ffffff';
+    pCtx.font = 'bold 26px Prompt, Arial';
+    pCtx.textAlign = 'center';
+    pCtx.textBaseline = 'middle';
+    pCtx.fillText(cleanTitle.substring(0, 24), 256, 48);
+
+    const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
+    const plaqueMat = new THREE.MeshStandardMaterial({ map: plaqueTex });
+    const plaqueMesh = new THREE.Mesh(plaqueGeo, plaqueMat);
+    plaqueMesh.position.set(0, -2.3, 0.06);
+    artGroup.add(plaqueMesh);
+
+    const spotlight = new THREE.SpotLight(0xfffae6, 1.2, 10, Math.PI / 4, 0.4);
+    spotlight.position.set(xPos > 0 ? xPos - 2 : xPos + 2, yPos + 3, zPos);
+    spotlight.target = frameMesh;
+    this.scene.add(spotlight);
+
+    artGroup.position.set(xPos, yPos, zPos);
+    artGroup.rotation.y = rotationY;
+
+    artGroup.userData = {
+      artIndex,
+      cleanTitle,
+      imagePath,
+      xPos,
+      yPos,
+      zPos
+    };
+
+    this.scene.add(artGroup);
+    return artGroup;
+  }
+
+  initCheckpointPadsAndArrows() {
+    const roomDepth = 28;
+
+    for (let r = 0; r < 5; r++) {
+      const roomCenterZ = -r * roomDepth - roomDepth / 2;
+
+      const padLeft = this.createStandingPad(-16.0, 0.02, roomCenterZ, r * 2 + 1);
+      this.checkpointPads.push(padLeft);
+
+      const padRight = this.createStandingPad(16.0, 0.02, roomCenterZ, r * 2 + 2);
+      this.checkpointPads.push(padRight);
+    }
+
+    this.activePathArrow = this.createPathArrowMesh(0, 0, 0);
+  }
+
+  createStandingPad(xPos, yPos, zPos, padIndex) {
+    const padGroup = new THREE.Group();
+
+    const padGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.04, 32);
+    const padMat = new THREE.MeshStandardMaterial({ 
+      color: 0x00f5d4, 
+      emissive: 0x00f5d4, 
+      emissiveIntensity: 0.6,
+      transparent: true,
+      opacity: 0.85 
+    });
+    const padMesh = new THREE.Mesh(padGeo, padMat);
+    padGroup.add(padMesh);
+
+    const ringGeo = new THREE.TorusGeometry(1.85, 0.06, 8, 32);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 2;
+    padGroup.add(ringMesh);
+
+    padGroup.position.set(xPos, yPos, zPos);
+    padGroup.userData = { padIndex, xPos, zPos, padMat };
+    padGroup.visible = false;
+
+    this.scene.add(padGroup);
+    return padGroup;
+  }
+
+  createPathArrowMesh(xPos, yPos, zPos) {
+    const arrowGroup = new THREE.Group();
+
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 1.4);
+    shape.lineTo(0.9, 0);
+    shape.lineTo(0.35, 0);
+    shape.lineTo(0.35, -1.2);
+    shape.lineTo(-0.35, -1.2);
+    shape.lineTo(-0.35, 0);
+    shape.lineTo(-0.9, 0);
+    shape.closePath();
+
+    const geo = new THREE.ShapeGeometry(shape);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.rotation.x = -Math.PI / 2;
+    arrowGroup.add(mesh);
+
+    arrowGroup.position.set(xPos, yPos, zPos);
+    arrowGroup.visible = false;
+
+    this.scene.add(arrowGroup);
+    return arrowGroup;
+  }
+
+  updatePathArrow(playerPos, targetPos) {
+    if (!this.activePathArrow) return;
+
+    if (targetPos && (targetPos.x !== 0 || targetPos.z !== 0)) {
+      const dirX = targetPos.x - playerPos.x;
+      const dirZ = targetPos.z - playerPos.z;
+      const dist = Math.hypot(dirX, dirZ);
+
+      if (dist > 1.2) {
+        this.activePathArrow.visible = true;
+
+        const normX = dirX / dist;
+        const normZ = dirZ / dist;
+
+        this.activePathArrow.position.set(
+          playerPos.x + normX * 1.8,
+          0.04,
+          playerPos.z + normZ * 1.8
+        );
+
+        const angle = Math.atan2(dirX, dirZ);
+        this.activePathArrow.rotation.y = angle;
+
+        const pulse = 1.0 + Math.sin(Date.now() * 0.008) * 0.2;
+        this.activePathArrow.scale.set(pulse, pulse, pulse);
+      } else {
+        this.activePathArrow.visible = false;
+      }
+    } else {
+      this.activePathArrow.visible = false;
     }
   }
 
@@ -238,7 +430,10 @@ class CourtWorld {
     const courtLength = 13.4;
 
     const matGeo = new THREE.PlaneGeometry(courtWidth, courtLength);
-    const matMaterial = new THREE.MeshToonMaterial({ map: this.sharedCourtTexture, side: THREE.DoubleSide });
+    const matMaterial = this.sharedCourtTexture 
+      ? new THREE.MeshToonMaterial({ map: this.sharedCourtTexture, side: THREE.DoubleSide })
+      : new THREE.MeshToonMaterial({ color: 0x0b8457, side: THREE.DoubleSide });
+
     const courtMat = new THREE.Mesh(matGeo, matMaterial);
     courtMat.rotation.x = -Math.PI / 2;
     courtMat.position.set(centerX, 0.01, centerZ);
@@ -285,13 +480,23 @@ class CourtWorld {
 
     doorZPositions.forEach((zPos, idx) => {
       const doorGroup = new THREE.Group();
-      const doorMat = new THREE.MeshToonMaterial({ color: doorColors[idx] });
+      
+      const doorMat = new THREE.MeshToonMaterial({ color: 0x2d3748 });
+      const seamMat = new THREE.MeshBasicMaterial({ color: 0x1a202c });
 
       const leftPanel = new THREE.Mesh(new THREE.BoxGeometry(4.0, 7.0, 0.5), doorMat);
       leftPanel.position.set(-2.0, 3.5, 0);
 
+      const leftSeam = new THREE.Mesh(new THREE.BoxGeometry(0.06, 7.0, 0.52), seamMat);
+      leftSeam.position.set(1.98, 0, 0);
+      leftPanel.add(leftSeam);
+
       const rightPanel = new THREE.Mesh(new THREE.BoxGeometry(4.0, 7.0, 0.5), doorMat);
       rightPanel.position.set(2.0, 3.5, 0);
+
+      const rightSeam = new THREE.Mesh(new THREE.BoxGeometry(0.06, 7.0, 0.52), seamMat);
+      rightSeam.position.set(-1.98, 0, 0);
+      rightPanel.add(rightSeam);
 
       doorGroup.add(leftPanel);
       doorGroup.add(rightPanel);
@@ -317,41 +522,92 @@ class CourtWorld {
     });
   }
 
-  initQuestMarkers() {
+  // 3D Ribbon Tied Gift Box Quest Markers with Lid Popping Mesh
+  initGiftBoxQuestMarkers() {
     const questZPositions = [-14, -42, -70, -98, -126];
 
     questZPositions.forEach((zPos, idx) => {
       const questNum = idx + 1;
-      const canvas = document.createElement('canvas');
-      canvas.width = 128;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
+      const boxGroup = new THREE.Group();
 
-      ctx.fillStyle = '#ffd700';
-      ctx.beginPath();
-      ctx.arc(64, 64, 56, 0, Math.PI * 2);
-      ctx.fill();
+      // Lower Box Container
+      const boxGeo = new THREE.BoxGeometry(1.0, 0.8, 1.0);
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0xe63946, roughness: 0.3 });
+      const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+      boxMesh.position.y = -0.1;
+      boxGroup.add(boxMesh);
 
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 8;
-      ctx.stroke();
+      // Separate Lid Mesh Group for Grand Opening Cutscene!
+      const lidGroup = new THREE.Group();
+      const lidGeo = new THREE.BoxGeometry(1.06, 0.22, 1.06);
+      const lidMesh = new THREE.Mesh(lidGeo, boxMat);
+      lidMesh.position.y = 0.41;
+      lidGroup.add(lidMesh);
 
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 72px Impact, Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`${questNum}`, 64, 64);
+      const ribbonMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.2 });
+      
+      const ribbonH = new THREE.Mesh(new THREE.BoxGeometry(1.08, 0.23, 0.2), ribbonMat);
+      ribbonH.position.y = 0.41;
+      lidGroup.add(ribbonH);
 
-      const texture = new THREE.CanvasTexture(canvas);
-      const spriteMat = new THREE.SpriteMaterial({ map: texture });
-      const sprite = new THREE.Sprite(spriteMat);
-      sprite.position.set(0, 3.5, zPos);
-      sprite.scale.set(2.4, 2.4, 1);
-      sprite.userData = { questNum, baseY: 3.5 };
+      const ribbonV = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.23, 1.08), ribbonMat);
+      ribbonV.position.y = 0.41;
+      lidGroup.add(ribbonV);
 
-      this.scene.add(sprite);
-      this.questMarkers.push(sprite);
+      const bowLeft = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.06, 8, 16), ribbonMat);
+      bowLeft.position.set(-0.16, 0.62, 0);
+      bowLeft.rotation.z = Math.PI / 4;
+      lidGroup.add(bowLeft);
+
+      const bowRight = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.06, 8, 16), ribbonMat);
+      bowRight.position.set(0.16, 0.62, 0);
+      bowRight.rotation.z = -Math.PI / 4;
+      lidGroup.add(bowRight);
+
+      const bowCenter = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), ribbonMat);
+      bowCenter.position.set(0, 0.58, 0);
+      lidGroup.add(bowCenter);
+
+      boxGroup.add(lidGroup);
+
+      // Golden Burst Light inside Gift Box
+      const burstLight = new THREE.PointLight(0xffd700, 0, 15);
+      burstLight.position.set(0, 0.5, 0);
+      boxGroup.add(burstLight);
+
+      boxGroup.position.set(0, 2.5, zPos);
+      boxGroup.userData = { questNum, baseY: 2.5, lidGroup, burstLight, openingProgress: 0 };
+
+      boxGroup.visible = false;
+
+      this.scene.add(boxGroup);
+      this.questMarkers.push(boxGroup);
     });
+  }
+
+  showGiftBoxForRoom(roomIdx) {
+    if (this.questMarkers[roomIdx]) {
+      this.questMarkers[roomIdx].visible = true;
+    }
+  }
+
+  // Grand Gift Box Opening Lid Animation
+  animateGiftBoxOpening(roomIdx, progress) {
+    const boxGroup = this.questMarkers[roomIdx];
+    if (boxGroup && boxGroup.userData.lidGroup) {
+      boxGroup.userData.openingProgress = progress;
+      const lid = boxGroup.userData.lidGroup;
+
+      // Pop lid off upward & tilt
+      lid.position.y = progress * 2.5;
+      lid.rotation.x = progress * Math.PI * 0.5;
+      lid.rotation.z = progress * Math.PI * 0.25;
+
+      // Flare golden light beam burst
+      if (boxGroup.userData.burstLight) {
+        boxGroup.userData.burstLight.intensity = Math.sin(progress * Math.PI) * 6.0;
+      }
+    }
   }
 
   unlockBarrier(index) {
@@ -372,7 +628,18 @@ class CourtWorld {
 
   update(time) {
     this.questMarkers.forEach(marker => {
-      marker.position.y = marker.userData.baseY + Math.sin(time * 0.003 + marker.userData.questNum) * 0.25;
+      if (marker.visible) {
+        if (marker.userData.openingProgress === 0) {
+          marker.position.y = marker.userData.baseY + Math.sin(time * 0.003 + marker.userData.questNum) * 0.25;
+          marker.rotation.y += 0.012;
+        }
+      }
+    });
+
+    this.checkpointPads.forEach(pad => {
+      if (pad.visible) {
+        pad.userData.padMat.emissiveIntensity = 0.5 + Math.sin(time * 0.005) * 0.3;
+      }
     });
 
     this.doors.forEach(door => {

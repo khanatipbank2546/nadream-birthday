@@ -13,15 +13,15 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet with Cache-Buster v=10.0 -->
-  <link rel="stylesheet" href="css/styles.css?v=10.0">
+  <!-- Custom Stylesheet with Cache-Buster v=100.0 -->
+  <link rel="stylesheet" href="css/styles.css?v=100.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-  <!-- Pre-Game Badminton Poster Screen (No Card Box, Front NaDream Focus!) -->
+  <!-- Pre-Game Badminton Poster Screen -->
   <div id="loading-screen" class="loading-screen">
     <!-- Top Badminton Poster Header -->
     <div class="poster-top-header">
@@ -45,7 +45,7 @@
   <!-- 3D WebGL Canvas -->
   <canvas id="webgl-canvas"></canvas>
 
-  <!-- 3D Calendar Month Tearing & Date 20 Burst Cutscene Overlay -->
+  <!-- 3D Calendar Month Tearing & Date 20 Burst Cutscene Overlay (Z-INDEX 9999) -->
   <div id="calendar-cutscene-overlay" class="calendar-cutscene-overlay hidden">
     <!-- Month Name Badge (Thai) -->
     <div id="calendar-month-title" class="calendar-month-title">
@@ -102,7 +102,7 @@
           <div id="quest-progress-fill" class="quest-progress-fill" style="width: 0%;"></div>
         </div>
         <div id="current-quest-title" class="quest-current-desc">
-          📌 เดินมุ่งหน้าตรงไปที่จุดศูนย์กลางห้องที่ 1
+          📌 เดินตามลูกศรนำทางบนพื้นไปชมรูปศิลปะ #1
         </div>
       </div>
     </div>
@@ -115,11 +115,11 @@
       <div class="hint-key">เมาส์ลาก</div> หมุนกล้องรอบตัวละคร
     </div>
 
-    <!-- Action Prompt Overlay (Number 1-5 Interaction) -->
+    <!-- Action Prompt Overlay -->
     <div id="action-prompt" class="action-prompt hidden">
       <button id="action-prompt-btn" class="action-btn-pulse">
-        <span id="action-prompt-number" class="action-number">1</span>
-        <span id="action-prompt-text" class="action-text">กดเพื่อทำภารกิจที่ 1</span>
+        <span id="action-prompt-number" class="action-number">🎨</span>
+        <span id="action-prompt-text" class="action-text">ชมรูปผลงานศิลปะ</span>
       </button>
     </div>
 
@@ -127,6 +127,42 @@
     <button id="sound-toggle-btn" class="sound-toggle-btn" title="เปิด/ปิด เสียง">
       <i id="sound-icon" class="fa-solid fa-volume-high"></i>
     </button>
+  </div>
+
+  <!-- 5-Star Photo Review Rating Modal Popup ("ความเท่ของรูป") -->
+  <div id="star-rating-modal" class="modal-backdrop hidden">
+    <div class="npc-dialog-card art-dialog-card rating-dialog-card">
+      <div class="npc-header">
+        <div class="npc-avatar">⭐</div>
+        <div class="npc-info">
+          <h2 id="star-title-text" class="npc-name">ชื่อรูปภาพ</h2>
+          <p class="npc-subtitle">✨ รีวิวผลงานศิลปะประจำสนามแบดมินตัน ✨</p>
+        </div>
+        <button id="star-modal-close" class="modal-close">&times;</button>
+      </div>
+      
+      <div class="npc-body text-center">
+        <img id="star-photo-img" src="" alt="Art Gallery Photo" class="art-display-img">
+        
+        <div class="star-rating-box">
+          <div class="rating-label">🔥 ความเท่ของรูปภาพนี้ 🔥</div>
+          <div class="stars-row">
+            <i class="fa-solid fa-star star-icon active-star"></i>
+            <i class="fa-solid fa-star star-icon active-star"></i>
+            <i class="fa-solid fa-star star-icon active-star"></i>
+            <i class="fa-solid fa-star star-icon active-star"></i>
+            <i class="fa-solid fa-star star-icon active-star"></i>
+          </div>
+          <div class="rating-score-text">⭐⭐⭐⭐⭐ 5 ดาวสุดเท่ อลังการมาก!</div>
+        </div>
+      </div>
+
+      <div class="npc-footer text-center">
+        <button id="star-confirm-btn" class="btn-primary btn-large-gold">
+          <i class="fa-solid fa-crown"></i> ให้คะแนนรูปนี้เรียบร้อย! ✨
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- NPC Bank Speech Bubble Modal -->
@@ -163,13 +199,13 @@
     </div>
   </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=10.0 -->
-  <script src="js/audio.js?v=10.0"></script>
-  <script src="js/character.js?v=10.0"></script>
-  <script src="js/npc_bank.js?v=10.0"></script>
-  <script src="js/court_world.js?v=10.0"></script>
-  <script src="js/quests.js?v=10.0"></script>
-  <script src="js/controls.js?v=10.0"></script>
-  <script src="js/main.js?v=10.0"></script>
+  <!-- Standard Order Scripts with Cache-Buster v=100.0 -->
+  <script src="js/audio.js?v=100.0"></script>
+  <script src="js/character.js?v=100.0"></script>
+  <script src="js/npc_bank.js?v=100.0"></script>
+  <script src="js/court_world.js?v=100.0"></script>
+  <script src="js/quests.js?v=100.0"></script>
+  <script src="js/controls.js?v=100.0"></script>
+  <script src="js/main.js?v=100.0"></script>
 </body>
 </html>

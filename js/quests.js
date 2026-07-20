@@ -1,126 +1,226 @@
 /* ==========================================================================
-   Quest Engine - Centered Room Checkpoints & Secret Door Cutscene Triggers
+   Quest Manager - Photo Review, 5-Star Rating & Grand Gift Box Cutscene Flow
    ========================================================================== */
 
 class QuestManager {
   constructor(courtWorld, bankNPC) {
     this.courtWorld = courtWorld;
     this.bankNPC = bankNPC;
-    
-    this.completedCount = 0;
-    this.currentQuestIndex = 1; // 1 to 5
-    this.activeTrigger = null;
 
-    // Checkpoint Positions (Placed in the EXACT CENTER of each room!)
-    this.questPositions = {
-      1: new THREE.Vector3(0, 0, -14),
-      2: new THREE.Vector3(0, 0, -42),
-      3: new THREE.Vector3(0, 0, -70),
-      4: new THREE.Vector3(0, 0, -98),
-      5: new THREE.Vector3(0, 0, -126),
-      'bank': new THREE.Vector3(0, 0, -150)
-    };
+    // Current State
+    this.currentRoom = 1; // Room 1 to 5
+    this.roomSubState = 'ART_1'; // 'ART_1' -> 'ART_2' -> 'GIFT_BOX' -> 'ROOM_COMPLETE'
+    this.currentQuestIndex = 0;
+    this.totalQuests = 5;
 
-    this.bindUIEvents();
+    this.activeTargetPos = new THREE.Vector3(0, 0, 0);
+    this.isNearTarget = false;
+    this.isProcessingCutscene = false;
+
+    this.initHUD();
+    this.startRoomQuest(1);
   }
 
-  bindUIEvents() {
-    const actionBtn = document.getElementById('action-prompt-btn');
-    const mobileActionBtn = document.getElementById('mobile-action-btn');
-    const npcCloseBtn = document.getElementById('npc-close-btn');
-    const npcHeaderClose = document.getElementById('npc-modal-close');
-    const replayMusicBtn = document.getElementById('replay-hbd-music');
+  initHUD() {
+    this.questTitleEl = document.getElementById('current-quest-title');
+    this.questCountEl = document.getElementById('quest-count');
+    this.questProgressFill = document.getElementById('quest-progress-fill');
+    
+    this.actionPrompt = document.getElementById('action-prompt');
+    this.actionBtn = document.getElementById('action-prompt-btn');
+    this.actionText = document.getElementById('action-prompt-text');
 
-    if (actionBtn) actionBtn.addEventListener('click', () => this.handleActionClick());
-    if (mobileActionBtn) mobileActionBtn.addEventListener('click', () => this.handleActionClick());
-    if (npcCloseBtn) npcCloseBtn.addEventListener('click', () => this.hideNPCModal());
-    if (npcHeaderClose) npcHeaderClose.addEventListener('click', () => this.hideNPCModal());
-    if (replayMusicBtn && window.soundEngine) replayMusicBtn.addEventListener('click', () => window.soundEngine.playHappyBirthday());
+    if (this.actionBtn) {
+      this.actionBtn.addEventListener('click', () => {
+        this.handleActionClick();
+      });
+    }
+  }
+
+  startRoomQuest(roomNum) {
+    this.currentRoom = roomNum;
+    this.roomSubState = 'ART_1';
+
+    // Hide all checkpoint pads and gift boxes first
+    this.courtWorld.checkpointPads.forEach(pad => pad.visible = false);
+    this.courtWorld.questMarkers.forEach(box => box.visible = false);
+
+    // Show Checkpoint Pad #1 (Left Wall)
+    const pad1Index = (roomNum - 1) * 2;
+    if (this.courtWorld.checkpointPads[pad1Index]) {
+      this.courtWorld.checkpointPads[pad1Index].visible = true;
+      const p = this.courtWorld.checkpointPads[pad1Index].userData;
+      this.activeTargetPos.set(p.xPos, 0, p.zPos);
+    }
+
+    this.updateTrackerText();
+  }
+
+  updateTrackerText() {
+    if (this.questCountEl) {
+      this.questCountEl.innerText = `${this.currentQuestIndex}/${this.totalQuests}`;
+    }
+    if (this.questProgressFill) {
+      this.questProgressFill.style.width = `${(this.currentQuestIndex / this.totalQuests) * 100}%`;
+    }
+
+    if (this.currentRoom <= 5) {
+      if (this.roomSubState === 'ART_1') {
+        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปที่จุด Checkpoint ฝั่งซ้าย เพื่อชมและให้คะแนนรูปศิลปะ #1`;
+      } else if (this.roomSubState === 'ART_2') {
+        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปที่จุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปศิลปะ #2`;
+      } else if (this.roomSubState === 'GIFT_BOX') {
+        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเปิดกล่องของขวัญกลางห้องเพื่อปลดล็อคประตูห้องถัดไป!`;
+      }
+    } else {
+      if (this.questTitleEl) this.questTitleEl.innerText = `👑 เดินเข้าสู่ห้องโถงแชมเปียน เพื่อพูดคุยกับ Bank!`;
+      this.activeTargetPos.set(0, 0, -152);
+    }
   }
 
   checkProximity(playerPos) {
-    const actionPrompt = document.getElementById('action-prompt');
-    const promptNumber = document.getElementById('action-prompt-number');
-    const promptText = document.getElementById('action-prompt-text');
+    if (this.isProcessingCutscene) return;
 
-    if (this.currentQuestIndex <= 5) {
-      const qPos = this.questPositions[this.currentQuestIndex];
-      const dist = playerPos.distanceTo(qPos);
+    if (this.currentRoom <= 5) {
+      if (this.roomSubState === 'ART_1' || this.roomSubState === 'ART_2') {
+        const artIdx = (this.currentRoom - 1) * 2 + (this.roomSubState === 'ART_1' ? 0 : 1);
+        const pad = this.courtWorld.checkpointPads[artIdx];
 
-      if (dist < 4.5) {
-        this.activeTrigger = this.currentQuestIndex;
-        if (actionPrompt) actionPrompt.classList.remove('hidden');
-        if (promptNumber) promptNumber.innerText = `${this.currentQuestIndex}`;
-        if (promptText) promptText.innerText = `กดเลข ${this.currentQuestIndex} เพื่อเปิดประตูทางลับห้องที่ ${this.currentQuestIndex + 1}`;
+        if (pad && pad.visible) {
+          const dist = Math.hypot(playerPos.x - pad.userData.xPos, playerPos.z - pad.userData.zPos);
+          if (dist < 2.5) {
+            this.showActionPrompt(`🎨 ชมและให้คะแนนรูปภาพ #${artIdx + 1}`);
+            this.isNearTarget = true;
+            return;
+          }
+        }
+      } else if (this.roomSubState === 'GIFT_BOX') {
+        const box = this.courtWorld.questMarkers[this.currentRoom - 1];
+        if (box && box.visible) {
+          const dist = Math.hypot(playerPos.x - box.position.x, playerPos.z - box.position.z);
+          if (dist < 3.0) {
+            this.showActionPrompt(`🎁 เปิดกล่องของขวัญประจำห้อง #${this.currentRoom}`);
+            this.isNearTarget = true;
+            return;
+          }
+        }
+      }
+    } else {
+      // Near Bank NPC in Grand Hall
+      const dist = Math.hypot(playerPos.x - 0, playerPos.z - (-152));
+      if (dist < 3.5) {
+        this.showActionPrompt(`🏸 พูดคุยกับ Bank (Happy Birthday!)`);
+        this.isNearTarget = true;
         return;
       }
     }
 
-    if (this.completedCount >= 5) {
-      const bankPos = this.questPositions['bank'];
-      const dist = playerPos.distanceTo(bankPos);
+    this.hideActionPrompt();
+    this.isNearTarget = false;
+  }
 
-      if (dist < 5.0) {
-        this.activeTrigger = 'bank';
-        if (actionPrompt) actionPrompt.classList.remove('hidden');
-        if (promptNumber) promptNumber.innerText = `🏸`;
-        if (promptText) promptText.innerText = `ทักทาย Bank`;
-        return;
-      }
+  showActionPrompt(text) {
+    if (this.actionPrompt) {
+      this.actionPrompt.classList.remove('hidden');
+      if (this.actionText) this.actionText.innerText = text;
     }
+  }
 
-    this.activeTrigger = null;
-    if (actionPrompt) actionPrompt.classList.add('hidden');
+  hideActionPrompt() {
+    if (this.actionPrompt) {
+      this.actionPrompt.classList.add('hidden');
+    }
   }
 
   handleActionClick() {
-    if (!this.activeTrigger) return;
-    if (window.soundEngine) window.soundEngine.playClick();
+    if (this.isProcessingCutscene) return;
 
-    if (typeof this.activeTrigger === 'number') {
-      const questNum = this.activeTrigger;
-      
-      this.courtWorld.unlockBarrier(questNum);
-      if (window.soundEngine) window.soundEngine.playSecretDoorCutscene();
+    if (this.currentRoom <= 5) {
+      if (this.roomSubState === 'ART_1' || this.roomSubState === 'ART_2') {
+        const artIdx = (this.currentRoom - 1) * 2 + (this.roomSubState === 'ART_1' ? 0 : 1);
+        const artFrame = this.courtWorld.artFrames[artIdx];
 
-      this.completedCount = questNum;
-      this.currentQuestIndex = questNum + 1;
+        if (artFrame && window.game) {
+          this.hideActionPrompt();
+          this.isProcessingCutscene = true;
 
-      const countBadge = document.getElementById('quest-count');
-      const progressFill = document.getElementById('quest-progress-fill');
-      const hudTitle = document.getElementById('current-quest-title');
+          // Launch 4-Second 3D Camera Orbit Preview Cutscene!
+          window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
+            // After 4-second preview, open 5-Star Rating Modal Popup!
+            if (window.showStarRatingModal) {
+              window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, () => {
+                this.isProcessingCutscene = false;
+                this.advanceRoomSubState();
+              });
+            }
+          });
+        }
+      } else if (this.roomSubState === 'GIFT_BOX') {
+        this.hideActionPrompt();
+        this.isProcessingCutscene = true;
 
-      if (countBadge) countBadge.innerText = `${this.completedCount}/5`;
-      if (progressFill) progressFill.style.width = `${(this.completedCount / 5) * 100}%`;
+        // Launch Grand Gift Box Opening Cutscene!
+        if (window.game) {
+          window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
+            this.courtWorld.unlockBarrier(this.currentRoom);
+            if (window.soundEngine) window.soundEngine.playQuestComplete();
 
-      if (this.currentQuestIndex <= 5) {
-        if (hudTitle) hudTitle.innerText = `✨ ประตูทางลับห้องที่ ${questNum} เปิดออกแล้ว! เดินผ่านลำแสงเข้าสู่ห้องที่ ${this.currentQuestIndex}`;
-      } else {
-        if (hudTitle) hudTitle.innerText = `🎉 ปลดล็อคประตูทางลับทั้งหมดแล้ว! เดินเข้าสู่ห้องโถงแชมเปียนพบ Bank`;
+            this.currentQuestIndex++;
+            this.currentRoom++;
+
+            if (this.currentRoom <= 5) {
+              this.startRoomQuest(this.currentRoom);
+            } else {
+              this.roomSubState = 'COMPLETE';
+              this.updateTrackerText();
+            }
+
+            this.isProcessingCutscene = false;
+          });
+        }
       }
-
-      const actionPrompt = document.getElementById('action-prompt');
-      if (actionPrompt) actionPrompt.classList.add('hidden');
-
-      // Trigger Cinematic Cutscene focusing on the secret door opening with light beams!
-      if (window.game) {
-        window.game.startDoorCutscene(questNum);
-      }
-
-    } else if (this.activeTrigger === 'bank') {
-      this.showNPCModal();
+    } else {
+      // Interact with Bank NPC
+      if (window.showNPCModal) window.showNPCModal();
     }
   }
 
-  showNPCModal() {
-    if (window.soundEngine) window.soundEngine.playHappyBirthday();
-    const npcModal = document.getElementById('npc-modal');
-    if (npcModal) npcModal.classList.remove('hidden');
-  }
+  advanceRoomSubState() {
+    if (this.roomSubState === 'ART_1') {
+      this.roomSubState = 'ART_2';
 
-  hideNPCModal() {
-    const npcModal = document.getElementById('npc-modal');
-    if (npcModal) npcModal.classList.add('hidden');
+      // Hide Pad #1, Show Pad #2
+      const pad1Index = (this.currentRoom - 1) * 2;
+      const pad2Index = pad1Index + 1;
+
+      if (this.courtWorld.checkpointPads[pad1Index]) this.courtWorld.checkpointPads[pad1Index].visible = false;
+      if (this.courtWorld.checkpointPads[pad2Index]) {
+        this.courtWorld.checkpointPads[pad2Index].visible = true;
+        const p = this.courtWorld.checkpointPads[pad2Index].userData;
+        this.activeTargetPos.set(p.xPos, 0, p.zPos);
+      }
+
+      this.updateTrackerText();
+
+    } else if (this.roomSubState === 'ART_2') {
+      this.roomSubState = 'GIFT_BOX';
+
+      // Hide Pad #2, Spawn 3D Gift Box in room center with cutscene!
+      const pad2Index = (this.currentRoom - 1) * 2 + 1;
+      if (this.courtWorld.checkpointPads[pad2Index]) this.courtWorld.checkpointPads[pad2Index].visible = false;
+
+      this.courtWorld.showGiftBoxForRoom(this.currentRoom - 1);
+      const box = this.courtWorld.questMarkers[this.currentRoom - 1];
+      if (box) {
+        this.activeTargetPos.set(box.position.x, 0, box.position.z);
+      }
+
+      if (window.game) {
+        window.game.startGiftBoxSpawnCutscene(box.position);
+      }
+
+      this.updateTrackerText();
+    }
   }
 }
 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NaDream & Bank - Badminton Court Birthday Quest 🏸🎂</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Prompt:wght@400;600;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Loading & Pre-Game 360° Showcase Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="character-loader">
+        <div class="loader-avatar">🏸</div>
+      </div>
+      <h1 class="loading-title">NaDream's Badminton World</h1>
+      <p class="loading-subtitle">การผจญภัยหา Bank ในสนามแบดมินตัน!</p>
+      <div class="progress-bar-container">
+        <div id="loading-progress" class="progress-bar-fill"></div>
+      </div>
+      <button id="start-btn" class="start-btn hidden">
+        <i class="fa-solid fa-gamepad"></i> เริ่มต้นการเดินทาง!
+      </button>
+    </div>
+  </div>
+
+  <!-- 3D WebGL Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Game HUD -->
+  <div id="game-hud" class="game-hud">
+    <!-- Top Left: Player Badge -->
+    <div class="player-badge">
+      <div class="avatar-icon">👑</div>
+      <div class="player-info">
+        <div class="player-name">NaDream <span class="badge-tag">Badminton HBD</span></div>
+        <div class="player-title">✨ ตามหา Bank ที่สนามแบดมินตัน</div>
+      </div>
+    </div>
+
+    <!-- Top Right: Quest Tracker & Camera View Switcher -->
+    <div class="top-right-controls">
+      <button id="camera-toggle-btn" class="camera-btn" title="เปลี่ยนมุมมอง">
+        <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
+      </button>
+      
+      <div class="quest-tracker">
+        <div class="tracker-header">
+          <i class="fa-solid fa-scroll text-gold"></i>
+          <span>ภารกิจตามหา Bank</span>
+          <span id="quest-count" class="quest-count-badge">0/5</span>
+        </div>
+        <div class="quest-progress-bar">
+          <div id="quest-progress-fill" class="quest-progress-fill" style="width: 0%;"></div>
+        </div>
+        <div id="current-quest-title" class="quest-current-desc">
+          📌 เดินมุ่งหน้าตรงไปในสนามแบดมินตัน หาภารกิจที่ 1
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop Controls Hint -->
+    <div class="controls-hint">
+      <div class="hint-key">W A S D</div> เดิน &nbsp;|&nbsp; 
+      <div class="hint-key">SPACE</div> กระโดด &nbsp;|&nbsp; 
+      <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp;
+      <div class="hint-key">เมาส์ลาก</div> หมุนกล้อง
+    </div>
+
+    <!-- Action Prompt Overlay (Number 1-5 Interaction) -->
+    <div id="action-prompt" class="action-prompt hidden">
+      <button id="action-prompt-btn" class="action-btn-pulse">
+        <span id="action-prompt-number" class="action-number">1</span>
+        <span id="action-prompt-text" class="action-text">กดเพื่อทำภารกิจที่ 1</span>
+      </button>
+    </div>
+
+    <!-- Sound Toggle Button -->
+    <button id="sound-toggle-btn" class="sound-toggle-btn" title="เปิด/ปิด เสียง">
+      <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Touch Controls -->
+  <div id="mobile-controls" class="mobile-controls">
+    <div id="joystick-zone" class="joystick-zone">
+      <div id="joystick-base" class="joystick-base">
+        <div id="joystick-stick" class="joystick-stick"></div>
+      </div>
+    </div>
+    <div class="mobile-action-zone">
+      <button id="mobile-jump-btn" class="mobile-jump-btn" title="กระโดด">
+        <i class="fa-solid fa-arrow-up"></i>
+      </button>
+      <button id="mobile-action-btn" class="mobile-action-btn" title="ทำภารกิจ">
+        <i class="fa-solid fa-hand-pointer"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- NPC Bank Speech Bubble Modal -->
+  <div id="npc-modal" class="modal-backdrop hidden">
+    <div class="npc-dialog-card">
+      <div class="npc-header">
+        <div class="npc-avatar">🏸</div>
+        <div class="npc-info">
+          <h2 class="npc-name">Bank <span class="npc-badge">Badminton Buddy</span></h2>
+          <p class="npc-subtitle">ผู้รอคอยที่ปลายสนามแบดมินตัน</p>
+        </div>
+        <button id="npc-modal-close" class="modal-close">&times;</button>
+      </div>
+      
+      <div class="npc-body">
+        <div class="speech-bubble">
+          <h1 class="hbd-title">🎂 HAPPY BIRTHDAY! 🎂</h1>
+          <p class="hbd-message">
+            "สุขสันต์วันเกิดนะ <strong>NaDream</strong>! 🎉✨<br>
+            ขอให้มีความสุขมากๆ สุขภาพแข็งแรง ยิ้มเยอะๆ ในทุกๆ วัน<br>
+            สมหวังในสิ่งที่คิดและตั้งใจไว้ทุกเรื่องเลยนะ!"
+          </p>
+        </div>
+      </div>
+
+      <div class="npc-footer">
+        <button id="replay-hbd-music" class="btn-secondary">
+          <i class="fa-solid fa-music"></i> ฟังเพลงวันเกิดอีกครั้ง
+        </button>
+        <button id="npc-close-btn" class="btn-primary">
+          <i class="fa-solid fa-heart"></i> ขอบคุณนะ! 💕
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Order Scripts (Zero Server Dependencies) -->
+  <script src="js/audio.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/npc_bank.js"></script>
+  <script src="js/court_world.js"></script>
+  <script src="js/quests.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

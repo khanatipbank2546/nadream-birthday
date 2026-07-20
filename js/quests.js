@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Sequential Pad Workflow & Gift Box Floor Checkpoint Pad
+   Quest Manager - Automatic Step Trigger & Instant Checkpoint Pad Hiding
    ========================================================================== */
 
 class QuestManager {
@@ -67,9 +67,9 @@ class QuestManager {
 
     if (this.currentRoom <= 5) {
       if (this.roomSubState === 'ART_1') {
-        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปที่จุด Checkpoint ฝั่งซ้าย เพื่อชมและให้คะแนนรูปศิลปะ #1`;
+        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint ฝั่งซ้าย เพื่อชมและให้คะแนนรูปภาพ #1`;
       } else if (this.roomSubState === 'ART_2') {
-        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปที่จุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปศิลปะ #2`;
+        if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปภาพ #2`;
       } else if (this.roomSubState === 'GIFT_BOX') {
         if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint กล่องของขวัญกลางห้องเพื่อปลดล็อคประตู!`;
       }
@@ -89,20 +89,69 @@ class QuestManager {
 
         if (pad && pad.visible) {
           const dist = Math.hypot(playerPos.x - pad.userData.xPos, playerPos.z - pad.userData.zPos);
-          if (dist < 2.8) {
-            this.showActionPrompt(`🎨 ชมและให้คะแนนรูปภาพ #${artIdx + 1}`);
+          
+          if (dist < 2.5) {
+            // AUTOMATIC TRIGGER UPON STEPPING ON THE CHECKPOINT PAD!
+            // INSTANTLY HIDE THE CHECKPOINT PAD!
+            pad.visible = false;
+            this.hideActionPrompt();
+            this.isProcessingCutscene = true;
+
+            const artFrame = this.courtWorld.artFrames[artIdx];
+            if (artFrame && window.game) {
+              window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
+                if (window.showStarRatingModal) {
+                  window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
+                    if (artFrame.userData.addStarBadge) {
+                      artFrame.userData.addStarBadge(ratedScore || 5);
+                    }
+                    this.isProcessingCutscene = false;
+                    this.advanceRoomSubState();
+                  });
+                }
+              });
+            }
+            return;
+          } else if (dist < 5.0) {
+            this.showActionPrompt(`🎨 เดินไปเหยียบจุด Checkpoint รูปภาพ #${artIdx + 1}`);
             this.isNearTarget = true;
             return;
           }
         }
       } else if (this.roomSubState === 'GIFT_BOX') {
         const boxPad = this.courtWorld.giftBoxPads[this.currentRoom - 1];
-        const box = this.courtWorld.questMarkers[this.currentRoom - 1];
 
         if (boxPad && boxPad.visible) {
           const dist = Math.hypot(playerPos.x - boxPad.userData.xPos, playerPos.z - boxPad.userData.zPos);
-          if (dist < 3.2) {
-            this.showActionPrompt(`🎁 เปิดกล่องของขวัญประจำห้อง #${this.currentRoom}`);
+          
+          if (dist < 2.5) {
+            // AUTOMATIC TRIGGER UPON STEPPING ON THE GIFT BOX PAD!
+            // INSTANTLY HIDE THE GIFT BOX PAD!
+            boxPad.visible = false;
+            this.hideActionPrompt();
+            this.isProcessingCutscene = true;
+
+            if (window.game) {
+              window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
+                this.courtWorld.unlockBarrier(this.currentRoom);
+                if (window.soundEngine) window.soundEngine.playQuestComplete();
+
+                this.currentQuestIndex++;
+                this.currentRoom++;
+
+                if (this.currentRoom <= 5) {
+                  this.startRoomQuest(this.currentRoom);
+                } else {
+                  this.roomSubState = 'COMPLETE';
+                  this.updateTrackerText();
+                }
+
+                this.isProcessingCutscene = false;
+              });
+            }
+            return;
+          } else if (dist < 5.0) {
+            this.showActionPrompt(`🎁 เดินไปเหยียบจุด Checkpoint กล่องของขวัญ #${this.currentRoom}`);
             this.isNearTarget = true;
             return;
           }
@@ -136,27 +185,26 @@ class QuestManager {
   }
 
   handleActionClick() {
+    // Optional click handler if player clicks prompt before stepping on pad
     if (this.isProcessingCutscene) return;
 
     if (this.currentRoom <= 5) {
       if (this.roomSubState === 'ART_1' || this.roomSubState === 'ART_2') {
         const artIdx = (this.currentRoom - 1) * 2 + (this.roomSubState === 'ART_1' ? 0 : 1);
-        const artFrame = this.courtWorld.artFrames[artIdx];
+        const pad = this.courtWorld.checkpointPads[artIdx];
+        if (pad) pad.visible = false;
 
+        const artFrame = this.courtWorld.artFrames[artIdx];
         if (artFrame && window.game) {
           this.hideActionPrompt();
           this.isProcessingCutscene = true;
 
-          // Launch 6-Second 3D Camera Orbit Preview Cutscene!
           window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
-            // After 6-second preview, open Interactive 5-Star Rating Modal Popup!
             if (window.showStarRatingModal) {
               window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
-                // Attach 3D Extruded Gold Star Badge above the frame in the 3D world!
                 if (artFrame.userData.addStarBadge) {
                   artFrame.userData.addStarBadge(ratedScore || 5);
                 }
-
                 this.isProcessingCutscene = false;
                 this.advanceRoomSubState();
               });
@@ -164,15 +212,12 @@ class QuestManager {
           });
         }
       } else if (this.roomSubState === 'GIFT_BOX') {
+        const boxPad = this.courtWorld.giftBoxPads[this.currentRoom - 1];
+        if (boxPad) boxPad.visible = false;
+
         this.hideActionPrompt();
         this.isProcessingCutscene = true;
 
-        // Hide Gift Box Floor Standing Pad
-        if (this.courtWorld.giftBoxPads[this.currentRoom - 1]) {
-          this.courtWorld.giftBoxPads[this.currentRoom - 1].visible = false;
-        }
-
-        // Launch Grand Gift Box Opening Cutscene!
         if (window.game) {
           window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
             this.courtWorld.unlockBarrier(this.currentRoom);
@@ -193,7 +238,6 @@ class QuestManager {
         }
       }
     } else {
-      // Interact with Bank NPC
       if (window.showNPCModal) window.showNPCModal();
     }
   }
@@ -202,7 +246,7 @@ class QuestManager {
     if (this.roomSubState === 'ART_1') {
       this.roomSubState = 'ART_2';
 
-      // Hide Pad #1 (Left Wall), Show Pad #2 (Right Wall)
+      // Ensure Pad #1 is hidden and Pad #2 (Right Wall) is shown
       const pad1Index = (this.currentRoom - 1) * 2;
       const pad2Index = pad1Index + 1;
 
@@ -220,7 +264,7 @@ class QuestManager {
     } else if (this.roomSubState === 'ART_2') {
       this.roomSubState = 'GIFT_BOX';
 
-      // Hide Pad #2
+      // Ensure Pad #2 is hidden
       const pad2Index = (this.currentRoom - 1) * 2 + 1;
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = false;

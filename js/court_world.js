@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Guaranteed 3D Extruded Gold Stars & Pads
+   3D Indoor Badminton Complex - Exact Raw Filename Titles & 3D Gold Stars
    ========================================================================== */
 
 class CourtWorld {
@@ -232,9 +232,9 @@ class CourtWorld {
   createWallArtFrame(xPos, yPos, zPos, rotationY, imagePath, artIndex) {
     const artGroup = new THREE.Group();
 
+    // Exact raw filename without extension (e.g. "1", "2", "hello")
     const fileNameFull = imagePath.split('/').pop();
-    const rawTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
-    const cleanTitle = `รูปที่ ${rawTitle}`;
+    const cleanTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
 
     const frameGeo = new THREE.BoxGeometry(3.1, 4.0, 0.12);
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
@@ -278,7 +278,7 @@ class CourtWorld {
 
       const titleText = starsScore > 0 ? `${cleanTitle} (${'★'.repeat(starsScore)})` : cleanTitle;
       pCtx.fillStyle = '#ffffff';
-      pCtx.font = 'bold 26px Prompt, Arial';
+      pCtx.font = 'bold 28px Prompt, Arial';
       pCtx.textAlign = 'center';
       pCtx.textBaseline = 'middle';
       pCtx.fillText(titleText, 256, 48);

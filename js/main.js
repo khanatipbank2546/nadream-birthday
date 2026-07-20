@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Application Entry Point - Photo Gallery Wall Hide & Game Loop
+   Main Entry Point - Calendar Month Sync & 3D Shatter Burst Cutscene
    ========================================================================== */
 
 class Game {
@@ -96,7 +96,6 @@ class Game {
           }
           loadingScreen.classList.add('fade-out');
           
-          // Hide Photo Gallery Wall when starting game!
           if (this.courtWorld) {
             this.courtWorld.hidePhotoGalleryWall();
           }
@@ -107,6 +106,7 @@ class Game {
     }, 50);
   }
 
+  // Synchronized Calendar Month Tearing & 3D NaDream Burst Dive Sequence
   startIntroCutscene() {
     this.gameState = 'FLOATING';
     this.cutsceneTimer = 0;
@@ -115,17 +115,19 @@ class Game {
     const calendarOverlay = document.getElementById('calendar-cutscene-overlay');
     if (calendarOverlay) calendarOverlay.classList.remove('hidden');
 
+    // Synchronized Thai & English Months (Jan 2569 -> July 2569)
     const months = [
-      'มกราคม 2569',
-      'กุมภาพันธ์ 2569',
-      'มีนาคม 2569',
-      'เมษายน 2569',
-      'พฤษภาคม 2569',
-      'มิถุนายน 2569',
-      'กรกฎาคม 2569'
+      { th: 'มกราคม 2569', en: 'JANUARY 2569' },
+      { th: 'กุมภาพันธ์ 2569', en: 'FEBRUARY 2569' },
+      { th: 'มีนาคม 2569', en: 'MARCH 2569' },
+      { th: 'เมษายน 2569', en: 'APRIL 2569' },
+      { th: 'พฤษภาคม 2569', en: 'MAY 2569' },
+      { th: 'มิถุนายน 2569', en: 'JUNE 2569' },
+      { th: 'กรกฎาคม 2569', en: 'JULY 2569' }
     ];
 
     const monthTitleEl = document.getElementById('calendar-month-title');
+    const headerStripEl = document.getElementById('calendar-header-strip');
     const calendarCard = document.getElementById('calendar-card');
     const date20 = document.getElementById('date-20-highlight');
     const burstFlare = document.getElementById('burst-flare');
@@ -135,7 +137,10 @@ class Game {
       
       const tearInterval = setInterval(() => {
         if (this.currentMonthIdx < months.length) {
-          if (monthTitleEl) monthTitleEl.innerText = months[this.currentMonthIdx];
+          const m = months[this.currentMonthIdx];
+          if (monthTitleEl) monthTitleEl.innerText = m.th;
+          if (headerStripEl) headerStripEl.innerText = m.en;
+
           if (calendarCard) {
             calendarCard.classList.remove('flip-tear');
             void calendarCard.offsetWidth;
@@ -147,24 +152,30 @@ class Game {
           clearInterval(tearInterval);
 
           if (monthTitleEl) monthTitleEl.innerText = '✨ 20 กรกฎาคม 2569 (วันเกิด NaDream!) ✨';
+          if (headerStripEl) headerStripEl.innerText = 'JULY 20th 2569';
           if (date20) date20.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
           setTimeout(() => {
+            // Step 3: Calendar Page 3D Shatter Burst + Gold Flare Explosion
+            if (calendarCard) calendarCard.classList.add('shatter-burst');
             if (burstFlare) burstFlare.classList.remove('hidden');
             if (window.soundEngine) window.soundEngine.playLandingImpact();
+            
+            // Step 4: NaDream 3D Avatar Dives & Shatters Through Calendar Page
             this.gameState = 'BURST_LAND';
 
             setTimeout(() => {
+              // Step 5: Superhero Impact Landing on Room 1 Court Floor
               if (calendarOverlay) calendarOverlay.classList.add('hidden');
               if (burstFlare) burstFlare.classList.add('hidden');
               this.gameState = 'PLAYING';
-            }, 800);
+            }, 750);
 
-          }, 1200);
+          }, 1100);
         }
-      }, 380);
+      }, 360);
 
-    }, 1200);
+    }, 1000);
   }
 
   startDoorCutscene(roomNumber) {
@@ -190,7 +201,8 @@ class Game {
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
 
     } else if (this.gameState === 'BURST_LAND') {
-      this.cutsceneTimer += delta * 2.5;
+      // Physical 3D Dive & Superhero Landing through shattered calendar page
+      this.cutsceneTimer += delta * 2.8;
       this.character.setLandingPose(Math.min(1.0, this.cutsceneTimer));
 
     } else if (this.isCutsceneActive) {

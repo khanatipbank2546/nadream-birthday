@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Input & Controls Manager - Camera-Relative Direction & Cutscene Camera
+   Input & Controls Manager - FIXED e bug, D-Pad & Touch Joystick (Global Window)
    ========================================================================== */
 
 class Controls {
@@ -20,7 +20,7 @@ class Controls {
     this.showcaseAngle = 0;
 
     this.isDraggingMouse = false;
-    this.previousMousePosition = { x: e.clientX, y: e.clientY };
+    this.previousMousePosition = { x: 0, y: 0 }; // FIXED e is not defined bug!
 
     this.bindKeyboardEvents();
     this.bindMouseEvents();
@@ -69,6 +69,7 @@ class Controls {
   }
 
   bindTouchControls() {
+    // 1. Mobile Virtual Joystick
     const joystickBase = document.getElementById('joystick-base');
     const joystickStick = document.getElementById('joystick-stick');
     if (joystickBase && joystickStick) {
@@ -130,6 +131,34 @@ class Controls {
       window.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
 
+    // 2. PUBG Mobile / ROV Style Directional D-Pad Touch Buttons
+    const bindDPadBtn = (elementId, keyCode) => {
+      const btn = document.getElementById(elementId);
+      if (!btn) return;
+
+      const press = (e) => {
+        if (e) e.preventDefault();
+        this.keysPressed[keyCode] = true;
+        btn.classList.add('active');
+      };
+      const release = (e) => {
+        if (e) e.preventDefault();
+        this.keysPressed[keyCode] = false;
+        btn.classList.remove('active');
+      };
+
+      btn.addEventListener('touchstart', press, { passive: false });
+      btn.addEventListener('touchend', release, { passive: false });
+      btn.addEventListener('mousedown', press);
+      btn.addEventListener('mouseup', release);
+    };
+
+    bindDPadBtn('dpad-up', 'KeyW');
+    bindDPadBtn('dpad-down', 'KeyS');
+    bindDPadBtn('dpad-left', 'KeyA');
+    bindDPadBtn('dpad-right', 'KeyD');
+
+    // 3. Mobile Jump Button
     const mobileJumpBtn = document.getElementById('mobile-jump-btn');
     if (mobileJumpBtn) {
       mobileJumpBtn.addEventListener('click', () => {
@@ -165,7 +194,6 @@ class Controls {
     this.camera.lookAt(targetPosition.x, targetPosition.y + 1.6, targetPosition.z);
   }
 
-  // Cinematic Cutscene Camera focusing on Secret Door opening
   updateCutsceneCamera(doorZPos, cutsceneProgress) {
     const camTarget = new THREE.Vector3(0, 3.5, doorZPos);
     const camEye = new THREE.Vector3(0, 4.5, doorZPos + 14.0 - cutsceneProgress * 3.0);
@@ -174,7 +202,6 @@ class Controls {
     this.camera.lookAt(camTarget);
   }
 
-  // Gameplay Camera Update
   updateCamera(targetPosition, characterRotation) {
     if (this.cameraMode === '3rd') {
       const offsetX = Math.sin(this.cameraAngleY) * this.cameraDistance * Math.cos(this.cameraAngleX);

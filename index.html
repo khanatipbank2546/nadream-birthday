@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>NaDream & Bank - Badminton Court Birthday Quest 🏸🎂</title>
   
   <!-- Google Fonts -->
@@ -68,14 +68,14 @@
           <div id="quest-progress-fill" class="quest-progress-fill" style="width: 0%;"></div>
         </div>
         <div id="current-quest-title" class="quest-current-desc">
-          📌 เดินมุ่งหน้าตรงไปในสนามแบดมินตัน หาภารกิจที่ 1
+          📌 เดินมุ่งหน้าตรงไปที่จุดศูนย์กลางห้องที่ 1
         </div>
       </div>
     </div>
 
     <!-- Desktop Controls Hint -->
     <div class="controls-hint">
-      <div class="hint-key">W A S D</div> เดิน &nbsp;|&nbsp; 
+      <div class="hint-key">W A S D</div> เดินตามมุมกล้อง &nbsp;|&nbsp; 
       <div class="hint-key">SPACE</div> กระโดด &nbsp;|&nbsp; 
       <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp;
       <div class="hint-key">เมาส์ลาก</div> หมุนกล้อง
@@ -95,16 +95,27 @@
     </button>
   </div>
 
-  <!-- Mobile Touch Controls -->
+  <!-- Mobile Touch Controls (PUBG Mobile / ROV Style) -->
   <div id="mobile-controls" class="mobile-controls">
+    <!-- Touch Joystick Zone -->
     <div id="joystick-zone" class="joystick-zone">
       <div id="joystick-base" class="joystick-base">
         <div id="joystick-stick" class="joystick-stick"></div>
       </div>
     </div>
+
+    <!-- Directional D-Pad Arrows (ROV / PUBG Style) -->
+    <div class="dpad-zone">
+      <button id="dpad-up" class="dpad-btn dpad-up" title="เดินหน้า"><i class="fa-solid fa-caret-up"></i></button>
+      <button id="dpad-left" class="dpad-btn dpad-left" title="เลี้ยวซ้าย"><i class="fa-solid fa-caret-left"></i></button>
+      <button id="dpad-right" class="dpad-btn dpad-right" title="เลี้ยวขวา"><i class="fa-solid fa-caret-right"></i></button>
+      <button id="dpad-down" class="dpad-btn dpad-down" title="ถอยหลัง"><i class="fa-solid fa-caret-down"></i></button>
+    </div>
+
+    <!-- Mobile Action & Jump Buttons -->
     <div class="mobile-action-zone">
       <button id="mobile-jump-btn" class="mobile-jump-btn" title="กระโดด">
-        <i class="fa-solid fa-arrow-up"></i>
+        🦘
       </button>
       <button id="mobile-action-btn" class="mobile-action-btn" title="ทำภารกิจ">
         <i class="fa-solid fa-hand-pointer"></i>
@@ -119,7 +130,7 @@
         <div class="npc-avatar">🏸</div>
         <div class="npc-info">
           <h2 class="npc-name">Bank <span class="npc-badge">Badminton Buddy</span></h2>
-          <p class="npc-subtitle">ผู้รอคอยที่ปลายสนามแบดมินตัน</p>
+          <p class="npc-subtitle">ผู้รอคอยที่ห้องโถงแชมเปียน</p>
         </div>
         <button id="npc-modal-close" class="modal-close">&times;</button>
       </div>

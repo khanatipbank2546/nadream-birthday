@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Cave RPG Birthday Adventure - Stylesheet
+   3D Indoor Badminton RPG - Mobile 100dvh & D-Pad PUBG/ROV Controls
    ========================================================================== */
 
 :root {
@@ -7,8 +7,8 @@
   --primary-cyan: #00f5d4;
   --accent-purple: #9d4edd;
   --accent-pink: #ff6b9b;
-  --cave-dark: #0a0b10;
-  --glass-bg: rgba(18, 20, 32, 0.82);
+  --stadium-dark: #1a202c;
+  --glass-bg: rgba(26, 32, 44, 0.88);
   --glass-border: rgba(255, 255, 255, 0.18);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   --text-main: #f8f9fa;
@@ -29,8 +29,9 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: 100dvh; /* Dynamic Viewport Height for mobile Messenger / Chrome */
   overflow: hidden;
-  background-color: var(--cave-dark);
+  background-color: var(--stadium-dark);
   font-family: var(--font-thai);
   color: var(--text-main);
 }
@@ -53,7 +54,8 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #181928 0%, #06070a 100%);
+  height: 100dvh;
+  background: radial-gradient(circle at center, #2d3748 0%, #1a202c 100%);
   z-index: 100;
   display: flex;
   justify-content: center;
@@ -68,8 +70,9 @@ html, body {
 
 .loading-content {
   text-align: center;
-  max-width: 420px;
-  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(16px);
@@ -78,7 +81,7 @@ html, body {
 }
 
 .loader-avatar {
-  font-size: 3.5rem;
+  font-size: 3rem;
   animation: floatBounce 2s infinite ease-in-out;
 }
 
@@ -89,7 +92,7 @@ html, body {
 
 .loading-title {
   font-family: var(--font-accent);
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary-gold), var(--primary-cyan), var(--accent-purple));
   -webkit-background-clip: text;
@@ -99,9 +102,9 @@ html, body {
 
 .loading-subtitle {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-top: 6px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .progress-bar-container {
@@ -148,9 +151,10 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
+  height: 100dvh;
   z-index: 10;
   pointer-events: none;
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -159,42 +163,42 @@ html, body {
 .player-badge {
   pointer-events: auto;
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 18px;
+  gap: 10px;
+  padding: 8px 14px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: var(--glass-shadow);
 }
 
 .avatar-icon {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   box-shadow: 0 0 10px rgba(255, 107, 155, 0.5);
 }
 
 .player-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .badge-tag {
-  font-size: 0.7rem;
-  padding: 2px 8px;
+  font-size: 0.65rem;
+  padding: 2px 6px;
   background: linear-gradient(90deg, #ffd700, #ff8c00);
   color: #000;
   border-radius: 10px;
@@ -202,7 +206,7 @@ html, body {
 }
 
 .player-title {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--primary-cyan);
 }
 
@@ -210,44 +214,38 @@ html, body {
 .top-right-controls {
   pointer-events: auto;
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 
 .camera-btn {
-  padding: 8px 16px;
+  padding: 6px 14px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 20px;
+  border-radius: 18px;
   color: var(--primary-gold);
   font-family: var(--font-thai);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   backdrop-filter: blur(10px);
   box-shadow: var(--glass-shadow);
-  transition: transform 0.2s, background 0.2s;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.camera-btn:hover {
-  transform: scale(1.05);
-  background: rgba(255, 215, 0, 0.2);
+  gap: 6px;
 }
 
 .quest-tracker {
-  width: 290px;
-  padding: 14px 18px;
+  width: 240px;
+  padding: 10px 14px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: var(--glass-shadow);
 }
 
@@ -255,36 +253,36 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .quest-count-badge {
   background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-  padding: 2px 10px;
+  padding: 2px 8px;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .quest-progress-bar {
   width: 100%;
-  height: 6px;
+  height: 5px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .quest-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--primary-cyan), var(--primary-gold));
   border-radius: 6px;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.5s ease;
 }
 
 .quest-current-desc {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: var(--text-main);
   line-height: 1.3;
 }
@@ -292,13 +290,13 @@ html, body {
 /* Desktop Controls Hint */
 .controls-hint {
   position: absolute;
-  bottom: 24px;
-  left: 24px;
+  bottom: 20px;
+  left: 20px;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   backdrop-filter: blur(8px);
 }
@@ -313,18 +311,18 @@ html, body {
   font-weight: bold;
 }
 
-/* Action Prompt Button with Big Number */
+/* Action Prompt Button */
 .action-prompt {
   pointer-events: auto;
   position: absolute;
-  bottom: 110px;
+  bottom: 130px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .action-btn-pulse {
-  padding: 14px 28px;
-  font-size: 1.05rem;
+  padding: 12px 24px;
+  font-size: 0.95rem;
   font-weight: 700;
   font-family: var(--font-thai);
   color: #000;
@@ -335,7 +333,7 @@ html, body {
   box-shadow: 0 0 25px rgba(0, 245, 212, 0.7);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   animation: pulseGlow 1.5s infinite alternate;
 }
 
@@ -343,15 +341,14 @@ html, body {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   background: #000;
   color: var(--primary-gold);
   font-family: var(--font-accent);
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 800;
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes pulseGlow {
@@ -363,35 +360,33 @@ html, body {
 .sound-toggle-btn {
   pointer-events: auto;
   position: absolute;
-  top: 145px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
+  top: 125px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--primary-gold);
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   backdrop-filter: blur(10px);
-  transition: transform 0.2s;
 }
 
-.sound-toggle-btn:hover {
-  transform: scale(1.1);
-}
+/* ==========================================================================
+   Mobile Controls (PUBG Mobile / ROV Style)
+   ========================================================================== */
 
-/* Mobile Controls & Jump Button */
 .mobile-controls {
   pointer-events: auto;
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 170px;
+  height: 160px;
   z-index: 20;
   display: none;
 }
@@ -399,15 +394,16 @@ html, body {
 @media (max-width: 768px) {
   .mobile-controls { display: block; }
   .controls-hint { display: none; }
-  .quest-tracker { width: 220px; font-size: 0.8rem; }
+  .player-badge { padding: 6px 10px; font-size: 0.85rem; }
+  .quest-tracker { width: 190px; padding: 8px 10px; }
 }
 
 .joystick-zone {
   position: absolute;
-  bottom: 30px;
-  left: 30px;
-  width: 110px;
-  height: 110px;
+  bottom: 20px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
 }
 
 .joystick-base {
@@ -421,8 +417,8 @@ html, body {
 }
 
 .joystick-stick {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   border-radius: 50%;
   position: absolute;
@@ -432,33 +428,67 @@ html, body {
   box-shadow: 0 0 15px rgba(255, 107, 155, 0.6);
 }
 
+/* PUBG Mobile / ROV Style Directional D-Pad Arrows */
+.dpad-zone {
+  position: absolute;
+  bottom: 18px;
+  left: 135px;
+  width: 90px;
+  height: 90px;
+}
+
+.dpad-btn {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(6px);
+}
+
+.dpad-btn.active, .dpad-btn:active {
+  background: var(--primary-cyan);
+  color: #000;
+}
+
+.dpad-up { top: 0; left: 29px; }
+.dpad-down { bottom: 0; left: 29px; }
+.dpad-left { top: 29px; left: 0; }
+.dpad-right { top: 29px; right: 0; }
+
 .mobile-action-zone {
   position: absolute;
-  bottom: 30px;
-  right: 30px;
+  bottom: 20px;
+  right: 20px;
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .mobile-jump-btn {
-  width: 65px;
-  height: 65px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-cyan), #00b4d8);
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   color: #000;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   box-shadow: 0 0 15px rgba(0, 245, 212, 0.6);
 }
 
 .mobile-action-btn {
-  width: 65px;
-  height: 65px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
-  border: 3px solid rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   color: #000;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
 }
 
@@ -469,13 +499,14 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(6, 7, 12, 0.8);
+  height: 100dvh;
+  background: rgba(6, 7, 12, 0.82);
   backdrop-filter: blur(12px);
   z-index: 50;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 16px;
 }
 
 .modal-backdrop.hidden, .action-prompt.hidden, .start-btn.hidden {
@@ -484,11 +515,11 @@ html, body {
 
 .npc-dialog-card {
   width: 100%;
-  max-width: 520px;
-  background: linear-gradient(135deg, rgba(20, 24, 40, 0.95), rgba(10, 12, 22, 0.95));
+  max-width: 480px;
+  background: linear-gradient(135deg, rgba(26, 32, 44, 0.95), rgba(15, 18, 28, 0.95));
   border: 2px solid var(--primary-gold);
-  border-radius: 28px;
-  padding: 28px;
+  border-radius: 24px;
+  padding: 24px;
   box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
   position: relative;
   animation: modalSlideUp 0.4s ease-out;
@@ -502,39 +533,38 @@ html, body {
 .npc-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 16px;
   position: relative;
 }
 
 .npc-avatar {
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   background: linear-gradient(135deg, #3a86ff, #00f5d4);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
 }
 
 .npc-name {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary-gold);
 }
 
 .npc-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   padding: 2px 8px;
   background: var(--accent-purple);
   color: #fff;
   border-radius: 10px;
-  vertical-align: middle;
 }
 
 .npc-subtitle {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -545,62 +575,61 @@ html, body {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   cursor: pointer;
 }
 
 .speech-bubble {
   background: rgba(255, 255, 255, 0.08);
   border: 1px dashed rgba(255, 215, 0, 0.5);
-  border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 20px;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 18px;
   text-align: center;
 }
 
 .hbd-title {
   font-family: var(--font-accent);
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary-gold), var(--accent-pink), var(--primary-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .hbd-message {
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.7;
   color: #f1f3f5;
 }
 
 .npc-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .btn-primary {
-  padding: 12px 26px;
+  padding: 10px 22px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   color: #fff;
   border: none;
   border-radius: 30px;
   font-family: var(--font-thai);
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
 }
 
 .btn-secondary {
-  padding: 12px 22px;
+  padding: 10px 18px;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
   font-family: var(--font-thai);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }

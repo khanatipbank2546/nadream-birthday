@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Mini-Games Engine - State 1 to State 5 Missions & FIFA Card Reveal
+   Mini-Games Engine - Non-blocking Toast Banners & Guaranteed Cutscene Callbacks
    ========================================================================== */
 
 class MiniGameEngine {
@@ -42,6 +42,8 @@ class MiniGameEngine {
     this.modalEl.style.display = 'flex';
     this.modalEl.style.zIndex = '99999';
 
+    if (this.giveUpBtn) this.giveUpBtn.style.display = 'inline-block';
+
     this.containerEl.innerHTML = '';
 
     if (roomNum === 1) {
@@ -54,6 +56,23 @@ class MiniGameEngine {
       this.initSlidingPuzzleState4();
     } else if (roomNum === 5) {
       this.initFIFACardRevealState5();
+    }
+  }
+
+  showSuccessBanner(msg, callback) {
+    if (this.containerEl) {
+      const banner = document.createElement('div');
+      banner.className = 'minigame-success-banner';
+      banner.innerHTML = `<h3>${msg}</h3>`;
+      this.containerEl.appendChild(banner);
+
+      if (window.soundEngine) window.soundEngine.playQuestComplete();
+
+      setTimeout(() => {
+        if (callback) callback();
+      }, 900);
+    } else {
+      if (callback) callback();
     }
   }
 
@@ -107,7 +126,6 @@ class MiniGameEngine {
     let selectedPieceIndex = null;
     const boardState = new Array(totalPieces).fill(null);
 
-    // Create 12 Board Target Drop Slots
     for (let i = 0; i < totalPieces; i++) {
       const slot = document.createElement('div');
       slot.className = 'jigsaw-slot';
@@ -130,7 +148,6 @@ class MiniGameEngine {
       boardEl.appendChild(slot);
     }
 
-    // Create 12 Piece Elements and Shuffle
     const pieceIndices = Array.from({ length: totalPieces }, (_, i) => i);
     pieceIndices.sort(() => Math.random() - 0.5);
 
@@ -146,7 +163,6 @@ class MiniGameEngine {
 
       piece.onclick = (e) => {
         e.stopPropagation();
-        // If piece is already placed on board, remove it back to tray
         const parentSlot = piece.parentElement;
         if (parentSlot && parentSlot.classList.contains('jigsaw-slot')) {
           const slotIdx = parseInt(parentSlot.dataset.slotIndex, 10);
@@ -156,7 +172,6 @@ class MiniGameEngine {
           return;
         }
 
-        // Select piece
         document.querySelectorAll('.jigsaw-piece').forEach(p => p.classList.remove('selected'));
         selectedPieceIndex = idx;
         piece.classList.add('selected');
@@ -177,10 +192,9 @@ class MiniGameEngine {
     }
 
     if (isComplete) {
-      setTimeout(() => {
-        alert("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จแล้ว!");
+      this.showSuccessBanner("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จเรียบร้อย!", () => {
         this.finishMiniGame(false);
-      }, 300);
+      });
     }
   }
 
@@ -193,7 +207,6 @@ class MiniGameEngine {
 
     const imgSrc = encodeURI("game/state2/จับผิดภาพ.jpg");
 
-    // 5 Defined Target Spot Areas (% relative to image dimensions)
     const spots = [
       { id: 1, x: 22, y: 30, radius: 8 },
       { id: 2, x: 78, y: 24, radius: 8 },
@@ -237,7 +250,6 @@ class MiniGameEngine {
             foundCount++;
             hitFound = true;
 
-            // Render Green Target Circle
             const marker = document.createElement('div');
             marker.className = 'spot-found-marker';
             marker.style.left = `${spot.x}%`;
@@ -248,17 +260,15 @@ class MiniGameEngine {
             if (window.soundEngine) window.soundEngine.playClick();
 
             if (foundCount >= 5) {
-              setTimeout(() => {
-                alert("🎉 สุดยอด! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!");
+              this.showSuccessBanner("🎉 เก่งมากๆ! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!", () => {
                 this.finishMiniGame(false);
-              }, 300);
+              });
             }
           }
         }
       });
 
       if (!hitFound) {
-        // Red Miss Click Marker
         const miss = document.createElement('div');
         miss.className = 'spot-miss-marker';
         miss.style.left = `${clickX}%`;
@@ -285,7 +295,6 @@ class MiniGameEngine {
       encodeURI("game/state3/ยิ้มกระชากกระเป๋า.jpg")
     ];
 
-    // Create 12 Cards (6 Pairs)
     let cards = [];
     cardImages.forEach((img, index) => {
       cards.push({ id: index, img });
@@ -336,7 +345,6 @@ class MiniGameEngine {
           const [c1, c2] = flippedCards;
 
           if (c1.id === c2.id) {
-            // Match Found!
             c1.element.classList.add('matched');
             c2.element.classList.add('matched');
             matchedPairs++;
@@ -345,13 +353,11 @@ class MiniGameEngine {
             lockBoard = false;
 
             if (matchedPairs >= 6) {
-              setTimeout(() => {
-                alert("🎉 เก่งมากๆ! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!");
+              this.showSuccessBanner("🎉 สุดยอด! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!", () => {
                 this.finishMiniGame(false);
-              }, 400);
+              });
             }
           } else {
-            // No Match - Flip back
             setTimeout(() => {
               c1.element.classList.remove('flipped');
               c2.element.classList.remove('flipped');
@@ -391,10 +397,9 @@ class MiniGameEngine {
     const boardEl = document.getElementById('sliding-board');
     if (!boardEl) return;
 
-    const size = 3; // 3x3 Grid (8 tiles + 1 blank)
+    const size = 3;
     let grid = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 
-    // Solvable Shuffle
     const shuffleGrid = () => {
       for (let i = 0; i < 60; i++) {
         const blankIdx = grid.indexOf(8);
@@ -444,7 +449,6 @@ class MiniGameEngine {
             if (window.soundEngine) window.soundEngine.playClick();
             renderBoard();
 
-            // Check Win
             let isSolved = true;
             for (let i = 0; i < 9; i++) {
               if (grid[i] !== i) {
@@ -454,10 +458,9 @@ class MiniGameEngine {
             }
 
             if (isSolved) {
-              setTimeout(() => {
-                alert("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!");
+              this.showSuccessBanner("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!", () => {
                 this.finishMiniGame(false);
-              }, 300);
+              });
             }
           }
         };
@@ -478,7 +481,6 @@ class MiniGameEngine {
 
     if (this.giveUpBtn) this.giveUpBtn.style.display = 'none';
 
-    // Sort rated photos: Rating Stars descending (5 -> 1), then rating order ascending
     const sortedPhotos = [...this.ratedPhotos].sort((a, b) => {
       if (b.score !== a.score) {
         return b.score - a.score;
@@ -509,7 +511,7 @@ class MiniGameEngine {
 
       const photo = sortedPhotos[index];
       const starsStr = '⭐'.repeat(photo.score);
-      const overallRating = 90 + photo.score * 2; // e.g. 99, 98, 96
+      const overallRating = 90 + photo.score * 2;
 
       if (cardContainer) {
         cardContainer.innerHTML = `

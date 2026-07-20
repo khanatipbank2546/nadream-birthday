@@ -146,7 +146,8 @@ class QuestManager {
           }
         }
       } else if (this.roomSubState === 'GIFT_BOX') {
-        const boxPad = this.courtWorld.giftBoxPads[this.currentRoom - 1];
+        const roomToComplete = this.currentRoom;
+        const boxPad = this.courtWorld.giftBoxPads[roomToComplete - 1];
 
         if (boxPad && boxPad.visible) {
           const dist = Math.hypot(playerPos.x - boxPad.userData.xPos, playerPos.z - boxPad.userData.zPos);
@@ -157,29 +158,37 @@ class QuestManager {
             this.isProcessingCutscene = true;
 
             if (window.game) {
-              window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
+              window.game.startGiftBoxOpeningCutscene(roomToComplete, () => {
                 // GIFT BOX CUTSCENE FINISHED -> START MINI-GAME MISSION!
                 if (window.miniGameEngine) {
-                  window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
-                    if (this.currentRoom <= 4) {
-                      const doorToUnlock = this.currentRoom;
-                      this.currentQuestIndex++;
-                      this.currentRoom++;
+                  window.miniGameEngine.startMiniGame(roomToComplete, this.ratedPhotos, (skipped) => {
+                    // Hide Gift Box & Standing Pad
+                    if (this.courtWorld.questMarkers[roomToComplete - 1]) {
+                      this.courtWorld.questMarkers[roomToComplete - 1].visible = false;
+                    }
+                    if (this.courtWorld.giftBoxPads[roomToComplete - 1]) {
+                      this.courtWorld.giftBoxPads[roomToComplete - 1].visible = false;
+                    }
+
+                    if (roomToComplete <= 4) {
+                      this.courtWorld.unlockBarrier(roomToComplete);
+
+                      this.currentQuestIndex = roomToComplete;
+                      this.currentRoom = roomToComplete + 1;
 
                       // IMMEDIATELY START NEXT ROOM QUEST SO ARROW POINTS TO NEXT ROOM'S CHECKPOINT PAD!
                       this.startRoomQuest(this.currentRoom);
 
                       // RUN SECRET DOOR OPENING CAMERA CUTSCENE!
                       if (window.game && window.game.startDoorOpeningCutscene) {
-                        window.game.startDoorOpeningCutscene(doorToUnlock, () => {
+                        window.game.startDoorOpeningCutscene(roomToComplete, () => {
                           this.isProcessingCutscene = false;
                         });
                       } else {
-                        this.courtWorld.unlockBarrier(doorToUnlock);
                         this.isProcessingCutscene = false;
                       }
 
-                    } else if (this.currentRoom === 5) {
+                    } else if (roomToComplete === 5) {
                       this.currentQuestIndex = 5;
                       this.currentRoom = 6;
                       this.roomSubState = 'COMPLETE';
@@ -192,9 +201,9 @@ class QuestManager {
                     }
                   });
                 } else {
-                  this.courtWorld.unlockBarrier(this.currentRoom);
-                  this.currentQuestIndex++;
-                  this.currentRoom++;
+                  this.courtWorld.unlockBarrier(roomToComplete);
+                  this.currentQuestIndex = roomToComplete;
+                  this.currentRoom = roomToComplete + 1;
                   if (this.currentRoom <= 5) this.startRoomQuest(this.currentRoom);
                   this.isProcessingCutscene = false;
                 }
@@ -202,7 +211,7 @@ class QuestManager {
             }
             return;
           } else if (dist < 5.0) {
-            this.showActionPrompt(`🎁 เดินไปเหยียบจุด Checkpoint กล่องของขวัญ #${this.currentRoom}`);
+            this.showActionPrompt(`🎁 เดินไปเหยียบจุด Checkpoint กล่องของขวัญ #${roomToComplete}`);
             this.isNearTarget = true;
             return;
           }
@@ -268,33 +277,42 @@ class QuestManager {
           });
         }
       } else if (this.roomSubState === 'GIFT_BOX') {
-        const boxPad = this.courtWorld.giftBoxPads[this.currentRoom - 1];
+        const roomToComplete = this.currentRoom;
+        const boxPad = this.courtWorld.giftBoxPads[roomToComplete - 1];
         if (boxPad) boxPad.visible = false;
 
         this.hideActionPrompt();
         this.isProcessingCutscene = true;
 
         if (window.game) {
-          window.game.startGiftBoxOpeningCutscene(this.currentRoom, () => {
+          window.game.startGiftBoxOpeningCutscene(roomToComplete, () => {
             if (window.miniGameEngine) {
-              window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
-                if (this.currentRoom <= 4) {
-                  const doorToUnlock = this.currentRoom;
-                  this.currentQuestIndex++;
-                  this.currentRoom++;
+              window.miniGameEngine.startMiniGame(roomToComplete, this.ratedPhotos, (skipped) => {
+                // Hide Gift Box & Standing Pad
+                if (this.courtWorld.questMarkers[roomToComplete - 1]) {
+                  this.courtWorld.questMarkers[roomToComplete - 1].visible = false;
+                }
+                if (this.courtWorld.giftBoxPads[roomToComplete - 1]) {
+                  this.courtWorld.giftBoxPads[roomToComplete - 1].visible = false;
+                }
+
+                if (roomToComplete <= 4) {
+                  this.courtWorld.unlockBarrier(roomToComplete);
+
+                  this.currentQuestIndex = roomToComplete;
+                  this.currentRoom = roomToComplete + 1;
 
                   this.startRoomQuest(this.currentRoom);
 
                   if (window.game && window.game.startDoorOpeningCutscene) {
-                    window.game.startDoorOpeningCutscene(doorToUnlock, () => {
+                    window.game.startDoorOpeningCutscene(roomToComplete, () => {
                       this.isProcessingCutscene = false;
                     });
                   } else {
-                    this.courtWorld.unlockBarrier(doorToUnlock);
                     this.isProcessingCutscene = false;
                   }
 
-                } else if (this.currentRoom === 5) {
+                } else if (roomToComplete === 5) {
                   this.currentQuestIndex = 5;
                   this.currentRoom = 6;
                   this.roomSubState = 'COMPLETE';

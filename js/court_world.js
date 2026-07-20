@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - 3D Gold Star Badges & Wall Photo Frames
+   3D Indoor Badminton Complex - Numeric Photo Paths & Wall Photo Frames
    ========================================================================== */
 
 class CourtWorld {
@@ -121,12 +121,13 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
+    // Background Photos 11.jfif to 15.jfif
     const bgPhotos = [
-      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/พี่หล่อไหมน้อง.jfif' },
-      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เจ๊สมคิด.jfif' },
-      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เด็กใหม่.jfif' },
-      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/เสื้อเทพ.jfif' },
-      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/แพ้ครับ555.jfif' }
+      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jfif' },
+      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jfif' },
+      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/13.jfif' },
+      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/14.jfif' },
+      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/15.jfif' }
     ];
 
     bgPhotos.forEach(p => {
@@ -138,7 +139,7 @@ class CourtWorld {
       pGroup.add(frameMesh);
 
       const picGeo = new THREE.PlaneGeometry(p.w, p.h);
-      this.textureLoader.load(encodeURI(p.path), (tex) => {
+      this.textureLoader.load(p.path, (tex) => {
         const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
         const picMesh = new THREE.Mesh(picGeo, picMat);
         picMesh.position.z = 0.05;
@@ -164,17 +165,18 @@ class CourtWorld {
   }
 
   initArtGalleryPhotos() {
+    // Exact Numeric Photo Files 1.jfif through 10.jfif
     const photoFiles = [
-      'pic/ยิ้มกระชากกระเป๋า.jfif',
-      'pic/นิ้วเกิน.jfif',
-      'pic/แช้มแรกป่ะ.jfif',
-      'pic/เสื้อเทพ.jfif',
-      'pic/ณเดช.jfif',
-      'pic/เล-กง เล-โก้.jfif',
-      'pic/พี่หล่อไหมน้อง.jfif',
-      'pic/เด็กใหม่.jfif',
-      'pic/เจ๊สมคิด.jfif',
-      'pic/แพ้ครับ555.jfif'
+      'pic/1.jfif',
+      'pic/2.jfif',
+      'pic/3.jfif',
+      'pic/4.jfif',
+      'pic/5.jfif',
+      'pic/6.jfif',
+      'pic/7.jfif',
+      'pic/8.jfif',
+      'pic/9.jfif',
+      'pic/10.jfif'
     ];
 
     const roomDepth = 28;
@@ -196,7 +198,8 @@ class CourtWorld {
     const artGroup = new THREE.Group();
 
     const fileNameFull = imagePath.split('/').pop();
-    const cleanTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
+    const rawTitle = fileNameFull.substring(0, fileNameFull.lastIndexOf('.')) || fileNameFull;
+    const cleanTitle = `รูปที่ ${rawTitle}`;
 
     const frameGeo = new THREE.BoxGeometry(3.1, 4.0, 0.12);
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.85, roughness: 0.25 });
@@ -204,7 +207,7 @@ class CourtWorld {
     artGroup.add(frameMesh);
 
     const picGeo = new THREE.PlaneGeometry(2.8, 3.6);
-    this.textureLoader.load(encodeURI(imagePath), (tex) => {
+    this.textureLoader.load(imagePath, (tex) => {
       const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
       const picMesh = new THREE.Mesh(picGeo, picMat);
       picMesh.position.z = 0.07;
@@ -232,7 +235,7 @@ class CourtWorld {
     pCtx.font = 'bold 26px Prompt, Arial';
     pCtx.textAlign = 'center';
     pCtx.textBaseline = 'middle';
-    pCtx.fillText(cleanTitle.substring(0, 24), 256, 48);
+    pCtx.fillText(cleanTitle, 256, 48);
 
     const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
     const plaqueMat = new THREE.MeshStandardMaterial({ map: plaqueTex });

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Character Controller - NaDream Avatar Redesign (Photo 5 Matching)
+   3D Character Controller - NaDream Avatar (Bangs Removed, Pulled-Back Hair)
    ========================================================================== */
 
 class CharacterController {
@@ -40,7 +40,6 @@ class CharacterController {
     canvas.height = 512;
     const ctx = canvas.getContext('2d');
 
-    // Deep Navy Blue Base (Upper Chest & Shoulders)
     const baseGrad = ctx.createLinearGradient(0, 0, 0, 512);
     baseGrad.addColorStop(0, '#0f172a');
     baseGrad.addColorStop(0.35, '#1e293b');
@@ -50,7 +49,6 @@ class CharacterController {
     ctx.fillStyle = baseGrad;
     ctx.fillRect(0, 0, 512, 512);
 
-    // Wave / Horizontal Gradient Lines (Photo 5 Athletic Pattern)
     ctx.lineWidth = 14;
     for (let y = 180; y < 512; y += 22) {
       const alpha = (y - 180) / 332;
@@ -63,7 +61,6 @@ class CharacterController {
       ctx.stroke();
     }
 
-    // Cyan Accent Highlights
     ctx.lineWidth = 8;
     ctx.strokeStyle = '#00f5d4';
     for (let y = 220; y < 480; y += 36) {
@@ -112,23 +109,20 @@ class CharacterController {
     return new THREE.CanvasTexture(canvas);
   }
 
-  // 3D Thin Metallic Wire Glasses (Exact match for Photos 1, 3, 4!)
+  // 3D Thin Metallic Wire Glasses (Photos 1, 3, 4)
   createGlasses() {
     const glassesGroup = new THREE.Group();
     const frameMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.9, roughness: 0.2 });
 
-    // Left Rim
     const rimGeo = new THREE.TorusGeometry(0.16, 0.018, 8, 24);
     const leftRim = new THREE.Mesh(rimGeo, frameMat);
     leftRim.position.set(-0.21, 0.02, 0.52);
     glassesGroup.add(leftRim);
 
-    // Right Rim
     const rightRim = new THREE.Mesh(rimGeo, frameMat);
     rightRim.position.set(0.21, 0.02, 0.52);
     glassesGroup.add(rightRim);
 
-    // Double Nose Bridge
     const bridgeGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.2, 8);
     const bridge1 = new THREE.Mesh(bridgeGeo, frameMat);
     bridge1.rotation.z = Math.PI / 2;
@@ -140,7 +134,6 @@ class CharacterController {
     bridge2.position.set(0, -0.04, 0.52);
     glassesGroup.add(bridge2);
 
-    // Side Temples
     const templeGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.45, 8);
     const leftTemple = new THREE.Mesh(templeGeo, frameMat);
     leftTemple.rotation.x = Math.PI / 2;
@@ -186,12 +179,11 @@ class CharacterController {
 
   buildCharacter() {
     const hairMaterial = new THREE.MeshToonMaterial({ color: 0x222225 });
-    const shortsMaterial = new THREE.MeshToonMaterial({ color: 0x141416 }); // Black Shorts
-    const stripeMaterial = new THREE.MeshToonMaterial({ color: 0xffffff });
+    const shortsMaterial = new THREE.MeshToonMaterial({ color: 0x141416 });
     const shoeMaterial = new THREE.MeshToonMaterial({ color: 0xffffff });
     const bagMaterial = new THREE.MeshToonMaterial({ color: 0xf4f4f0 });
 
-    // 1. HEAD, FACE & WIRE GLASSES
+    // 1. HEAD, FACE & WIRE GLASSES (Clean forehead, NO BANGS!)
     const headGroup = new THREE.Group();
     const faceTex = this.createFaceTexture();
     const faceMaterial = new THREE.MeshToonMaterial({ map: faceTex });
@@ -201,25 +193,25 @@ class CharacterController {
     headMesh.rotation.y = -Math.PI / 2;
     headGroup.add(headMesh);
 
-    // Hair Cap
-    const hairCapGeo = new THREE.SphereGeometry(0.58, 32, 16, 0, Math.PI * 2, 0, Math.PI / 1.8);
+    // Hair Cap - Positioned higher up & back so FOREHEAD IS COMPLETELY CLEAN & EXPOSED (NO BANGS!)
+    const hairCapGeo = new THREE.SphereGeometry(0.57, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.2);
     const hairCap = new THREE.Mesh(hairCapGeo, hairMaterial);
-    hairCap.position.set(0, 0.05, -0.02);
+    hairCap.position.set(0, 0.12, -0.09);
     headGroup.add(hairCap);
 
     // 3D Thin Wire Glasses
     const glasses = this.createGlasses();
     headGroup.add(glasses);
 
-    // Ponytail Hair
+    // Sleek Rear Ponytail
     const ponytailGroup = new THREE.Group();
-    const ponytailGeo = new THREE.ConeGeometry(0.2, 0.7, 16);
+    const ponytailGeo = new THREE.ConeGeometry(0.22, 0.75, 16);
     const ponytailMesh = new THREE.Mesh(ponytailGeo, hairMaterial);
     ponytailMesh.rotation.x = -Math.PI / 3;
     ponytailMesh.position.set(0, -0.25, -0.2);
     ponytailGroup.add(ponytailMesh);
 
-    ponytailGroup.position.set(0, 0.15, -0.48);
+    ponytailGroup.position.set(0, 0.18, -0.5);
     headGroup.add(ponytailGroup);
     this.ponytail = ponytailGroup;
 
@@ -283,8 +275,8 @@ class CharacterController {
     legRight.position.y = -0.6;
     rightLegGroup.add(legRight);
 
-    const rightShoe = new THREE.Mesh(shoeGeo, shoeMaterial);
-    rightShoe.position.set(0, -0.85, 0.06);
+    const shoeRight = new THREE.Mesh(shoeGeo, shoeMaterial);
+    shoeRight.position.set(0, -0.85, 0.06);
     rightLegGroup.add(rightShoe);
 
     rightLegGroup.position.set(0.25, 0.8, 0);

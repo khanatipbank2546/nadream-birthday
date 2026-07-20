@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Grand 3D Gift Box & Photo Gallery
+   3D Indoor Badminton Complex - Forward Guide Arrow & Encoded Thai Texture Loader
    ========================================================================== */
 
 class CourtWorld {
@@ -138,7 +138,7 @@ class CourtWorld {
       pGroup.add(frameMesh);
 
       const picGeo = new THREE.PlaneGeometry(p.w, p.h);
-      this.textureLoader.load(p.path, (tex) => {
+      this.textureLoader.load(encodeURI(p.path), (tex) => {
         const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
         const picMesh = new THREE.Mesh(picGeo, picMat);
         picMesh.position.z = 0.05;
@@ -204,7 +204,7 @@ class CourtWorld {
     artGroup.add(frameMesh);
 
     const picGeo = new THREE.PlaneGeometry(2.8, 3.6);
-    this.textureLoader.load(imagePath, (tex) => {
+    this.textureLoader.load(encodeURI(imagePath), (tex) => {
       const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
       const picMesh = new THREE.Mesh(picGeo, picMat);
       picMesh.position.z = 0.07;
@@ -331,6 +331,7 @@ class CourtWorld {
     return arrowGroup;
   }
 
+  // Dynamically update floor path arrow in front of player pointing directly at target!
   updatePathArrow(playerPos, targetPos) {
     if (!this.activePathArrow) return;
 
@@ -351,7 +352,8 @@ class CourtWorld {
           playerPos.z + normZ * 1.8
         );
 
-        const angle = Math.atan2(dirX, dirZ);
+        // ADD + Math.PI SO THE ARROW POINTS DIRECTLY FORWARD TOWARDS THE TARGET!
+        const angle = Math.atan2(dirX, dirZ) + Math.PI;
         this.activePathArrow.rotation.y = angle;
 
         const pulse = 1.0 + Math.sin(Date.now() * 0.008) * 0.2;
@@ -530,14 +532,12 @@ class CourtWorld {
       const questNum = idx + 1;
       const boxGroup = new THREE.Group();
 
-      // Lower Box Container
       const boxGeo = new THREE.BoxGeometry(1.0, 0.8, 1.0);
       const boxMat = new THREE.MeshStandardMaterial({ color: 0xe63946, roughness: 0.3 });
       const boxMesh = new THREE.Mesh(boxGeo, boxMat);
       boxMesh.position.y = -0.1;
       boxGroup.add(boxMesh);
 
-      // Separate Lid Mesh Group for Grand Opening Cutscene!
       const lidGroup = new THREE.Group();
       const lidGeo = new THREE.BoxGeometry(1.06, 0.22, 1.06);
       const lidMesh = new THREE.Mesh(lidGeo, boxMat);
@@ -570,7 +570,6 @@ class CourtWorld {
 
       boxGroup.add(lidGroup);
 
-      // Golden Burst Light inside Gift Box
       const burstLight = new THREE.PointLight(0xffd700, 0, 15);
       burstLight.position.set(0, 0.5, 0);
       boxGroup.add(burstLight);
@@ -591,19 +590,16 @@ class CourtWorld {
     }
   }
 
-  // Grand Gift Box Opening Lid Animation
   animateGiftBoxOpening(roomIdx, progress) {
     const boxGroup = this.questMarkers[roomIdx];
     if (boxGroup && boxGroup.userData.lidGroup) {
       boxGroup.userData.openingProgress = progress;
       const lid = boxGroup.userData.lidGroup;
 
-      // Pop lid off upward & tilt
       lid.position.y = progress * 2.5;
       lid.rotation.x = progress * Math.PI * 0.5;
       lid.rotation.z = progress * Math.PI * 0.25;
 
-      // Flare golden light beam burst
       if (boxGroup.userData.burstLight) {
         boxGroup.userData.burstLight.intensity = Math.sin(progress * Math.PI) * 6.0;
       }

@@ -13,8 +13,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet with Cache-Buster v=100.0 -->
-  <link rel="stylesheet" href="css/styles.css?v=100.0">
+  <!-- Custom Stylesheet with Cache-Buster v=101.0 -->
+  <link rel="stylesheet" href="css/styles.css?v=101.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -129,14 +129,14 @@
     </button>
   </div>
 
-  <!-- 5-Star Photo Review Rating Modal Popup ("ความเท่ของรูป") -->
+  <!-- Interactive 5-Star Photo Review Rating Modal Popup ("ความเท่ของรูป") -->
   <div id="star-rating-modal" class="modal-backdrop hidden">
     <div class="npc-dialog-card art-dialog-card rating-dialog-card">
       <div class="npc-header">
         <div class="npc-avatar">⭐</div>
         <div class="npc-info">
           <h2 id="star-title-text" class="npc-name">ชื่อรูปภาพ</h2>
-          <p class="npc-subtitle">✨ รีวิวผลงานศิลปะประจำสนามแบดมินตัน ✨</p>
+          <p class="npc-subtitle">✨ เลือกให้คะแนนความเท่ 1 - 5 ดาว ✨</p>
         </div>
         <button id="star-modal-close" class="modal-close">&times;</button>
       </div>
@@ -145,21 +145,21 @@
         <img id="star-photo-img" src="" alt="Art Gallery Photo" class="art-display-img">
         
         <div class="star-rating-box">
-          <div class="rating-label">🔥 ความเท่ของรูปภาพนี้ 🔥</div>
-          <div class="stars-row">
-            <i class="fa-solid fa-star star-icon active-star"></i>
-            <i class="fa-solid fa-star star-icon active-star"></i>
-            <i class="fa-solid fa-star star-icon active-star"></i>
-            <i class="fa-solid fa-star star-icon active-star"></i>
-            <i class="fa-solid fa-star star-icon active-star"></i>
+          <div class="rating-label">🔥 คลิกเลือกดาวประเมินความเท่ของรูป 🔥</div>
+          <div id="stars-row" class="stars-row">
+            <i data-star="1" class="fa-solid fa-star star-icon active-star"></i>
+            <i data-star="2" class="fa-solid fa-star star-icon active-star"></i>
+            <i data-star="3" class="fa-solid fa-star star-icon active-star"></i>
+            <i data-star="4" class="fa-solid fa-star star-icon active-star"></i>
+            <i data-star="5" class="fa-solid fa-star star-icon active-star"></i>
           </div>
-          <div class="rating-score-text">⭐⭐⭐⭐⭐ 5 ดาวสุดเท่ อลังการมาก!</div>
+          <div id="rating-score-text" class="rating-score-text">⭐⭐⭐⭐⭐ 5 ดาว เท่ระดับเทพ!</div>
         </div>
       </div>
 
       <div class="npc-footer text-center">
         <button id="star-confirm-btn" class="btn-primary btn-large-gold">
-          <i class="fa-solid fa-crown"></i> ให้คะแนนรูปนี้เรียบร้อย! ✨
+          <i class="fa-solid fa-crown"></i> ยืนยันคะแนนรูปนี้เรียบร้อย! ✨
         </button>
       </div>
     </div>
@@ -199,13 +199,13 @@
     </div>
   </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=100.0 -->
-  <script src="js/audio.js?v=100.0"></script>
-  <script src="js/character.js?v=100.0"></script>
-  <script src="js/npc_bank.js?v=100.0"></script>
-  <script src="js/court_world.js?v=100.0"></script>
-  <script src="js/quests.js?v=100.0"></script>
-  <script src="js/controls.js?v=100.0"></script>
-  <script src="js/main.js?v=100.0"></script>
+  <!-- Standard Order Scripts with Cache-Buster v=101.0 -->
+  <script src="js/audio.js?v=101.0"></script>
+  <script src="js/character.js?v=101.0"></script>
+  <script src="js/npc_bank.js?v=101.0"></script>
+  <script src="js/court_world.js?v=101.0"></script>
+  <script src="js/quests.js?v=101.0"></script>
+  <script src="js/controls.js?v=101.0"></script>
+  <script src="js/main.js?v=101.0"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Entry Point - 4-Second Photo Review, 5-Star Rating & Gift Box Cutscenes
+   Main Entry Point - Interactive 1-5 Star Rating & 180-deg Zoom Cutscenes
    ========================================================================== */
 
 class Game {
@@ -197,7 +197,7 @@ class Game {
     }, 400);
   }
 
-  // 4-Second 3D Camera Orbit Preview Cutscene
+  // 4-Second 180° Wall-Safe Preview Cutscene
   startPhotoPreviewCutscene(artData, callback) {
     this.gameState = 'PHOTO_PREVIEW';
     this.previewArtPos.set(artData.xPos, artData.yPos, artData.zPos);
@@ -329,18 +329,65 @@ class Game {
   }
 }
 
-// Global helper for 5-Star Photo Review Rating Modal Popup
+// Global helper for Interactive 1-5 Star Photo Review Rating Modal Popup
 window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallback) {
   const modal = document.getElementById('star-rating-modal');
   const img = document.getElementById('star-photo-img');
   const title = document.getElementById('star-title-text');
   const confirmBtn = document.getElementById('star-confirm-btn');
   const closeBtn = document.getElementById('star-modal-close');
+  const starsContainer = document.getElementById('stars-row');
+  const scoreText = document.getElementById('rating-score-text');
 
   if (modal && img && title) {
-    img.src = imagePath;
+    // Wrap imagePath in encodeURI for reliable Thai filename rendering!
+    img.src = encodeURI(imagePath);
     title.innerText = cleanTitleText;
     modal.classList.remove('hidden');
+
+    let currentRating = 5;
+
+    const scoreLabels = [
+      "⭐ 1 ดาว พอใช้ได้",
+      "⭐⭐ 2 ดาว ดีงามมาก",
+      "⭐⭐⭐ 3 ดาว เท่สุดยอด",
+      "⭐⭐⭐⭐ 4 ดาว เท่เหลือล้น",
+      "⭐⭐⭐⭐⭐ 5 ดาว เท่ระดับเทพ!"
+    ];
+
+    const updateStarDisplay = (score) => {
+      currentRating = score;
+      if (scoreText) scoreText.innerText = scoreLabels[score - 1];
+
+      if (starsContainer) {
+        const starIcons = starsContainer.querySelectorAll('.star-icon');
+        starIcons.forEach((star, idx) => {
+          if (idx < score) {
+            star.style.opacity = '1.0';
+            star.style.filter = 'drop-shadow(0 0 10px #ffd700)';
+            star.style.color = '#ffd700';
+          } else {
+            star.style.opacity = '0.3';
+            star.style.filter = 'none';
+            star.style.color = '#a0aab2';
+          }
+        });
+      }
+    };
+
+    updateStarDisplay(5);
+
+    if (starsContainer) {
+      const starIcons = starsContainer.querySelectorAll('.star-icon');
+      starIcons.forEach(star => {
+        star.onclick = (e) => {
+          e.stopPropagation();
+          const starVal = parseInt(star.getAttribute('data-star') || '5', 10);
+          updateStarDisplay(starVal);
+          if (window.soundEngine) window.soundEngine.playClick();
+        };
+      });
+    }
 
     const handleConfirm = () => {
       modal.classList.add('hidden');

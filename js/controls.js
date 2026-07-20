@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Camera Controls - 4-Second Photo Preview Orbit & Gift Box Cutscenes
+   3D Camera Controls - Stationary Showcase & 180-deg Wall-Safe Zoom Orbit
    ========================================================================== */
 
 class Controls {
@@ -101,27 +101,40 @@ class Controls {
     if (window.soundEngine) window.soundEngine.playClick();
   }
 
+  // Pre-Game Showcase Camera: STATIONARY facing the Photo Feature Wall! (No background spinning!)
   updateShowcaseCamera(characterPos, timeMs) {
-    const orbitSpeed = 0.0004;
-    const radius = 6.8;
-    const angle = timeMs * orbitSpeed;
-
-    const camX = characterPos.x + Math.sin(angle) * radius;
-    const camY = characterPos.y + 2.2;
-    const camZ = characterPos.z + Math.cos(angle) * radius;
-
-    this.camera.position.set(camX, camY, camZ);
-    this.camera.lookAt(characterPos.x, characterPos.y + 1.4, characterPos.z);
+    this.camera.position.set(0, 2.2, -13.5);
+    this.camera.lookAt(0, 1.4, -20.0);
   }
 
-  // 4-Second 3D Camera Orbit Preview around Wall Art Frame
+  // 4-Second 180° Wall-Safe Preview Camera with Dynamic Multi-Phase Zoom (No Wall Clipping!)
   updatePhotoPreviewCamera(artPos, progress) {
-    const orbitAngle = progress * Math.PI * 1.5; // Orbit 270 degrees in 4s
-    const distance = 4.2;
+    // 180° Front Arc Pan facing the Wall (From -PI/2 to +PI/2)
+    const arcAngle = (progress - 0.5) * Math.PI * 0.9;
+    
+    // Dynamic Multi-Phase Zoom Curve in 4 Seconds:
+    // 0.0s -> 1.5s: Zoom-in Close-up (Distance 4.5 -> 2.4)
+    // 1.5s -> 3.0s: Close-up Pan Across Details (Distance 2.4 -> 2.8)
+    // 3.0s -> 4.0s: Smooth Zoom-out (Distance 2.8 -> 4.2)
+    let zoomDist = 4.2;
+    if (progress < 0.35) {
+      const t = progress / 0.35;
+      zoomDist = 4.5 - t * 2.1; // Close-up 2.4
+    } else if (progress < 0.75) {
+      const t = (progress - 0.35) / 0.40;
+      zoomDist = 2.4 + t * 0.4;
+    } else {
+      const t = (progress - 0.75) / 0.25;
+      zoomDist = 2.8 + t * 1.4; // Zoom out to 4.2
+    }
 
-    const camX = artPos.x + Math.sin(orbitAngle) * distance;
-    const camY = artPos.y + Math.sin(progress * Math.PI) * 0.4;
-    const camZ = artPos.z + Math.cos(orbitAngle) * distance;
+    // Determine wall facing direction from artPos.x
+    // Left Wall (x = -18.45) faces +X; Right Wall (x = +18.45) faces -X
+    const wallNormalDir = artPos.x < 0 ? 1 : -1;
+
+    const camX = artPos.x + Math.cos(arcAngle) * zoomDist * wallNormalDir;
+    const camY = artPos.y + Math.sin(progress * Math.PI) * 0.35;
+    const camZ = artPos.z + Math.sin(arcAngle) * zoomDist * 0.8;
 
     this.camera.position.set(camX, camY, camZ);
     this.camera.lookAt(artPos.x, artPos.y, artPos.z);

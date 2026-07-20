@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton RPG - Mobile 100dvh & D-Pad PUBG/ROV Controls
+   3D Indoor Badminton RPG - Mobile Touch Controls Visibility (Always Visible)
    ========================================================================== */
 
 :root {
@@ -29,7 +29,7 @@
 html, body {
   width: 100%;
   height: 100%;
-  height: 100dvh; /* Dynamic Viewport Height for mobile Messenger / Chrome */
+  height: 100dvh;
   overflow: hidden;
   background-color: var(--stadium-dark);
   font-family: var(--font-thai);
@@ -56,7 +56,7 @@ html, body {
   height: 100%;
   height: 100dvh;
   background: radial-gradient(circle at center, #2d3748 0%, #1a202c 100%);
-  z-index: 100;
+  z-index: 200;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -139,11 +139,6 @@ html, body {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.start-btn:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
-}
-
 /* Game HUD */
 .game-hud {
   position: absolute;
@@ -154,7 +149,7 @@ html, body {
   height: 100dvh;
   z-index: 10;
   pointer-events: none;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -163,12 +158,12 @@ html, body {
 .player-badge {
   pointer-events: auto;
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 12px;
+  left: 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 6px 12px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
@@ -177,19 +172,18 @@ html, body {
 }
 
 .avatar-icon {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.2rem;
-  box-shadow: 0 0 10px rgba(255, 107, 155, 0.5);
+  font-size: 1.1rem;
 }
 
 .player-name {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -206,30 +200,35 @@ html, body {
 }
 
 .player-title {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--primary-cyan);
 }
 
-/* Top Right Controls & Camera Toggle */
+/* Top Right Controls */
 .top-right-controls {
   pointer-events: auto;
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 12px;
+  right: 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 8px;
+  gap: 6px;
 }
 
-.camera-btn {
-  padding: 6px 14px;
+.top-buttons-row {
+  display: flex;
+  gap: 6px;
+}
+
+.hud-btn {
+  padding: 6px 12px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   border-radius: 18px;
   color: var(--primary-gold);
   font-family: var(--font-thai);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -240,8 +239,8 @@ html, body {
 }
 
 .quest-tracker {
-  width: 240px;
-  padding: 10px 14px;
+  width: 220px;
+  padding: 8px 12px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   backdrop-filter: blur(12px);
@@ -253,9 +252,9 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .quest-count-badge {
@@ -271,7 +270,7 @@ html, body {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .quest-progress-fill {
@@ -282,21 +281,21 @@ html, body {
 }
 
 .quest-current-desc {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-main);
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
 /* Desktop Controls Hint */
 .controls-hint {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
+  bottom: 16px;
+  left: 16px;
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   backdrop-filter: blur(8px);
 }
@@ -315,9 +314,10 @@ html, body {
 .action-prompt {
   pointer-events: auto;
   position: absolute;
-  bottom: 130px;
+  bottom: 140px;
   left: 50%;
   transform: translateX(-50%);
+  z-index: 110;
 }
 
 .action-btn-pulse {
@@ -360,15 +360,15 @@ html, body {
 .sound-toggle-btn {
   pointer-events: auto;
   position: absolute;
-  top: 125px;
-  right: 16px;
-  width: 40px;
-  height: 40px;
+  top: 115px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--primary-gold);
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -377,7 +377,7 @@ html, body {
 }
 
 /* ==========================================================================
-   Mobile Controls (PUBG Mobile / ROV Style)
+   Mobile Touch Controls (ALWAYS VISIBLE & PROMINENT)
    ========================================================================== */
 
 .mobile-controls {
@@ -386,110 +386,120 @@ html, body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 160px;
-  z-index: 20;
-  display: none;
+  height: 180px;
+  z-index: 100; /* High Z-Index so touch controls are ALWAYS on top! */
+  display: block; /* Visible by default on all screens! */
 }
 
-@media (max-width: 768px) {
-  .mobile-controls { display: block; }
-  .controls-hint { display: none; }
-  .player-badge { padding: 6px 10px; font-size: 0.85rem; }
-  .quest-tracker { width: 190px; padding: 8px 10px; }
+.mobile-controls.hidden-force {
+  display: none !important;
 }
 
+/* Virtual Joystick */
 .joystick-zone {
   position: absolute;
-  bottom: 20px;
+  bottom: 25px;
   left: 20px;
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
 }
 
 .joystick-base {
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--primary-cyan);
   border-radius: 50%;
   position: relative;
   backdrop-filter: blur(8px);
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
 }
 
 .joystick-stick {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  border: 2px solid #fff;
   border-radius: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 15px rgba(255, 107, 155, 0.6);
+  box-shadow: 0 0 15px rgba(255, 107, 155, 0.8);
 }
 
-/* PUBG Mobile / ROV Style Directional D-Pad Arrows */
+/* Directional D-Pad Arrows (PUBG / ROV Style - HUGE & CLEAR) */
 .dpad-zone {
   position: absolute;
-  bottom: 18px;
-  left: 135px;
-  width: 90px;
-  height: 90px;
+  bottom: 20px;
+  left: 145px;
+  width: 115px;
+  height: 115px;
 }
 
 .dpad-btn {
   position: absolute;
-  width: 32px;
-  height: 32px;
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 1.1rem;
+  width: 38px;
+  height: 38px;
+  background: rgba(15, 20, 32, 0.85);
+  border: 2px solid var(--primary-gold);
+  border-radius: 10px;
+  color: var(--primary-gold);
+  font-size: 1.3rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
 }
 
 .dpad-btn.active, .dpad-btn:active {
   background: var(--primary-cyan);
   color: #000;
+  border-color: #fff;
+  transform: scale(0.95);
 }
 
-.dpad-up { top: 0; left: 29px; }
-.dpad-down { bottom: 0; left: 29px; }
-.dpad-left { top: 29px; left: 0; }
-.dpad-right { top: 29px; right: 0; }
+.dpad-up { top: 0; left: 38px; }
+.dpad-down { bottom: 0; left: 38px; }
+.dpad-left { top: 38px; left: 0; }
+.dpad-right { top: 38px; right: 0; }
 
 .mobile-action-zone {
   position: absolute;
-  bottom: 20px;
+  bottom: 25px;
   right: 20px;
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .mobile-jump-btn {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-cyan), #00b4d8);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 3px solid #fff;
   color: #000;
-  font-size: 1.5rem;
-  box-shadow: 0 0 15px rgba(0, 245, 212, 0.6);
+  font-size: 1.6rem;
+  box-shadow: 0 0 20px rgba(0, 245, 212, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .mobile-action-btn {
-  width: 58px;
-  height: 58px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  border: 3px solid #fff;
   color: #000;
-  font-size: 1.3rem;
-  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+  font-size: 1.4rem;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Modals & Bank Speech Bubble */
@@ -500,9 +510,9 @@ html, body {
   width: 100%;
   height: 100%;
   height: 100dvh;
-  background: rgba(6, 7, 12, 0.82);
+  background: rgba(6, 7, 12, 0.85);
   backdrop-filter: blur(12px);
-  z-index: 50;
+  z-index: 250;
   display: flex;
   justify-content: center;
   align-items: center;

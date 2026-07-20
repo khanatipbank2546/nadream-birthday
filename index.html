@@ -52,11 +52,16 @@
       </div>
     </div>
 
-    <!-- Top Right: Quest Tracker & Camera View Switcher -->
+    <!-- Top Right: Quest Tracker & Controls Toggle Buttons -->
     <div class="top-right-controls">
-      <button id="camera-toggle-btn" class="camera-btn" title="เปลี่ยนมุมมอง">
-        <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
-      </button>
+      <div class="top-buttons-row">
+        <button id="touch-toggle-btn" class="hud-btn" title="ซ่อน/แสดงปุ่มเดินหน้าจอ">
+          <i class="fa-solid fa-gamepad"></i> <span>🎮 ปุ่มเดิน</span>
+        </button>
+        <button id="camera-toggle-btn" class="hud-btn" title="เปลี่ยนมุมมอง">
+          <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
+        </button>
+      </div>
       
       <div class="quest-tracker">
         <div class="tracker-header">
@@ -95,7 +100,7 @@
     </button>
   </div>
 
-  <!-- Mobile Touch Controls (PUBG Mobile / ROV Style) -->
+  <!-- Mobile Touch Controls (PUBG Mobile / ROV Style - ALWAYS VISIBLE) -->
   <div id="mobile-controls" class="mobile-controls">
     <!-- Touch Joystick Zone -->
     <div id="joystick-zone" class="joystick-zone">
@@ -104,7 +109,7 @@
       </div>
     </div>
 
-    <!-- Directional D-Pad Arrows (ROV / PUBG Style) -->
+    <!-- Directional D-Pad Arrows (ROV / PUBG Style - HUGE & CLEAR) -->
     <div class="dpad-zone">
       <button id="dpad-up" class="dpad-btn dpad-up" title="เดินหน้า"><i class="fa-solid fa-caret-up"></i></button>
       <button id="dpad-left" class="dpad-btn dpad-left" title="เลี้ยวซ้าย"><i class="fa-solid fa-caret-left"></i></button>

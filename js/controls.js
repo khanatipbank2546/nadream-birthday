@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Input & Controls Manager - FIXED e bug, D-Pad & Touch Joystick (Global Window)
+   Input & Controls Manager - D-Pad, Touch Joystick & Toggle Button (Global Window)
    ========================================================================== */
 
 class Controls {
@@ -20,12 +20,13 @@ class Controls {
     this.showcaseAngle = 0;
 
     this.isDraggingMouse = false;
-    this.previousMousePosition = { x: 0, y: 0 }; // FIXED e is not defined bug!
+    this.previousMousePosition = { x: 0, y: 0 };
 
     this.bindKeyboardEvents();
     this.bindMouseEvents();
     this.bindTouchControls();
     this.bindCameraToggle();
+    this.bindTouchControlsToggle();
   }
 
   bindKeyboardEvents() {
@@ -171,6 +172,17 @@ class Controls {
     const toggleBtn = document.getElementById('camera-toggle-btn');
     if (toggleBtn) {
       toggleBtn.addEventListener('click', () => this.toggleCameraView());
+    }
+  }
+
+  bindTouchControlsToggle() {
+    const touchToggleBtn = document.getElementById('touch-toggle-btn');
+    const mobileControls = document.getElementById('mobile-controls');
+
+    if (touchToggleBtn && mobileControls) {
+      touchToggleBtn.addEventListener('click', () => {
+        mobileControls.classList.toggle('hidden-force');
+      });
     }
   }
 

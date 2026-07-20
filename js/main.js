@@ -231,6 +231,24 @@ class Game {
     if (window.soundEngine) window.soundEngine.playDoorUnlock();
   }
 
+  // Secret Door Opening Camera Cutscene (Pans to Door as panels slide open with glowing light!)
+  startDoorOpeningCutscene(doorIndex, callback) {
+    this.gameState = 'DOOR_OPENING';
+    const door = this.courtWorld ? this.courtWorld.doors[doorIndex - 1] : null;
+    const doorZ = door ? door.userData.zPos : -doorIndex * 28;
+
+    this.previewArtPos.set(0, 0, doorZ);
+    this.previewTimer = 0;
+    this.previewCallback = callback;
+
+    if (this.courtWorld) {
+      this.courtWorld.unlockBarrier(doorIndex);
+    }
+    if (window.soundEngine) {
+      window.soundEngine.playDoorUnlock();
+    }
+  }
+
   // Grand Birthday Finale Cutscene (Room 5 Complete)
   startGrandBirthdayFinale() {
     this.gameState = 'FINALE';
@@ -337,6 +355,23 @@ class Game {
         if (this.giftBoxCallback) {
           const cb = this.giftBoxCallback;
           this.giftBoxCallback = null;
+          cb();
+        }
+      }
+
+    } else if (this.gameState === 'DOOR_OPENING') {
+      this.previewTimer += delta;
+      const progress = Math.min(1.0, this.previewTimer / 2.0); // 2.0s Secret Door Opening Cutscene!
+
+      if (this.controls) {
+        this.controls.updateDoorOpeningCamera(this.previewArtPos, progress);
+      }
+
+      if (this.previewTimer >= 2.0) {
+        this.gameState = 'PLAYING';
+        if (this.previewCallback) {
+          const cb = this.previewCallback;
+          this.previewCallback = null;
           cb();
         }
       }

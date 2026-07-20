@@ -161,6 +161,16 @@ class Controls {
     this.camera.lookAt(0, 2.8, doorZ - 2);
   }
 
+  // Dedicated Secret Door Opening Camera Cutscene (Pans to facing Secret Door as it slides open)
+  updateDoorOpeningCamera(doorPos, progress) {
+    const camX = doorPos.x + Math.sin(progress * Math.PI * 0.2) * 1.5;
+    const camY = 3.2;
+    const camZ = doorPos.z + 8.5 - progress * 1.5;
+
+    this.camera.position.set(camX, camY, camZ);
+    this.camera.lookAt(doorPos.x, 3.0, doorPos.z);
+  }
+
   updateCamera(characterPos, characterRotation) {
     if (this.cameraMode === 'THIRD_PERSON') {
       const offsetX = Math.sin(this.cameraAngleY) * Math.cos(this.cameraAngleX) * this.cameraDistance;

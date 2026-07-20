@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - State 1-5 Mini-Games Trigger & Grand Birthday Finale
+   Quest Manager - Secret Door Cutscene & Immediate Next Room Arrow Rotation
    ========================================================================== */
 
 class QuestManager {
@@ -49,11 +49,12 @@ class QuestManager {
     if (this.courtWorld.giftBoxPads) this.courtWorld.giftBoxPads.forEach(pad => pad.visible = false);
     if (this.courtWorld.questMarkers) this.courtWorld.questMarkers.forEach(box => box.visible = false);
 
-    // Show Checkpoint Pad #1 (Left Wall)
+    // Show Checkpoint Pad #1 (Left Wall) for roomNum
     const pad1Index = (roomNum - 1) * 2;
     if (this.courtWorld.checkpointPads && this.courtWorld.checkpointPads[pad1Index]) {
       this.courtWorld.checkpointPads[pad1Index].visible = true;
       const p = this.courtWorld.checkpointPads[pad1Index].userData;
+      // DIRECTLY UPDATE TARGET POS SO FLOOR ARROW IMMEDIATELY POINTS TO PAD #1 IN THIS ROOM!
       this.activeTargetPos.set(p.xPos, 0, p.zPos);
     }
 
@@ -86,7 +87,6 @@ class QuestManager {
     if (!artFrame || !artFrame.userData) return;
     const finalScore = score || 5;
 
-    // Check if already recorded
     const existing = this.ratedPhotos.find(p => p.artIndex === artFrame.userData.artIndex);
     if (existing) {
       existing.score = finalScore;
@@ -162,16 +162,24 @@ class QuestManager {
                 if (window.miniGameEngine) {
                   window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
                     if (this.currentRoom <= 4) {
-                      this.courtWorld.unlockBarrier(this.currentRoom);
-                      if (window.soundEngine) window.soundEngine.playQuestComplete();
-
+                      const doorToUnlock = this.currentRoom;
                       this.currentQuestIndex++;
                       this.currentRoom++;
+
+                      // IMMEDIATELY START NEXT ROOM QUEST SO ARROW POINTS TO NEXT ROOM'S CHECKPOINT PAD!
                       this.startRoomQuest(this.currentRoom);
-                      this.isProcessingCutscene = false;
+
+                      // RUN SECRET DOOR OPENING CAMERA CUTSCENE!
+                      if (window.game && window.game.startDoorOpeningCutscene) {
+                        window.game.startDoorOpeningCutscene(doorToUnlock, () => {
+                          this.isProcessingCutscene = false;
+                        });
+                      } else {
+                        this.courtWorld.unlockBarrier(doorToUnlock);
+                        this.isProcessingCutscene = false;
+                      }
 
                     } else if (this.currentRoom === 5) {
-                      // ROOM 5 FINISHED -> GRAND BIRTHDAY FINALE WITH BANK NPC!
                       this.currentQuestIndex = 5;
                       this.currentRoom = 6;
                       this.roomSubState = 'COMPLETE';
@@ -271,13 +279,20 @@ class QuestManager {
             if (window.miniGameEngine) {
               window.miniGameEngine.startMiniGame(this.currentRoom, this.ratedPhotos, (skipped) => {
                 if (this.currentRoom <= 4) {
-                  this.courtWorld.unlockBarrier(this.currentRoom);
-                  if (window.soundEngine) window.soundEngine.playQuestComplete();
-
+                  const doorToUnlock = this.currentRoom;
                   this.currentQuestIndex++;
                   this.currentRoom++;
+
                   this.startRoomQuest(this.currentRoom);
-                  this.isProcessingCutscene = false;
+
+                  if (window.game && window.game.startDoorOpeningCutscene) {
+                    window.game.startDoorOpeningCutscene(doorToUnlock, () => {
+                      this.isProcessingCutscene = false;
+                    });
+                  } else {
+                    this.courtWorld.unlockBarrier(doorToUnlock);
+                    this.isProcessingCutscene = false;
+                  }
 
                 } else if (this.currentRoom === 5) {
                   this.currentQuestIndex = 5;

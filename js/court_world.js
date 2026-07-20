@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Numeric Photo Paths & Wall Photo Frames
+   3D Indoor Badminton Complex - Standard JPG Photo Paths & Fallback Loaders
    ========================================================================== */
 
 class CourtWorld {
@@ -121,13 +121,13 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
-    // Background Photos 11.jfif to 15.jfif
+    // Standard JPG Background Photos 11.jpg to 15.jpg
     const bgPhotos = [
-      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jfif' },
-      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jfif' },
-      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/13.jfif' },
-      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/14.jfif' },
-      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/15.jfif' }
+      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jpg' },
+      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jpg' },
+      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/13.jpg' },
+      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/14.jpg' },
+      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/15.jpg' }
     ];
 
     bgPhotos.forEach(p => {
@@ -145,10 +145,18 @@ class CourtWorld {
         picMesh.position.z = 0.05;
         pGroup.add(picMesh);
       }, undefined, () => {
-        const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
-        const picMesh = new THREE.Mesh(picGeo, fallbackMat);
-        picMesh.position.z = 0.05;
-        pGroup.add(picMesh);
+        // Try fallback .jfif extension
+        this.textureLoader.load(p.path.replace(/\.jpg$/, '.jfif'), (tex) => {
+          const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+          const picMesh = new THREE.Mesh(picGeo, picMat);
+          picMesh.position.z = 0.05;
+          pGroup.add(picMesh);
+        }, undefined, () => {
+          const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
+          const picMesh = new THREE.Mesh(picGeo, fallbackMat);
+          picMesh.position.z = 0.05;
+          pGroup.add(picMesh);
+        });
       });
 
       pGroup.position.set(p.x, p.y, wallZ + 0.1);
@@ -165,18 +173,18 @@ class CourtWorld {
   }
 
   initArtGalleryPhotos() {
-    // Exact Numeric Photo Files 1.jfif through 10.jfif
+    // Standard JPG Numeric Photo Files 1.jpg through 10.jpg
     const photoFiles = [
-      'pic/1.jfif',
-      'pic/2.jfif',
-      'pic/3.jfif',
-      'pic/4.jfif',
-      'pic/5.jfif',
-      'pic/6.jfif',
-      'pic/7.jfif',
-      'pic/8.jfif',
-      'pic/9.jfif',
-      'pic/10.jfif'
+      'pic/1.jpg',
+      'pic/2.jpg',
+      'pic/3.jpg',
+      'pic/4.jpg',
+      'pic/5.jpg',
+      'pic/6.jpg',
+      'pic/7.jpg',
+      'pic/8.jpg',
+      'pic/9.jpg',
+      'pic/10.jpg'
     ];
 
     const roomDepth = 28;
@@ -207,16 +215,22 @@ class CourtWorld {
     artGroup.add(frameMesh);
 
     const picGeo = new THREE.PlaneGeometry(2.8, 3.6);
-    this.textureLoader.load(imagePath, (tex) => {
+    
+    const applyTexture = (tex) => {
       const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
       const picMesh = new THREE.Mesh(picGeo, picMat);
       picMesh.position.z = 0.07;
       artGroup.add(picMesh);
-    }, undefined, () => {
-      const fallbackMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
-      const picMesh = new THREE.Mesh(picGeo, fallbackMat);
-      picMesh.position.z = 0.07;
-      artGroup.add(picMesh);
+    };
+
+    // Attempt loading .jpg, fallback to .jfif
+    this.textureLoader.load(imagePath, applyTexture, undefined, () => {
+      this.textureLoader.load(imagePath.replace(/\.jpg$/, '.jfif'), applyTexture, undefined, () => {
+        const fallbackMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
+        const picMesh = new THREE.Mesh(picGeo, fallbackMat);
+        picMesh.position.z = 0.07;
+        artGroup.add(picMesh);
+      });
     });
 
     const plaqueGeo = new THREE.BoxGeometry(2.6, 0.45, 0.08);

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Camera Controls - Stationary Showcase & 180-deg Wall-Safe Zoom Orbit
+   3D Camera Controls - Fixed Showcase Framing & 6-Second 180-deg Zoom Orbit
    ========================================================================== */
 
 class Controls {
@@ -101,39 +101,38 @@ class Controls {
     if (window.soundEngine) window.soundEngine.playClick();
   }
 
-  // Pre-Game Showcase Camera: STATIONARY facing the Photo Feature Wall! (No background spinning!)
+  // Pre-Game Showcase Camera: PERFECTLY FRAMED facing NaDream and the Feature Wall! (No clipping!)
   updateShowcaseCamera(characterPos, timeMs) {
-    this.camera.position.set(0, 2.2, -13.5);
-    this.camera.lookAt(0, 1.4, -20.0);
+    this.camera.position.set(0, 2.8, -8.0);
+    this.camera.lookAt(0, 3.0, -16.0);
   }
 
-  // 4-Second 180° Wall-Safe Preview Camera with Dynamic Multi-Phase Zoom (No Wall Clipping!)
+  // 6-Second 180° Wall-Safe Preview Camera with Dynamic Multi-Phase Zoom (No Wall Clipping!)
   updatePhotoPreviewCamera(artPos, progress) {
     // 180° Front Arc Pan facing the Wall (From -PI/2 to +PI/2)
-    const arcAngle = (progress - 0.5) * Math.PI * 0.9;
+    const arcAngle = (progress - 0.5) * Math.PI * 0.95;
     
-    // Dynamic Multi-Phase Zoom Curve in 4 Seconds:
-    // 0.0s -> 1.5s: Zoom-in Close-up (Distance 4.5 -> 2.4)
-    // 1.5s -> 3.0s: Close-up Pan Across Details (Distance 2.4 -> 2.8)
-    // 3.0s -> 4.0s: Smooth Zoom-out (Distance 2.8 -> 4.2)
-    let zoomDist = 4.2;
-    if (progress < 0.35) {
-      const t = progress / 0.35;
-      zoomDist = 4.5 - t * 2.1; // Close-up 2.4
+    // Dynamic Multi-Phase Zoom Curve in 6 Seconds:
+    // 0.0s -> 2.0s: Smooth Zoom-in Close-up (Distance 4.8 -> 2.4)
+    // 2.0s -> 4.5s: 180° Pan Across Details (Distance 2.4 -> 2.8)
+    // 4.5s -> 6.0s: Smooth Zoom-out (Distance 2.8 -> 4.5)
+    let zoomDist = 4.5;
+    if (progress < 0.33) {
+      const t = progress / 0.33;
+      zoomDist = 4.8 - t * 2.4; // Close-up 2.4
     } else if (progress < 0.75) {
-      const t = (progress - 0.35) / 0.40;
+      const t = (progress - 0.33) / 0.42;
       zoomDist = 2.4 + t * 0.4;
     } else {
       const t = (progress - 0.75) / 0.25;
-      zoomDist = 2.8 + t * 1.4; // Zoom out to 4.2
+      zoomDist = 2.8 + t * 1.7; // Zoom out to 4.5
     }
 
     // Determine wall facing direction from artPos.x
-    // Left Wall (x = -18.45) faces +X; Right Wall (x = +18.45) faces -X
     const wallNormalDir = artPos.x < 0 ? 1 : -1;
 
     const camX = artPos.x + Math.cos(arcAngle) * zoomDist * wallNormalDir;
-    const camY = artPos.y + Math.sin(progress * Math.PI) * 0.35;
+    const camY = artPos.y + Math.sin(progress * Math.PI) * 0.4;
     const camZ = artPos.z + Math.sin(arcAngle) * zoomDist * 0.8;
 
     this.camera.position.set(camX, camY, camZ);

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Photo Review, 5-Star Rating & Grand Gift Box Cutscene Flow
+   Quest Manager - Sequential Checkpoint Pad Toggle & 3D Star Badge Attachment
    ========================================================================== */
 
 class QuestManager {
@@ -88,7 +88,7 @@ class QuestManager {
 
         if (pad && pad.visible) {
           const dist = Math.hypot(playerPos.x - pad.userData.xPos, playerPos.z - pad.userData.zPos);
-          if (dist < 2.5) {
+          if (dist < 2.8) {
             this.showActionPrompt(`🎨 ชมและให้คะแนนรูปภาพ #${artIdx + 1}`);
             this.isNearTarget = true;
             return;
@@ -98,7 +98,7 @@ class QuestManager {
         const box = this.courtWorld.questMarkers[this.currentRoom - 1];
         if (box && box.visible) {
           const dist = Math.hypot(playerPos.x - box.position.x, playerPos.z - box.position.z);
-          if (dist < 3.0) {
+          if (dist < 3.2) {
             this.showActionPrompt(`🎁 เปิดกล่องของขวัญประจำห้อง #${this.currentRoom}`);
             this.isNearTarget = true;
             return;
@@ -144,11 +144,16 @@ class QuestManager {
           this.hideActionPrompt();
           this.isProcessingCutscene = true;
 
-          // Launch 4-Second 3D Camera Orbit Preview Cutscene!
+          // Launch 6-Second 3D Camera Orbit Preview Cutscene!
           window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
-            // After 4-second preview, open 5-Star Rating Modal Popup!
+            // After 6-second preview, open Interactive 5-Star Rating Modal Popup!
             if (window.showStarRatingModal) {
-              window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, () => {
+              window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
+                // Attach 3D Gold Star Badge above the frame in the 3D world!
+                if (artFrame.userData.addStarBadge) {
+                  artFrame.userData.addStarBadge(ratedScore || 5);
+                }
+
                 this.isProcessingCutscene = false;
                 this.advanceRoomSubState();
               });
@@ -189,11 +194,13 @@ class QuestManager {
     if (this.roomSubState === 'ART_1') {
       this.roomSubState = 'ART_2';
 
-      // Hide Pad #1, Show Pad #2
+      // Hide Pad #1 (Left Wall), Show Pad #2 (Right Wall)
       const pad1Index = (this.currentRoom - 1) * 2;
       const pad2Index = pad1Index + 1;
 
-      if (this.courtWorld.checkpointPads[pad1Index]) this.courtWorld.checkpointPads[pad1Index].visible = false;
+      if (this.courtWorld.checkpointPads[pad1Index]) {
+        this.courtWorld.checkpointPads[pad1Index].visible = false;
+      }
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = true;
         const p = this.courtWorld.checkpointPads[pad2Index].userData;
@@ -207,7 +214,9 @@ class QuestManager {
 
       // Hide Pad #2, Spawn 3D Gift Box in room center with cutscene!
       const pad2Index = (this.currentRoom - 1) * 2 + 1;
-      if (this.courtWorld.checkpointPads[pad2Index]) this.courtWorld.checkpointPads[pad2Index].visible = false;
+      if (this.courtWorld.checkpointPads[pad2Index]) {
+        this.courtWorld.checkpointPads[pad2Index].visible = false;
+      }
 
       this.courtWorld.showGiftBoxForRoom(this.currentRoom - 1);
       const box = this.courtWorld.questMarkers[this.currentRoom - 1];

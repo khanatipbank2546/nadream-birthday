@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Entry Point - Interactive 1-5 Star Rating & 180-deg Zoom Cutscenes
+   Main Entry Point - 6-Second Photo Preview Cutscene & 3D Star Badges
    ========================================================================== */
 
 class Game {
@@ -197,7 +197,7 @@ class Game {
     }, 400);
   }
 
-  // 4-Second 180° Wall-Safe Preview Cutscene
+  // 6-Second 180° Wall-Safe Preview Cutscene
   startPhotoPreviewCutscene(artData, callback) {
     this.gameState = 'PHOTO_PREVIEW';
     this.previewArtPos.set(artData.xPos, artData.yPos, artData.zPos);
@@ -260,13 +260,13 @@ class Game {
 
     } else if (this.gameState === 'PHOTO_PREVIEW') {
       this.previewTimer += delta;
-      const progress = Math.min(1.0, this.previewTimer / 4.0); // 4 Seconds Orbit!
+      const progress = Math.min(1.0, this.previewTimer / 6.0); // 6 Seconds Orbit!
 
       if (this.controls) {
         this.controls.updatePhotoPreviewCamera(this.previewArtPos, progress);
       }
 
-      if (this.previewTimer >= 4.0) {
+      if (this.previewTimer >= 6.0) {
         this.gameState = 'PLAYING';
         if (this.previewCallback) {
           const cb = this.previewCallback;
@@ -340,7 +340,6 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
   const scoreText = document.getElementById('rating-score-text');
 
   if (modal && img && title) {
-    // Wrap imagePath in encodeURI for reliable Thai filename rendering!
     img.src = encodeURI(imagePath);
     title.innerText = cleanTitleText;
     modal.classList.remove('hidden');
@@ -392,13 +391,13 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
     const handleConfirm = () => {
       modal.classList.add('hidden');
       if (window.soundEngine) window.soundEngine.playQuestComplete();
-      if (onConfirmCallback) onConfirmCallback();
+      if (onConfirmCallback) onConfirmCallback(currentRating);
     };
 
     if (confirmBtn) confirmBtn.onclick = handleConfirm;
     if (closeBtn) closeBtn.onclick = handleConfirm;
   } else {
-    if (onConfirmCallback) onConfirmCallback();
+    if (onConfirmCallback) onConfirmCallback(5);
   }
 };
 

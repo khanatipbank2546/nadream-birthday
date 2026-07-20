@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Forward Guide Arrow & Encoded Thai Texture Loader
+   3D Indoor Badminton Complex - 3D Gold Star Badges & Wall Photo Frames
    ========================================================================== */
 
 class CourtWorld {
@@ -245,6 +245,9 @@ class CourtWorld {
     spotlight.target = frameMesh;
     this.scene.add(spotlight);
 
+    // 3D Gold Star Badge Group floating above the Frame!
+    let starBadgeGroup = null;
+
     artGroup.position.set(xPos, yPos, zPos);
     artGroup.rotation.y = rotationY;
 
@@ -254,7 +257,37 @@ class CourtWorld {
       imagePath,
       xPos,
       yPos,
-      zPos
+      zPos,
+      addStarBadge: (score) => {
+        if (starBadgeGroup) artGroup.remove(starBadgeGroup);
+        starBadgeGroup = new THREE.Group();
+
+        const badgeGeo = new THREE.BoxGeometry(score * 0.45 + 0.2, 0.45, 0.08);
+        const badgeCanvas = document.createElement('canvas');
+        badgeCanvas.width = 512;
+        badgeCanvas.height = 96;
+        const bCtx = badgeCanvas.getContext('2d');
+
+        bCtx.fillStyle = '#0f172a';
+        bCtx.fillRect(0, 0, 512, 96);
+        bCtx.strokeStyle = '#ffd700';
+        bCtx.lineWidth = 4;
+        bCtx.strokeRect(4, 4, 504, 88);
+
+        bCtx.fillStyle = '#ffd700';
+        bCtx.font = 'bold 36px Arial';
+        bCtx.textAlign = 'center';
+        bCtx.textBaseline = 'middle';
+        bCtx.fillText('★'.repeat(score), 256, 48);
+
+        const badgeTex = new THREE.CanvasTexture(badgeCanvas);
+        const badgeMat = new THREE.MeshStandardMaterial({ map: badgeTex, emissive: 0xffd700, emissiveIntensity: 0.4 });
+        const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat);
+        badgeMesh.position.set(0, 2.38, 0.08);
+        starBadgeGroup.add(badgeMesh);
+
+        artGroup.add(starBadgeGroup);
+      }
     };
 
     this.scene.add(artGroup);
@@ -331,7 +364,6 @@ class CourtWorld {
     return arrowGroup;
   }
 
-  // Dynamically update floor path arrow in front of player pointing directly at target!
   updatePathArrow(playerPos, targetPos) {
     if (!this.activePathArrow) return;
 
@@ -352,7 +384,6 @@ class CourtWorld {
           playerPos.z + normZ * 1.8
         );
 
-        // ADD + Math.PI SO THE ARROW POINTS DIRECTLY FORWARD TOWARDS THE TARGET!
         const angle = Math.atan2(dirX, dirZ) + Math.PI;
         this.activePathArrow.rotation.y = angle;
 

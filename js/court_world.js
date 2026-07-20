@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Exact Thai Photo Titles & 3D Gold Stars
+   3D Indoor Badminton Complex - Guaranteed Photos & Unlit 3D Gold Stars
    ========================================================================== */
 
 class CourtWorld {
@@ -122,12 +122,13 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
+    // Guaranteed 5 Pre-Game Feature Wall Photos (NO TITLES/PLAQUES, JUST FRAMED PHOTOS)
     const bgPhotos = [
-      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/พี่หล่อไหมน้อง.jpg' },
-      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เจ๊สมคิด.jpg' },
-      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/เด็กใหม่.jpg' },
-      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/เสื้อเทพ.jpg' },
-      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/แพ้ทุกเกมครับ555.jpg' }
+      { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jpg' },
+      { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jpg' },
+      { x: 5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/13.jpg' },
+      { x: -4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/14.jpg' },
+      { x: 4.8, y: 3.0, w: 2.8, h: 2.2, path: 'background/15.jpg' }
     ];
 
     bgPhotos.forEach(p => {
@@ -145,10 +146,13 @@ class CourtWorld {
         picMesh.position.z = 0.05;
         pGroup.add(picMesh);
       }, undefined, () => {
-        const fallbackMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
-        const picMesh = new THREE.Mesh(picGeo, fallbackMat);
-        picMesh.position.z = 0.05;
-        pGroup.add(picMesh);
+        // Fallback to pic/ photos if background/ has any issue
+        this.textureLoader.load(encodeURI('pic/เจ๊สมคิด.jpg'), (tex) => {
+          const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+          const picMesh = new THREE.Mesh(picGeo, picMat);
+          picMesh.position.z = 0.05;
+          pGroup.add(picMesh);
+        });
       });
 
       pGroup.position.set(p.x, p.y, wallZ + 0.1);
@@ -194,12 +198,12 @@ class CourtWorld {
     }
   }
 
-  // Create Extruded 3D Vector Gold Star Mesh (Matching User Reference Screenshot)
+  // Create Extruded 3D Vector Gold Star Mesh (Ultra Glowing & Bright)
   create3DStarMesh() {
     const shape = new THREE.Shape();
     const points = 5;
-    const outerRadius = 0.32;
-    const innerRadius = 0.13;
+    const outerRadius = 0.36;
+    const innerRadius = 0.14;
 
     for (let i = 0; i < points * 2; i++) {
       const r = (i % 2 === 0) ? outerRadius : innerRadius;
@@ -211,15 +215,9 @@ class CourtWorld {
     }
     shape.closePath();
 
-    const extrudeSettings = { depth: 0.1, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.04, bevelThickness: 0.04 };
+    const extrudeSettings = { depth: 0.12, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.04, bevelThickness: 0.04 };
     const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    const mat = new THREE.MeshStandardMaterial({ 
-      color: 0xffd700, 
-      metalness: 0.95, 
-      roughness: 0.1, 
-      emissive: 0xffd700, 
-      emissiveIntensity: 0.9 
-    });
+    const mat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
     return new THREE.Mesh(geo, mat);
   }
 
@@ -249,7 +247,6 @@ class CourtWorld {
     // Plaque Mesh displaying exact Thai Title (e.g. "เจ๊สมคิด", "แช้มแรกป่ะ")
     const plaqueGeo = new THREE.BoxGeometry(2.8, 0.52, 0.08);
     let plaqueMesh = null;
-    let plaqueTex = null;
 
     const renderPlaqueTexture = (starsScore = 0) => {
       const plaqueCanvas = document.createElement('canvas');
@@ -270,7 +267,7 @@ class CourtWorld {
       pCtx.textBaseline = 'middle';
       pCtx.fillText(titleText, 256, 48);
 
-      plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
+      const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
       if (plaqueMesh) {
         plaqueMesh.material.map = plaqueTex;
         plaqueMesh.material.needsUpdate = true;
@@ -284,7 +281,7 @@ class CourtWorld {
     plaqueMesh.position.set(0, -2.3, 0.06);
     artGroup.add(plaqueMesh);
 
-    const spotlight = new THREE.SpotLight(0xfffae6, 1.4, 12, Math.PI / 4, 0.4);
+    const spotlight = new THREE.SpotLight(0xfffae6, 1.6, 14, Math.PI / 4, 0.4);
     spotlight.position.set(xPos > 0 ? xPos - 2 : xPos + 2, yPos + 3, zPos);
     spotlight.target = frameMesh;
     this.scene.add(spotlight);
@@ -307,7 +304,7 @@ class CourtWorld {
         starBadgeGroup = new THREE.Group();
 
         const count = Math.max(1, Math.min(5, score));
-        const spacing = 0.62;
+        const spacing = 0.65;
         const startX = -((count - 1) * spacing) / 2;
 
         for (let i = 0; i < count; i++) {

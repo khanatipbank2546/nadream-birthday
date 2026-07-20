@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Standard JPG Photo Paths & Fallback Loaders
+   3D Indoor Badminton Complex - Extruded 3D Gold Stars & Gift Box Floor Pads
    ========================================================================== */
 
 class CourtWorld {
@@ -8,6 +8,7 @@ class CourtWorld {
     this.doors = [];
     this.questMarkers = [];
     this.checkpointPads = [];
+    this.giftBoxPads = [];
     this.artFrames = [];
     this.photoGalleryWallGroup = null;
     this.activePathArrow = null;
@@ -121,7 +122,6 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
-    // Standard JPG Background Photos 11.jpg to 15.jpg
     const bgPhotos = [
       { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jpg' },
       { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jpg' },
@@ -145,7 +145,6 @@ class CourtWorld {
         picMesh.position.z = 0.05;
         pGroup.add(picMesh);
       }, undefined, () => {
-        // Try fallback .jfif extension
         this.textureLoader.load(p.path.replace(/\.jpg$/, '.jfif'), (tex) => {
           const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
           const picMesh = new THREE.Mesh(picGeo, picMat);
@@ -173,7 +172,6 @@ class CourtWorld {
   }
 
   initArtGalleryPhotos() {
-    // Standard JPG Numeric Photo Files 1.jpg through 10.jpg
     const photoFiles = [
       'pic/1.jpg',
       'pic/2.jpg',
@@ -202,6 +200,35 @@ class CourtWorld {
     }
   }
 
+  // Create Extruded 3D Vector Gold Star Mesh (Matching User Reference Screenshot)
+  create3DStarMesh() {
+    const shape = new THREE.Shape();
+    const points = 5;
+    const outerRadius = 0.24;
+    const innerRadius = 0.10;
+
+    for (let i = 0; i < points * 2; i++) {
+      const r = (i % 2 === 0) ? outerRadius : innerRadius;
+      const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(a) * r;
+      const y = Math.sin(a) * r;
+      if (i === 0) shape.moveTo(x, y);
+      else shape.lineTo(x, y);
+    }
+    shape.closePath();
+
+    const extrudeSettings = { depth: 0.06, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.02, bevelThickness: 0.02 };
+    const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    const mat = new THREE.MeshStandardMaterial({ 
+      color: 0xffd700, 
+      metalness: 0.9, 
+      roughness: 0.2, 
+      emissive: 0xffa500, 
+      emissiveIntensity: 0.5 
+    });
+    return new THREE.Mesh(geo, mat);
+  }
+
   createWallArtFrame(xPos, yPos, zPos, rotationY, imagePath, artIndex) {
     const artGroup = new THREE.Group();
 
@@ -223,7 +250,6 @@ class CourtWorld {
       artGroup.add(picMesh);
     };
 
-    // Attempt loading .jpg, fallback to .jfif
     this.textureLoader.load(imagePath, applyTexture, undefined, () => {
       this.textureLoader.load(imagePath.replace(/\.jpg$/, '.jfif'), applyTexture, undefined, () => {
         const fallbackMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
@@ -262,7 +288,7 @@ class CourtWorld {
     spotlight.target = frameMesh;
     this.scene.add(spotlight);
 
-    // 3D Gold Star Badge Group floating above the Frame!
+    // REAL 3D Extruded Gold Star Badge Row floating directly above the Frame!
     let starBadgeGroup = null;
 
     artGroup.position.set(xPos, yPos, zPos);
@@ -279,29 +305,17 @@ class CourtWorld {
         if (starBadgeGroup) artGroup.remove(starBadgeGroup);
         starBadgeGroup = new THREE.Group();
 
-        const badgeGeo = new THREE.BoxGeometry(score * 0.45 + 0.2, 0.45, 0.08);
-        const badgeCanvas = document.createElement('canvas');
-        badgeCanvas.width = 512;
-        badgeCanvas.height = 96;
-        const bCtx = badgeCanvas.getContext('2d');
+        const count = Math.max(1, Math.min(5, score));
+        const spacing = 0.52;
+        const startX = -((count - 1) * spacing) / 2;
 
-        bCtx.fillStyle = '#0f172a';
-        bCtx.fillRect(0, 0, 512, 96);
-        bCtx.strokeStyle = '#ffd700';
-        bCtx.lineWidth = 4;
-        bCtx.strokeRect(4, 4, 504, 88);
-
-        bCtx.fillStyle = '#ffd700';
-        bCtx.font = 'bold 36px Arial';
-        bCtx.textAlign = 'center';
-        bCtx.textBaseline = 'middle';
-        bCtx.fillText('★'.repeat(score), 256, 48);
-
-        const badgeTex = new THREE.CanvasTexture(badgeCanvas);
-        const badgeMat = new THREE.MeshStandardMaterial({ map: badgeTex, emissive: 0xffd700, emissiveIntensity: 0.4 });
-        const badgeMesh = new THREE.Mesh(badgeGeo, badgeMat);
-        badgeMesh.position.set(0, 2.38, 0.08);
-        starBadgeGroup.add(badgeMesh);
+        for (let i = 0; i < count; i++) {
+          const starMesh = this.create3DStarMesh();
+          starMesh.position.set(startX + i * spacing, 2.38, 0.08);
+          // Slight arch curve effect matching reference image!
+          starMesh.position.y += Math.sin((i / (count - 1 || 1)) * Math.PI) * 0.12;
+          starBadgeGroup.add(starMesh);
+        }
 
         artGroup.add(starBadgeGroup);
       }
@@ -317,11 +331,16 @@ class CourtWorld {
     for (let r = 0; r < 5; r++) {
       const roomCenterZ = -r * roomDepth - roomDepth / 2;
 
+      // Photo Art Standing Pads
       const padLeft = this.createStandingPad(-16.0, 0.02, roomCenterZ, r * 2 + 1);
       this.checkpointPads.push(padLeft);
 
       const padRight = this.createStandingPad(16.0, 0.02, roomCenterZ, r * 2 + 2);
       this.checkpointPads.push(padRight);
+
+      // Dedicated Gift Box Floor Standing Pad in Room Center!
+      const giftBoxPad = this.createStandingPad(0, 0.02, roomCenterZ, 100 + r + 1);
+      this.giftBoxPads.push(giftBoxPad);
     }
 
     this.activePathArrow = this.createPathArrowMesh(0, 0, 0);
@@ -636,6 +655,9 @@ class CourtWorld {
     if (this.questMarkers[roomIdx]) {
       this.questMarkers[roomIdx].visible = true;
     }
+    if (this.giftBoxPads[roomIdx]) {
+      this.giftBoxPads[roomIdx].visible = true;
+    }
   }
 
   animateGiftBoxOpening(roomIdx, progress) {
@@ -683,6 +705,12 @@ class CourtWorld {
     this.checkpointPads.forEach(pad => {
       if (pad.visible) {
         pad.userData.padMat.emissiveIntensity = 0.5 + Math.sin(time * 0.005) * 0.3;
+      }
+    });
+
+    this.giftBoxPads.forEach(pad => {
+      if (pad.visible) {
+        pad.userData.padMat.emissiveIntensity = 0.6 + Math.sin(time * 0.006) * 0.3;
       }
     });
 

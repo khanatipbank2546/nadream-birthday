@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Sequential Checkpoint Pad Toggle & 3D Star Badge Attachment
+   Quest Manager - Sequential Pad Workflow & Gift Box Floor Checkpoint Pad
    ========================================================================== */
 
 class QuestManager {
@@ -41,13 +41,14 @@ class QuestManager {
     this.currentRoom = roomNum;
     this.roomSubState = 'ART_1';
 
-    // Hide all checkpoint pads and gift boxes first
-    this.courtWorld.checkpointPads.forEach(pad => pad.visible = false);
-    this.courtWorld.questMarkers.forEach(box => box.visible = false);
+    // Hide all art pads, gift box pads, and gift boxes
+    if (this.courtWorld.checkpointPads) this.courtWorld.checkpointPads.forEach(pad => pad.visible = false);
+    if (this.courtWorld.giftBoxPads) this.courtWorld.giftBoxPads.forEach(pad => pad.visible = false);
+    if (this.courtWorld.questMarkers) this.courtWorld.questMarkers.forEach(box => box.visible = false);
 
     // Show Checkpoint Pad #1 (Left Wall)
     const pad1Index = (roomNum - 1) * 2;
-    if (this.courtWorld.checkpointPads[pad1Index]) {
+    if (this.courtWorld.checkpointPads && this.courtWorld.checkpointPads[pad1Index]) {
       this.courtWorld.checkpointPads[pad1Index].visible = true;
       const p = this.courtWorld.checkpointPads[pad1Index].userData;
       this.activeTargetPos.set(p.xPos, 0, p.zPos);
@@ -70,7 +71,7 @@ class QuestManager {
       } else if (this.roomSubState === 'ART_2') {
         if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปที่จุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปศิลปะ #2`;
       } else if (this.roomSubState === 'GIFT_BOX') {
-        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเปิดกล่องของขวัญกลางห้องเพื่อปลดล็อคประตูห้องถัดไป!`;
+        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint กล่องของขวัญกลางห้องเพื่อปลดล็อคประตู!`;
       }
     } else {
       if (this.questTitleEl) this.questTitleEl.innerText = `👑 เดินเข้าสู่ห้องโถงแชมเปียน เพื่อพูดคุยกับ Bank!`;
@@ -95,9 +96,11 @@ class QuestManager {
           }
         }
       } else if (this.roomSubState === 'GIFT_BOX') {
+        const boxPad = this.courtWorld.giftBoxPads[this.currentRoom - 1];
         const box = this.courtWorld.questMarkers[this.currentRoom - 1];
-        if (box && box.visible) {
-          const dist = Math.hypot(playerPos.x - box.position.x, playerPos.z - box.position.z);
+
+        if (boxPad && boxPad.visible) {
+          const dist = Math.hypot(playerPos.x - boxPad.userData.xPos, playerPos.z - boxPad.userData.zPos);
           if (dist < 3.2) {
             this.showActionPrompt(`🎁 เปิดกล่องของขวัญประจำห้อง #${this.currentRoom}`);
             this.isNearTarget = true;
@@ -149,7 +152,7 @@ class QuestManager {
             // After 6-second preview, open Interactive 5-Star Rating Modal Popup!
             if (window.showStarRatingModal) {
               window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
-                // Attach 3D Gold Star Badge above the frame in the 3D world!
+                // Attach 3D Extruded Gold Star Badge above the frame in the 3D world!
                 if (artFrame.userData.addStarBadge) {
                   artFrame.userData.addStarBadge(ratedScore || 5);
                 }
@@ -163,6 +166,11 @@ class QuestManager {
       } else if (this.roomSubState === 'GIFT_BOX') {
         this.hideActionPrompt();
         this.isProcessingCutscene = true;
+
+        // Hide Gift Box Floor Standing Pad
+        if (this.courtWorld.giftBoxPads[this.currentRoom - 1]) {
+          this.courtWorld.giftBoxPads[this.currentRoom - 1].visible = false;
+        }
 
         // Launch Grand Gift Box Opening Cutscene!
         if (window.game) {
@@ -212,12 +220,13 @@ class QuestManager {
     } else if (this.roomSubState === 'ART_2') {
       this.roomSubState = 'GIFT_BOX';
 
-      // Hide Pad #2, Spawn 3D Gift Box in room center with cutscene!
+      // Hide Pad #2
       const pad2Index = (this.currentRoom - 1) * 2 + 1;
       if (this.courtWorld.checkpointPads[pad2Index]) {
         this.courtWorld.checkpointPads[pad2Index].visible = false;
       }
 
+      // Reveal 3D Gift Box AND Gift Box Floor Standing Pad under it!
       this.courtWorld.showGiftBoxForRoom(this.currentRoom - 1);
       const box = this.courtWorld.questMarkers[this.currentRoom - 1];
       if (box) {

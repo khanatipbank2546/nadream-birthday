@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Application Entry Point - Laptop PC 3D Showcase & Calendar Intro Cutscene
+   Main Application Entry Point - Independent 360° Character Rotation Fix
    ========================================================================== */
 
 class Game {
@@ -182,13 +182,16 @@ class Game {
     const elapsedTime = this.clock.getElapsedTime();
 
     if (this.gameState === 'SHOWCASE') {
-      // 360° Camera Orbit around NaDream in Room 1
+      // Camera Orbit around Room 1
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
-      this.character.group.rotation.y += 0.005;
+      
+      // Independent 360° Character Mesh Rotation (Shows front, ponytail, back & side profiles!)
+      this.character.group.rotation.y += 0.008;
 
     } else if (this.gameState === 'FLOATING' || this.gameState === 'CALENDAR_TEAR') {
-      // Zero-Gravity Levitation Pose
+      // Zero-Gravity Levitation Pose + Independent 360° Rotation
       this.character.setFloatingPose(elapsedTime);
+      this.character.group.rotation.y += 0.008;
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
 
     } else if (this.gameState === 'BURST_LAND') {

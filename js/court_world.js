@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Mobile 60 FPS Optimized World (Global Window)
+   3D Indoor Badminton Complex - Laptop PC High-Graphics World (Global Window)
    ========================================================================== */
 
 class CourtWorld {
@@ -8,7 +8,6 @@ class CourtWorld {
     this.doors = [];
     this.questMarkers = [];
 
-    // Create 1 single shared texture in GPU memory for all 20 courts (Saves 98% VRAM!)
     this.sharedCourtTexture = this.createSharedCourtTexture();
 
     this.initLighting();
@@ -19,56 +18,56 @@ class CourtWorld {
 
   createSharedCourtTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 1024;
+    canvas.width = 1024;
+    canvas.height = 2048;
     const ctx = canvas.getContext('2d');
 
     // BWF Green Mat Base
     ctx.fillStyle = '#0b8457';
-    ctx.fillRect(0, 0, 512, 1024);
+    ctx.fillRect(0, 0, 1024, 2048);
 
     // Crisp White Boundary Lines
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 12;
+    ctx.lineWidth = 20;
 
-    ctx.strokeRect(12, 12, 488, 1000);
-    ctx.strokeRect(36, 12, 440, 1000);
+    ctx.strokeRect(24, 24, 976, 2000);
+    ctx.strokeRect(72, 24, 880, 2000);
 
     ctx.beginPath();
-    ctx.moveTo(12, 512);
-    ctx.lineTo(500, 512);
+    ctx.moveTo(24, 1024);
+    ctx.lineTo(1000, 1024);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(12, 364);
-    ctx.lineTo(500, 364);
-    ctx.moveTo(12, 660);
-    ctx.lineTo(500, 660);
+    ctx.moveTo(24, 728);
+    ctx.lineTo(1000, 728);
+    ctx.moveTo(24, 1320);
+    ctx.lineTo(1000, 1320);
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(256, 12);
-    ctx.lineTo(256, 364);
-    ctx.moveTo(256, 660);
-    ctx.lineTo(256, 1012);
+    ctx.moveTo(512, 24);
+    ctx.lineTo(512, 728);
+    ctx.moveTo(512, 1320);
+    ctx.lineTo(512, 2024);
     ctx.stroke();
 
     const texture = new THREE.CanvasTexture(canvas);
-    texture.anisotropy = 4;
+    texture.anisotropy = 16;
     return texture;
   }
 
   initLighting() {
-    // Cozy Ambient Light
-    const ambient = new THREE.AmbientLight(0x3a4a60, 0.95);
+    const ambient = new THREE.AmbientLight(0x3a4a60, 0.85);
     this.scene.add(ambient);
 
-    // Primary Arena Directional Light
-    const sunLight = new THREE.DirectionalLight(0xfffae6, 0.9);
+    const sunLight = new THREE.DirectionalLight(0xfffae6, 0.95);
     sunLight.position.set(10, 35, 15);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
     this.scene.add(sunLight);
 
-    this.sunLight = sunLight;
     this.scene.fog = new THREE.FogExp2(0x1a202c, 0.008);
   }
 
@@ -87,9 +86,10 @@ class CourtWorld {
       const floorMesh = new THREE.Mesh(floorGeo, floorMat);
       floorMesh.rotation.x = -Math.PI / 2;
       floorMesh.position.set(0, 0, roomCenterZ);
+      floorMesh.receiveShadow = true;
       this.scene.add(floorMesh);
 
-      // 2. 4 Authentic Badminton Courts (Reusing shared court texture!)
+      // 2. 4 Authentic Badminton Courts
       const courtOffsets = [
         { x: -10.5, z: roomCenterZ + 6.5 },  // Court 1
         { x: 10.5, z: roomCenterZ + 6.5 },   // Court 2
@@ -123,6 +123,7 @@ class CourtWorld {
     const grandFloor = new THREE.Mesh(grandFloorGeo, grandFloorMat);
     grandFloor.rotation.x = -Math.PI / 2;
     grandFloor.position.set(0, 0, grandCenterZ);
+    grandFloor.receiveShadow = true;
     this.scene.add(grandFloor);
 
     // Gold Winner's Stage
@@ -130,9 +131,10 @@ class CourtWorld {
     const stageMat = new THREE.MeshToonMaterial({ color: 0xffd700 });
     const stage = new THREE.Mesh(stageGeo, stageMat);
     stage.position.set(0, 0.3, grandCenterZ);
+    stage.receiveShadow = true;
     this.scene.add(stage);
 
-    const stageLight = new THREE.PointLight(0xffd700, 2.0, 25);
+    const stageLight = new THREE.PointLight(0xffd700, 2.5, 30);
     stageLight.position.set(0, 5, grandCenterZ);
     this.scene.add(stageLight);
   }
@@ -141,15 +143,14 @@ class CourtWorld {
     const courtWidth = 6.1;
     const courtLength = 13.4;
 
-    // Single Mat Mesh with shared texture
     const matGeo = new THREE.PlaneGeometry(courtWidth, courtLength);
     const matMaterial = new THREE.MeshToonMaterial({ map: this.sharedCourtTexture, side: THREE.DoubleSide });
     const courtMat = new THREE.Mesh(matGeo, matMaterial);
     courtMat.rotation.x = -Math.PI / 2;
     courtMat.position.set(centerX, 0.01, centerZ);
+    courtMat.receiveShadow = true;
     this.scene.add(courtMat);
 
-    // Net
     const netGeo = new THREE.PlaneGeometry(courtWidth + 0.6, 1.55);
     const netMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
     const netMesh = new THREE.Mesh(netGeo, netMat);
@@ -157,11 +158,11 @@ class CourtWorld {
     this.scene.add(netMesh);
 
     const postMat = new THREE.MeshToonMaterial({ color: 0x1a202c });
-    const postLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.55, 8), postMat);
+    const postLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.55, 12), postMat);
     postLeft.position.set(centerX - courtWidth / 2 - 0.3, 0.78, centerZ);
     this.scene.add(postLeft);
 
-    const postRight = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.55, 8), postMat);
+    const postRight = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.55, 12), postMat);
     postRight.position.set(centerX + courtWidth / 2 + 0.3, 0.78, centerZ);
     this.scene.add(postRight);
   }
@@ -201,7 +202,7 @@ class CourtWorld {
       doorGroup.add(leftPanel);
       doorGroup.add(rightPanel);
 
-      const lightBeam = new THREE.PointLight(doorColors[idx], 0, 20);
+      const lightBeam = new THREE.PointLight(doorColors[idx], 0, 25);
       lightBeam.position.set(0, 3.5, zPos - 2.0);
       this.scene.add(lightBeam);
 
@@ -287,7 +288,7 @@ class CourtWorld {
         door.userData.leftPanel.position.x = -2.0 - slideX;
         door.userData.rightPanel.position.x = 2.0 + slideX;
 
-        door.userData.lightBeam.intensity = door.userData.openProgress * 4.0;
+        door.userData.lightBeam.intensity = door.userData.openProgress * 4.5;
       }
     });
   }

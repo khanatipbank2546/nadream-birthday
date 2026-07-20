@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Application Entry Point - Mobile 60 FPS Optimized Engine (Global Window)
+   Main Application Entry Point - Laptop PC 3D Showcase & Calendar Intro Cutscene
    ========================================================================== */
 
 class Game {
@@ -7,13 +7,14 @@ class Game {
     this.canvas = document.getElementById('webgl-canvas');
     this.clock = new THREE.Clock();
 
-    this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-    this.isTurboMode = true; // Turbo 60 FPS Mode enabled by default!
-
-    this.isGameStarted = false;
-    this.isCutsceneActive = false;
+    // Game State Machine
+    this.gameState = 'SHOWCASE'; // SHOWCASE -> FLOATING -> CALENDAR_TEAR -> BURST_LAND -> PLAYING
     this.cutsceneTimer = 0;
-    this.cutsceneDoorZ = 0;
+    this.currentMonthIdx = 0;
+
+    this.isCutsceneActive = false; // Secret door cutscene state
+    this.secretDoorZ = 0;
+    this.secretDoorTimer = 0;
 
     this.initScene();
     this.initEntities();
@@ -34,26 +35,18 @@ class Game {
       200
     );
 
-    // Ultra-Fast Mobile WebGL Renderer Configuration
+    // High-Graphics Laptop / PC WebGL Renderer
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      antialias: !this.isMobile,
-      powerPreference: 'default',
-      precision: 'mediump',
-      failIfMajorPerformanceCaveat: false
+      antialias: true,
+      powerPreference: 'high-performance',
+      precision: 'highp'
     });
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Cap Pixel Ratio to 1.0 on mobile to guarantee smooth 60 FPS without GPU overheating
-    const targetPixelRatio = this.isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
-    this.renderer.setPixelRatio(targetPixelRatio);
-
-    // Disable heavy shadow map calculations on mobile for 300% FPS boost
-    this.renderer.shadowMap.enabled = !this.isMobile;
-    if (this.renderer.shadowMap.enabled) {
-      this.renderer.shadowMap.type = THREE.BasicShadowMap;
-    }
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   }
 
   initEntities() {
@@ -81,25 +74,6 @@ class Game {
         }
       });
     }
-
-    const turboBtn = document.getElementById('turbo-toggle-btn');
-    if (turboBtn) {
-      turboBtn.addEventListener('click', () => this.toggleTurboMode());
-    }
-  }
-
-  toggleTurboMode() {
-    this.isTurboMode = !this.isTurboMode;
-    const turboText = document.getElementById('turbo-mode-text');
-    if (this.isTurboMode) {
-      this.renderer.setPixelRatio(1.0);
-      this.renderer.shadowMap.enabled = false;
-      if (turboText) turboText.innerText = '⚡ โหมดลื่น (60 FPS)';
-    } else {
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-      this.renderer.shadowMap.enabled = true;
-      if (turboText) turboText.innerText = '✨ โหมดภาพสวย';
-    }
   }
 
   setupLoadingScreen() {
@@ -116,25 +90,88 @@ class Game {
         clearInterval(interval);
         if (startBtn) startBtn.classList.remove('hidden');
 
-        const launchGame = () => {
+        startBtn.onclick = () => {
           if (window.soundEngine) {
             window.soundEngine.startBGM();
             window.soundEngine.playClick();
           }
           loadingScreen.classList.add('fade-out');
-          this.isGameStarted = true;
+          this.startIntroCutscene();
         };
-
-        startBtn.onclick = launchGame;
-        loadingScreen.onclick = launchGame;
       }
     }, 50);
   }
 
+  // 5-Phase Intro Cutscene Execution Sequence
+  startIntroCutscene() {
+    this.gameState = 'FLOATING';
+    this.cutsceneTimer = 0;
+    this.currentMonthIdx = 0;
+
+    const calendarOverlay = document.getElementById('calendar-cutscene-overlay');
+    if (calendarOverlay) calendarOverlay.classList.remove('hidden');
+
+    const months = [
+      'มกราคม 2569',
+      'กุมภาพันธ์ 2569',
+      'มีนาคม 2569',
+      'เมษายน 2569',
+      'พฤษภาคม 2569',
+      'มิถุนายน 2569',
+      'กรกฎาคม 2569'
+    ];
+
+    const monthTitleEl = document.getElementById('calendar-month-title');
+    const calendarCard = document.getElementById('calendar-card');
+    const date20 = document.getElementById('date-20-highlight');
+    const burstFlare = document.getElementById('burst-flare');
+
+    // Step 1: NaDream Levitates up (0s - 1.2s)
+    setTimeout(() => {
+      this.gameState = 'CALENDAR_TEAR';
+      
+      // Step 2: Rapid Calendar Month Tearing Sequence (1.2s - 3.8s)
+      const tearInterval = setInterval(() => {
+        if (this.currentMonthIdx < months.length) {
+          if (monthTitleEl) monthTitleEl.innerText = months[this.currentMonthIdx];
+          if (calendarCard) {
+            calendarCard.classList.remove('flip-tear');
+            void calendarCard.offsetWidth; // Trigger reflow
+            calendarCard.classList.add('flip-tear');
+          }
+          if (window.soundEngine) window.soundEngine.playCalendarTear();
+          this.currentMonthIdx++;
+        } else {
+          clearInterval(tearInterval);
+
+          // Step 3: Zooming to Date 20 (July 20th 2569)
+          if (monthTitleEl) monthTitleEl.innerText = '✨ 20 กรกฎาคม 2569 (วันเกิด NaDream!) ✨';
+          if (date20) date20.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          setTimeout(() => {
+            // Step 4: Burst Through Date 20 Flare Explosion
+            if (burstFlare) burstFlare.classList.remove('hidden');
+            if (window.soundEngine) window.soundEngine.playLandingImpact();
+            this.gameState = 'BURST_LAND';
+
+            setTimeout(() => {
+              // Step 5: Superhero Landing onto Room 1 Floor & Start Playing!
+              if (calendarOverlay) calendarOverlay.classList.add('hidden');
+              if (burstFlare) burstFlare.classList.add('hidden');
+              this.gameState = 'PLAYING';
+            }, 800);
+
+          }, 1200);
+        }
+      }, 380);
+
+    }, 1200);
+  }
+
   startDoorCutscene(roomNumber) {
     const doorZPositions = [-28, -56, -84, -112, -140];
-    this.cutsceneDoorZ = doorZPositions[roomNumber - 1];
-    this.cutsceneTimer = 0;
+    this.secretDoorZ = doorZPositions[roomNumber - 1];
+    this.secretDoorTimer = 0;
     this.isCutsceneActive = true;
   }
 
@@ -144,19 +181,32 @@ class Game {
     const delta = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
 
-    if (!this.isGameStarted) {
+    if (this.gameState === 'SHOWCASE') {
+      // 360° Camera Orbit around NaDream in Room 1
       this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
       this.character.group.rotation.y += 0.005;
 
-    } else if (this.isCutsceneActive) {
-      this.cutsceneTimer += delta;
-      this.controls.updateCutsceneCamera(this.cutsceneDoorZ, this.cutsceneTimer / 2.5);
+    } else if (this.gameState === 'FLOATING' || this.gameState === 'CALENDAR_TEAR') {
+      // Zero-Gravity Levitation Pose
+      this.character.setFloatingPose(elapsedTime);
+      this.controls.updateShowcaseCamera(this.character.position, elapsedTime * 1000);
 
-      if (this.cutsceneTimer >= 2.5) {
+    } else if (this.gameState === 'BURST_LAND') {
+      // Superhero Burst Landing Animation
+      this.cutsceneTimer += delta * 2.5;
+      this.character.setLandingPose(Math.min(1.0, this.cutsceneTimer));
+
+    } else if (this.isCutsceneActive) {
+      // Secret Door Opening Cutscene
+      this.secretDoorTimer += delta;
+      this.controls.updateCutsceneCamera(this.secretDoorZ, this.secretDoorTimer / 2.5);
+
+      if (this.secretDoorTimer >= 2.5) {
         this.isCutsceneActive = false;
       }
 
-    } else {
+    } else if (this.gameState === 'PLAYING') {
+      // 3rd Person Gameplay
       const activeBarrierZ = this.courtWorld.getActiveBarrierZ();
       this.character.update(
         delta, 

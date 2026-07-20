@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Character Controller - FIXED Movement Direction Math (Global Window)
+   3D Character Controller - Floating Pose & Superhero Landing (Global Window)
    ========================================================================== */
 
 class CharacterController {
@@ -10,7 +10,7 @@ class CharacterController {
     // Position & Movement Parameters
     this.position = new THREE.Vector3(0, 0, 0); // Start at Room 1 entrance
     this.rotation = 0; // Radians
-    this.speed = 0.085; // Smooth, precise, natural walking speed!
+    this.speed = 0.085;
     this.isMoving = false;
     this.walkCycle = 0;
 
@@ -227,6 +227,56 @@ class CharacterController {
     this.group.add(this.nametag);
   }
 
+  // Zero-Gravity Levitation Floating Pose (Intro Cutscene Step 1 & 2)
+  setFloatingPose(elapsedTime) {
+    const floatY = 2.5 + Math.sin(elapsedTime * 2.5) * 0.4;
+    this.position.y = floatY;
+
+    // Levitation Arm & Leg Pose
+    this.leftArm.rotation.z = Math.PI / 4 + Math.sin(elapsedTime * 2) * 0.15;
+    this.rightArm.rotation.z = -Math.PI / 4 - Math.sin(elapsedTime * 2) * 0.15;
+    this.leftArm.rotation.x = -0.2;
+    this.rightArm.rotation.x = -0.2;
+
+    this.leftLeg.rotation.x = 0.3 + Math.sin(elapsedTime * 1.8) * 0.1;
+    this.rightLeg.rotation.x = -0.3 - Math.sin(elapsedTime * 1.8) * 0.1;
+
+    if (this.ponytail) {
+      this.ponytail.rotation.x = -Math.PI / 3 + Math.sin(elapsedTime * 3) * 0.1;
+    }
+
+    this.group.position.copy(this.position);
+  }
+
+  // Superhero Burst & Landing Pose (Intro Cutscene Step 4 & 5)
+  setLandingPose(progress) {
+    // Progress 0 -> 1: From height Y=4.0 down to floor Y=0
+    const startY = 4.5;
+    this.position.y = startY * (1 - progress);
+
+    if (progress < 0.7) {
+      // Diving Burst Forward Pose
+      this.leftArm.rotation.x = Math.PI * 0.8;
+      this.rightArm.rotation.x = Math.PI * 0.8;
+      this.leftLeg.rotation.x = -0.4;
+      this.rightLeg.rotation.x = 0.4;
+    } else {
+      // Impact Superhero Knee Landing Crouch
+      const crouch = (1 - progress) / 0.3;
+      this.leftArm.rotation.x = -0.8;
+      this.rightArm.rotation.x = 0.8;
+      this.leftLeg.rotation.x = 0.9 * crouch;
+      this.rightLeg.rotation.x = 0.9 * crouch;
+    }
+
+    if (progress >= 1.0) {
+      this.position.y = 0;
+      this.isGrounded = true;
+    }
+
+    this.group.position.copy(this.position);
+  }
+
   jump() {
     if (this.isGrounded) {
       this.velocityY = this.jumpPower;
@@ -235,7 +285,7 @@ class CharacterController {
     }
   }
 
-  // Camera-Relative Movement Update (FIXED Forward Vector Math!)
+  // Camera-Relative Movement Update
   update(delta, keysPressed, joystickVector, cameraAngleY = 0, activeBarrierZ = -1000) {
     let inputX = 0;
     let inputZ = 0;
@@ -266,17 +316,15 @@ class CharacterController {
       }
     }
 
-    // 2. FIXED Camera-Relative Movement Vector Math
+    // 2. Camera-Relative Movement Vector Math
     if (inputX !== 0 || inputZ !== 0) {
       this.isMoving = true;
 
-      // Correct forward and right vectors relative to camera Y angle
       const fwdX = Math.sin(cameraAngleY);
       const fwdZ = Math.cos(cameraAngleY);
       const rightX = Math.cos(cameraAngleY);
       const rightZ = -Math.sin(cameraAngleY);
 
-      // World Movement Direction
       let moveDirX = (fwdX * inputZ) + (rightX * inputX);
       let moveDirZ = (fwdZ * inputZ) + (rightZ * inputX);
 
@@ -286,20 +334,16 @@ class CharacterController {
         moveDirZ /= length;
       }
 
-      // Rotate NaDream mesh to face direction of movement
       this.rotation = Math.atan2(moveDirX, moveDirZ);
       this.group.rotation.y = this.rotation;
 
-      // Calculate next position
       const nextX = this.position.x + moveDirX * this.speed;
       const nextZ = this.position.z + moveDirZ * this.speed;
 
-      // Room Bounds Checking
       if (nextX >= -17.5 && nextX <= 17.5) {
         this.position.x = nextX;
       }
 
-      // Locked Door Barrier Collision Checking
       if (nextZ > activeBarrierZ) {
         this.position.z = nextZ;
       }

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton RPG - Mobile Touch Controls Visibility (Always Visible)
+   3D Indoor Badminton RPG - Laptop PC High-Graphics & Calendar Cutscene
    ========================================================================== */
 
 :root {
@@ -10,7 +10,7 @@
   --stadium-dark: #1a202c;
   --glass-bg: rgba(26, 32, 44, 0.88);
   --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6);
   --text-main: #f8f9fa;
   --text-muted: #a0aab2;
   --font-thai: 'Prompt', 'Kanit', sans-serif;
@@ -23,13 +23,11 @@
   padding: 0;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: manipulation;
 }
 
 html, body {
   width: 100%;
   height: 100%;
-  height: 100dvh;
   overflow: hidden;
   background-color: var(--stadium-dark);
   font-family: var(--font-thai);
@@ -47,19 +45,20 @@ html, body {
   display: block;
 }
 
-/* Loading Screen */
+/* Loading & Pre-Game 360° Showcase Screen Overlay */
 .loading-screen {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
-  background: radial-gradient(circle at center, #2d3748 0%, #1a202c 100%);
+  background: transparent;
   z-index: 200;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
+  padding-bottom: 60px;
+  pointer-events: none;
   transition: opacity 0.6s ease, visibility 0.6s ease;
 }
 
@@ -68,52 +67,60 @@ html, body {
   visibility: hidden;
 }
 
-.loading-content {
+.showcase-banner-card {
+  pointer-events: auto;
   text-align: center;
   width: 90%;
-  max-width: 400px;
-  padding: 24px;
+  max-width: 480px;
+  padding: 28px;
   background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(16px);
-  border-radius: 24px;
-  box-shadow: var(--glass-shadow);
+  border: 2px solid var(--primary-gold);
+  backdrop-filter: blur(18px);
+  border-radius: 28px;
+  box-shadow: 0 0 50px rgba(255, 215, 0, 0.35);
+  animation: floatCard 3s infinite ease-in-out;
 }
 
-.loader-avatar {
-  font-size: 3rem;
-  animation: floatBounce 2s infinite ease-in-out;
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes floatBounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-12px) scale(1.1); }
+.badge-header {
+  display: inline-block;
+  padding: 4px 14px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink));
+  color: #fff;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
 }
 
 .loading-title {
   font-family: var(--font-accent);
-  font-size: 1.8rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary-gold), var(--primary-cyan), var(--accent-purple));
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary-gold), var(--primary-cyan), var(--accent-pink));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-top: 10px;
+  margin-bottom: 8px;
 }
 
 .loading-subtitle {
   color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-top: 6px;
-  margin-bottom: 20px;
+  font-size: 0.95rem;
+  margin-bottom: 22px;
 }
 
 .progress-bar-container {
   width: 100%;
   height: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .progress-bar-fill {
@@ -126,17 +133,141 @@ html, body {
 
 .start-btn {
   width: 100%;
-  padding: 14px 28px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  padding: 16px 32px;
+  font-size: 1.25rem;
+  font-weight: 800;
   font-family: var(--font-thai);
   color: #000;
   background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
   transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.start-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 0 45px rgba(255, 215, 0, 1.0);
+}
+
+/* ==========================================================================
+   3D Calendar Month Tearing & Date 20 Burst Cutscene Overlay
+   ========================================================================== */
+
+.calendar-cutscene-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 14, 24, 0.82);
+  backdrop-filter: blur(14px);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+}
+
+.calendar-month-title {
+  font-family: var(--font-thai);
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--primary-gold);
+  text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.calendar-card {
+  width: 380px;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.calendar-card.flip-tear {
+  animation: calendarFlipTear 0.35s ease-out forwards;
+}
+
+@keyframes calendarFlipTear {
+  0% { transform: rotateX(0deg) scale(1); opacity: 1; }
+  50% { transform: rotateX(-45deg) translateY(-40px) scale(1.05); opacity: 0.8; }
+  100% { transform: rotateX(-90deg) translateY(-100px) scale(0.9); opacity: 0; }
+}
+
+.calendar-header-strip {
+  background: linear-gradient(135deg, #e63946, #c1121f);
+  color: #ffffff;
+  font-family: var(--font-accent);
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 14px;
+  letter-spacing: 2px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 18px;
+  background: #ffffff;
+  color: #1d3557;
+}
+
+.day-head {
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-align: center;
+  color: #a8dadc;
+}
+
+.day-cell {
+  text-align: center;
+  padding: 8px 0;
+  font-weight: 600;
+  font-size: 1.05rem;
+  border-radius: 8px;
+}
+
+/* Date 20 Birthday Highlight Box */
+.date-20-highlight {
+  background: linear-gradient(135deg, var(--primary-gold), #ff8c00) !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  font-size: 1.4rem !important;
+  box-shadow: 0 0 25px rgba(255, 215, 0, 1.0);
+  animation: pulseDate20 0.8s infinite alternate;
+}
+
+@keyframes pulseDate20 {
+  0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+  100% { transform: scale(1.3); box-shadow: 0 0 35px rgba(255, 215, 0, 1.0); }
+}
+
+/* Radiant Burst Flare */
+.burst-flare {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200vw;
+  height: 200vh;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.95) 0%, rgba(0, 245, 212, 0.6) 40%, transparent 70%);
+  z-index: 350;
+  animation: flareExpand 0.6s ease-out forwards;
+}
+
+@keyframes flareExpand {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.0); }
 }
 
 /* Game HUD */
@@ -146,10 +277,9 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
   z-index: 10;
   pointer-events: none;
-  padding: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -158,32 +288,32 @@ html, body {
 .player-badge {
   pointer-events: auto;
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 16px;
+  left: 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 10px;
+  padding: 8px 16px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
   box-shadow: var(--glass-shadow);
 }
 
 .avatar-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
 }
 
 .player-name {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -191,7 +321,7 @@ html, body {
 }
 
 .badge-tag {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   padding: 2px 6px;
   background: linear-gradient(90deg, #ffd700, #ff8c00);
   color: #000;
@@ -200,7 +330,7 @@ html, body {
 }
 
 .player-title {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--primary-cyan);
 }
 
@@ -208,30 +338,25 @@ html, body {
 .top-right-controls {
   pointer-events: auto;
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 16px;
+  right: 16px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
-}
-
-.top-buttons-row {
-  display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 
 .hud-btn {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
+  border-radius: 20px;
   color: var(--primary-gold);
   font-family: var(--font-thai);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
   box-shadow: var(--glass-shadow);
   display: flex;
   align-items: center;
@@ -239,12 +364,12 @@ html, body {
 }
 
 .quest-tracker {
-  width: 220px;
-  padding: 8px 12px;
+  width: 250px;
+  padding: 10px 16px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
   box-shadow: var(--glass-shadow);
 }
 
@@ -252,25 +377,25 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .quest-count-badge {
   background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
   padding: 2px 8px;
   border-radius: 12px;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
 }
 
 .quest-progress-bar {
   width: 100%;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.1);
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .quest-progress-fill {
@@ -281,31 +406,31 @@ html, body {
 }
 
 .quest-current-desc {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-main);
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 /* Desktop Controls Hint */
 .controls-hint {
   position: absolute;
-  bottom: 16px;
-  left: 16px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 8px 18px;
+  border-radius: 24px;
+  font-size: 0.82rem;
   color: var(--text-muted);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .hint-key {
   display: inline-block;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
   font-family: monospace;
   font-weight: bold;
 }
@@ -314,15 +439,14 @@ html, body {
 .action-prompt {
   pointer-events: auto;
   position: absolute;
-  bottom: 140px;
+  bottom: 120px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 110;
 }
 
 .action-btn-pulse {
-  padding: 12px 24px;
-  font-size: 0.95rem;
+  padding: 14px 28px;
+  font-size: 1rem;
   font-weight: 700;
   font-family: var(--font-thai);
   color: #000;
@@ -360,146 +484,20 @@ html, body {
 .sound-toggle-btn {
   pointer-events: auto;
   position: absolute;
-  top: 115px;
-  right: 12px;
-  width: 38px;
-  height: 38px;
+  top: 135px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--primary-gold);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(10px);
-}
-
-/* ==========================================================================
-   Mobile Touch Controls (ALWAYS VISIBLE & PROMINENT)
-   ========================================================================== */
-
-.mobile-controls {
-  pointer-events: auto;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 180px;
-  z-index: 100; /* High Z-Index so touch controls are ALWAYS on top! */
-  display: block; /* Visible by default on all screens! */
-}
-
-.mobile-controls.hidden-force {
-  display: none !important;
-}
-
-/* Virtual Joystick */
-.joystick-zone {
-  position: absolute;
-  bottom: 25px;
-  left: 20px;
-  width: 110px;
-  height: 110px;
-}
-
-.joystick-base {
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 2px solid var(--primary-cyan);
-  border-radius: 50%;
-  position: relative;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
-}
-
-.joystick-stick {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-  border: 2px solid #fff;
-  border-radius: 50%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 15px rgba(255, 107, 155, 0.8);
-}
-
-/* Directional D-Pad Arrows (PUBG / ROV Style - HUGE & CLEAR) */
-.dpad-zone {
-  position: absolute;
-  bottom: 20px;
-  left: 145px;
-  width: 115px;
-  height: 115px;
-}
-
-.dpad-btn {
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  background: rgba(15, 20, 32, 0.85);
-  border: 2px solid var(--primary-gold);
-  border-radius: 10px;
-  color: var(--primary-gold);
-  font-size: 1.3rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  cursor: pointer;
-}
-
-.dpad-btn.active, .dpad-btn:active {
-  background: var(--primary-cyan);
-  color: #000;
-  border-color: #fff;
-  transform: scale(0.95);
-}
-
-.dpad-up { top: 0; left: 38px; }
-.dpad-down { bottom: 0; left: 38px; }
-.dpad-left { top: 38px; left: 0; }
-.dpad-right { top: 38px; right: 0; }
-
-.mobile-action-zone {
-  position: absolute;
-  bottom: 25px;
-  right: 20px;
-  display: flex;
-  gap: 14px;
-}
-
-.mobile-jump-btn {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-cyan), #00b4d8);
-  border: 3px solid #fff;
-  color: #000;
-  font-size: 1.6rem;
-  box-shadow: 0 0 20px rgba(0, 245, 212, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.mobile-action-btn {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-gold), #ff8c00);
-  border: 3px solid #fff;
-  color: #000;
-  font-size: 1.4rem;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  backdrop-filter: blur(12px);
 }
 
 /* Modals & Bank Speech Bubble */
@@ -509,9 +507,8 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  height: 100dvh;
   background: rgba(6, 7, 12, 0.85);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   z-index: 250;
   display: flex;
   justify-content: center;
@@ -519,18 +516,18 @@ html, body {
   padding: 16px;
 }
 
-.modal-backdrop.hidden, .action-prompt.hidden, .start-btn.hidden {
+.modal-backdrop.hidden, .action-prompt.hidden, .start-btn.hidden, .calendar-cutscene-overlay.hidden, .burst-flare.hidden {
   display: none !important;
 }
 
 .npc-dialog-card {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   background: linear-gradient(135deg, rgba(26, 32, 44, 0.95), rgba(15, 18, 28, 0.95));
   border: 2px solid var(--primary-gold);
   border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 0 50px rgba(255, 215, 0, 0.4);
+  padding: 28px;
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.45);
   position: relative;
   animation: modalSlideUp 0.4s ease-out;
 }
@@ -543,30 +540,30 @@ html, body {
 .npc-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
   position: relative;
 }
 
 .npc-avatar {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, #3a86ff, #00f5d4);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
 }
 
 .npc-name {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary-gold);
 }
 
 .npc-badge {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   padding: 2px 8px;
   background: var(--accent-purple);
   color: #fff;
@@ -574,7 +571,7 @@ html, body {
 }
 
 .npc-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
 }
 
@@ -585,31 +582,31 @@ html, body {
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   cursor: pointer;
 }
 
 .speech-bubble {
   background: rgba(255, 255, 255, 0.08);
   border: 1px dashed rgba(255, 215, 0, 0.5);
-  border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 18px;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 .hbd-title {
   font-family: var(--font-accent);
-  font-size: 1.7rem;
+  font-size: 1.85rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--primary-gold), var(--accent-pink), var(--primary-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .hbd-message {
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1.7;
   color: #f1f3f5;
 }
@@ -617,29 +614,29 @@ html, body {
 .npc-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
 }
 
 .btn-primary {
-  padding: 10px 22px;
+  padding: 12px 24px;
   background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
   color: #fff;
   border: none;
   border-radius: 30px;
   font-family: var(--font-thai);
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .btn-secondary {
-  padding: 10px 18px;
+  padding: 12px 20px;
   background: rgba(255, 255, 255, 0.15);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 30px;
   font-family: var(--font-thai);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   cursor: pointer;
 }

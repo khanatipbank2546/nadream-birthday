@@ -2,13 +2,13 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NaDream & Bank - Badminton Court Birthday Quest 🏸🎂</title>
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Prompt:wght@400;600;700&family=Outfit:wght@600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&family=Prompt:wght@400;600;700;800&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,15 +23,15 @@
 
   <!-- Loading & Pre-Game 360° Showcase Screen -->
   <div id="loading-screen" class="loading-screen">
-    <div class="loading-content">
-      <div class="character-loader">
-        <div class="loader-avatar">🏸</div>
-      </div>
+    <div class="showcase-banner-card">
+      <div class="badge-header">🏸 3D BIRTHDAY ADVENTURE</div>
       <h1 class="loading-title">NaDream's Badminton World</h1>
-      <p class="loading-subtitle">การผจญภัยหา Bank ในสนามแบดมินตัน!</p>
+      <p class="loading-subtitle">การผจญภัยตามหา Bank ในอาคารสนามแบดมินตัน!</p>
+      
       <div class="progress-bar-container">
         <div id="loading-progress" class="progress-bar-fill"></div>
       </div>
+      
       <button id="start-btn" class="start-btn hidden">
         <i class="fa-solid fa-gamepad"></i> เริ่มต้นการเดินทาง!
       </button>
@@ -40,6 +40,34 @@
 
   <!-- 3D WebGL Canvas -->
   <canvas id="webgl-canvas"></canvas>
+
+  <!-- 3D Calendar Month Tearing & Date 20 Burst Cutscene Overlay -->
+  <div id="calendar-cutscene-overlay" class="calendar-cutscene-overlay hidden">
+    <!-- Month Name Badge -->
+    <div id="calendar-month-title" class="calendar-month-title">
+      มกราคม 2569
+    </div>
+
+    <!-- Calendar Flip Card -->
+    <div id="calendar-card" class="calendar-card">
+      <div class="calendar-header-strip">JULY 2569</div>
+      <div id="calendar-grid" class="calendar-grid">
+        <div class="day-head">อา</div><div class="day-head">จ</div><div class="day-head">อ</div><div class="day-head">พ</div><div class="day-head">พฤ</div><div class="day-head">ศ</div><div class="day-head">ส</div>
+        <!-- Days -->
+        <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
+        <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div>
+        <div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div>
+        <!-- DATE 20 SPECIAL BIRTHDAY HIGHLIGHT -->
+        <div id="date-20-highlight" class="day-cell date-20-highlight">20</div>
+        <div class="day-cell">21</div>
+        <div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div><div class="day-cell">27</div><div class="day-cell">28</div>
+        <div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+      </div>
+    </div>
+
+    <!-- Tearing Flare Beam Burst -->
+    <div id="burst-flare" class="burst-flare hidden"></div>
+  </div>
 
   <!-- Game HUD -->
   <div id="game-hud" class="game-hud">
@@ -52,15 +80,9 @@
       </div>
     </div>
 
-    <!-- Top Right: Quest Tracker & Controls Toggle Buttons -->
+    <!-- Top Right: Quest Tracker & Camera Toggle -->
     <div class="top-right-controls">
       <div class="top-buttons-row">
-        <button id="turbo-toggle-btn" class="hud-btn turbo-btn" title="เปิด/ปิด โหมดความเร็ว 60 FPS">
-          <i class="fa-solid fa-bolt"></i> <span id="turbo-mode-text">⚡ โหมดลื่น (60 FPS)</span>
-        </button>
-        <button id="touch-toggle-btn" class="hud-btn" title="ซ่อน/แสดงปุ่มเดินหน้าจอ">
-          <i class="fa-solid fa-gamepad"></i> <span>🎮 ปุ่มเดิน</span>
-        </button>
         <button id="camera-toggle-btn" class="hud-btn" title="เปลี่ยนมุมมอง">
           <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
         </button>
@@ -81,12 +103,12 @@
       </div>
     </div>
 
-    <!-- Desktop Controls Hint -->
+    <!-- Laptop / PC Desktop Controls Hint -->
     <div class="controls-hint">
       <div class="hint-key">W A S D</div> เดินตามมุมกล้อง &nbsp;|&nbsp; 
       <div class="hint-key">SPACE</div> กระโดด &nbsp;|&nbsp; 
       <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp;
-      <div class="hint-key">เมาส์ลาก</div> หมุนกล้อง
+      <div class="hint-key">เมาส์ลาก</div> หมุนกล้องรอบตัวละคร
     </div>
 
     <!-- Action Prompt Overlay (Number 1-5 Interaction) -->
@@ -101,34 +123,6 @@
     <button id="sound-toggle-btn" class="sound-toggle-btn" title="เปิด/ปิด เสียง">
       <i id="sound-icon" class="fa-solid fa-volume-high"></i>
     </button>
-  </div>
-
-  <!-- Mobile Touch Controls (PUBG Mobile / ROV Style - ALWAYS VISIBLE) -->
-  <div id="mobile-controls" class="mobile-controls">
-    <!-- Touch Joystick Zone -->
-    <div id="joystick-zone" class="joystick-zone">
-      <div id="joystick-base" class="joystick-base">
-        <div id="joystick-stick" class="joystick-stick"></div>
-      </div>
-    </div>
-
-    <!-- Directional D-Pad Arrows (ROV / PUBG Style - HUGE & CLEAR) -->
-    <div class="dpad-zone">
-      <button id="dpad-up" class="dpad-btn dpad-up" title="เดินหน้า"><i class="fa-solid fa-caret-up"></i></button>
-      <button id="dpad-left" class="dpad-btn dpad-left" title="เลี้ยวซ้าย"><i class="fa-solid fa-caret-left"></i></button>
-      <button id="dpad-right" class="dpad-btn dpad-right" title="เลี้ยวขวา"><i class="fa-solid fa-caret-right"></i></button>
-      <button id="dpad-down" class="dpad-btn dpad-down" title="ถอยหลัง"><i class="fa-solid fa-caret-down"></i></button>
-    </div>
-
-    <!-- Mobile Action & Jump Buttons -->
-    <div class="mobile-action-zone">
-      <button id="mobile-jump-btn" class="mobile-jump-btn" title="กระโดด">
-        🦘
-      </button>
-      <button id="mobile-action-btn" class="mobile-action-btn" title="ทำภารกิจ">
-        <i class="fa-solid fa-hand-pointer"></i>
-      </button>
-    </div>
   </div>
 
   <!-- NPC Bank Speech Bubble Modal -->

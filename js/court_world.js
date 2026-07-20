@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Extruded 3D Gold Stars & Gift Box Floor Pads
+   3D Indoor Badminton Complex - Guaranteed 3D Extruded Gold Stars & Pads
    ========================================================================== */
 
 class CourtWorld {
@@ -204,8 +204,8 @@ class CourtWorld {
   create3DStarMesh() {
     const shape = new THREE.Shape();
     const points = 5;
-    const outerRadius = 0.24;
-    const innerRadius = 0.10;
+    const outerRadius = 0.28;
+    const innerRadius = 0.11;
 
     for (let i = 0; i < points * 2; i++) {
       const r = (i % 2 === 0) ? outerRadius : innerRadius;
@@ -217,14 +217,14 @@ class CourtWorld {
     }
     shape.closePath();
 
-    const extrudeSettings = { depth: 0.06, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.02, bevelThickness: 0.02 };
+    const extrudeSettings = { depth: 0.08, bevelEnabled: true, bevelSegments: 4, steps: 1, bevelSize: 0.03, bevelThickness: 0.03 };
     const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const mat = new THREE.MeshStandardMaterial({ 
       color: 0xffd700, 
-      metalness: 0.9, 
-      roughness: 0.2, 
-      emissive: 0xffa500, 
-      emissiveIntensity: 0.5 
+      metalness: 0.95, 
+      roughness: 0.1, 
+      emissive: 0xffd700, 
+      emissiveIntensity: 0.8 
     });
     return new THREE.Mesh(geo, mat);
   }
@@ -259,31 +259,45 @@ class CourtWorld {
       });
     });
 
-    const plaqueGeo = new THREE.BoxGeometry(2.6, 0.45, 0.08);
-    const plaqueCanvas = document.createElement('canvas');
-    plaqueCanvas.width = 512;
-    plaqueCanvas.height = 96;
-    const pCtx = plaqueCanvas.getContext('2d');
+    // Plaque Mesh
+    const plaqueGeo = new THREE.BoxGeometry(2.6, 0.5, 0.08);
+    let plaqueMesh = null;
+    let plaqueTex = null;
 
-    pCtx.fillStyle = '#0f172a';
-    pCtx.fillRect(0, 0, 512, 96);
-    pCtx.strokeStyle = '#ffd700';
-    pCtx.lineWidth = 4;
-    pCtx.strokeRect(4, 4, 504, 88);
+    const renderPlaqueTexture = (starsScore = 0) => {
+      const plaqueCanvas = document.createElement('canvas');
+      plaqueCanvas.width = 512;
+      plaqueCanvas.height = 96;
+      const pCtx = plaqueCanvas.getContext('2d');
 
-    pCtx.fillStyle = '#ffffff';
-    pCtx.font = 'bold 26px Prompt, Arial';
-    pCtx.textAlign = 'center';
-    pCtx.textBaseline = 'middle';
-    pCtx.fillText(cleanTitle, 256, 48);
+      pCtx.fillStyle = '#0f172a';
+      pCtx.fillRect(0, 0, 512, 96);
+      pCtx.strokeStyle = '#ffd700';
+      pCtx.lineWidth = 4;
+      pCtx.strokeRect(4, 4, 504, 88);
 
-    const plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
-    const plaqueMat = new THREE.MeshStandardMaterial({ map: plaqueTex });
-    const plaqueMesh = new THREE.Mesh(plaqueGeo, plaqueMat);
+      const titleText = starsScore > 0 ? `${cleanTitle} (${'★'.repeat(starsScore)})` : cleanTitle;
+      pCtx.fillStyle = '#ffffff';
+      pCtx.font = 'bold 26px Prompt, Arial';
+      pCtx.textAlign = 'center';
+      pCtx.textBaseline = 'middle';
+      pCtx.fillText(titleText, 256, 48);
+
+      plaqueTex = new THREE.CanvasTexture(plaqueCanvas);
+      if (plaqueMesh) {
+        plaqueMesh.material.map = plaqueTex;
+        plaqueMesh.material.needsUpdate = true;
+      }
+      return plaqueTex;
+    };
+
+    const initialPlaqueTex = renderPlaqueTexture(0);
+    const plaqueMat = new THREE.MeshStandardMaterial({ map: initialPlaqueTex });
+    plaqueMesh = new THREE.Mesh(plaqueGeo, plaqueMat);
     plaqueMesh.position.set(0, -2.3, 0.06);
     artGroup.add(plaqueMesh);
 
-    const spotlight = new THREE.SpotLight(0xfffae6, 1.2, 10, Math.PI / 4, 0.4);
+    const spotlight = new THREE.SpotLight(0xfffae6, 1.4, 12, Math.PI / 4, 0.4);
     spotlight.position.set(xPos > 0 ? xPos - 2 : xPos + 2, yPos + 3, zPos);
     spotlight.target = frameMesh;
     this.scene.add(spotlight);
@@ -306,18 +320,19 @@ class CourtWorld {
         starBadgeGroup = new THREE.Group();
 
         const count = Math.max(1, Math.min(5, score));
-        const spacing = 0.52;
+        const spacing = 0.58;
         const startX = -((count - 1) * spacing) / 2;
 
         for (let i = 0; i < count; i++) {
           const starMesh = this.create3DStarMesh();
-          starMesh.position.set(startX + i * spacing, 2.38, 0.08);
-          // Slight arch curve effect matching reference image!
-          starMesh.position.y += Math.sin((i / (count - 1 || 1)) * Math.PI) * 0.12;
+          starMesh.position.set(startX + i * spacing, 2.28, 0.12);
+          // Arch curve effect matching reference image!
+          starMesh.position.y += Math.sin((i / (count - 1 || 1)) * Math.PI) * 0.16;
           starBadgeGroup.add(starMesh);
         }
 
         artGroup.add(starBadgeGroup);
+        renderPlaqueTexture(count);
       }
     };
 
@@ -591,7 +606,6 @@ class CourtWorld {
     });
   }
 
-  // 3D Ribbon Tied Gift Box Quest Markers with Lid Popping Mesh
   initGiftBoxQuestMarkers() {
     const questZPositions = [-14, -42, -70, -98, -126];
 

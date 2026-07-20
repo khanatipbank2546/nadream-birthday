@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Input & Controls Manager - Front NaDream Showcase Camera & Controls
+   Input & Controls Manager - Fixed Showcase Camera (Stationary Background)
    ========================================================================== */
 
 class Controls {
@@ -16,8 +16,6 @@ class Controls {
     this.cameraHeight = 4.5;
     this.cameraAngleY = 0;
     this.cameraAngleX = 0.25;
-
-    this.showcaseAngle = 0;
 
     this.isDraggingMouse = false;
     this.previousMousePosition = { x: 0, y: 0 };
@@ -82,16 +80,13 @@ class Controls {
     }
   }
 
-  // Front & Center Showcase Camera Orbit around Floating NaDream
+  // Fixed Showcase Camera: Background Wall Stays Stationary, Only NaDream Spins!
   updateShowcaseCamera(targetPosition, time) {
-    this.showcaseAngle = time * 0.0006;
-    const dist = 5.2; // Front & Center focus!
-    const height = 2.2;
+    const eyeX = targetPosition.x;
+    const eyeY = targetPosition.y + 2.2;
+    const eyeZ = targetPosition.z - 5.2; // Fixed Camera Position in front!
 
-    const eyeX = targetPosition.x + Math.sin(this.showcaseAngle) * dist;
-    const eyeZ = targetPosition.z + Math.cos(this.showcaseAngle) * dist;
-
-    this.camera.position.set(eyeX, targetPosition.y + height, eyeZ);
+    this.camera.position.set(eyeX, eyeY, eyeZ);
     this.camera.lookAt(targetPosition.x, targetPosition.y + 1.8, targetPosition.z);
   }
 

@@ -343,16 +343,11 @@ class CharacterController {
   }
 
   setFloatingPose(elapsedTime) {
-    const floatY = 2.2 + Math.sin(elapsedTime * 2.5) * 0.3;
-    this.position.y = floatY;
-
-    this.leftArm.rotation.z = Math.PI / 4 + Math.sin(elapsedTime * 2) * 0.15;
-    this.rightArm.rotation.z = -Math.PI / 4 - Math.sin(elapsedTime * 2) * 0.15;
-    this.leftArm.rotation.x = -0.2;
-    this.rightArm.rotation.x = -0.2;
-
-    this.leftLeg.rotation.x = 0.3 + Math.sin(elapsedTime * 1.8) * 0.1;
-    this.rightLeg.rotation.x = -0.3 - Math.sin(elapsedTime * 1.8) * 0.1;
+    this.position.y = 0;
+    this.leftArm.rotation.x = Math.sin(elapsedTime * 2) * 0.1;
+    this.rightArm.rotation.x = -Math.sin(elapsedTime * 2) * 0.1;
+    this.leftLeg.rotation.x = 0;
+    this.rightLeg.rotation.x = 0;
 
     if (this.ponytail) {
       this.ponytail.rotation.x = -Math.PI / 6 + Math.sin(elapsedTime * 3) * 0.12;

@@ -98,8 +98,9 @@ class Controls {
   }
 
   updateShowcaseCamera(characterPos, timeMs) {
-    this.camera.position.set(0, 2.8, -8.0);
-    this.camera.lookAt(0, 3.0, -16.0);
+    const targetZ = characterPos ? characterPos.z : 5;
+    this.camera.position.set(0, 1.8, targetZ + 4.5);
+    this.camera.lookAt(0, 1.3, targetZ);
   }
 
   updatePhotoPreviewCamera(artPos, progress) {

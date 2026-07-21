@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Camera Controls - Smooth 3.0s Door Opening Cutscene Camera
+   3D Camera Controls - Fixed Showcase Framing & 6-Second 180-deg Zoom Orbit
    ========================================================================== */
 
 class Controls {
@@ -13,8 +13,8 @@ class Controls {
 
     // Orbit Angles & Distances
     this.cameraDistance = 7.5;
-    this.cameraAngleY = 0;
-    this.cameraAngleX = 0.28;
+    this.cameraAngleY = 0; // Horizontal orbit angle
+    this.cameraAngleX = 0.28; // Vertical elevation angle
 
     // Mouse Drag Control
     this.isDragging = false;
@@ -42,6 +42,7 @@ class Controls {
       this.keysPressed[e.code] = false;
     });
 
+    // Mouse Drag Camera Orbit
     this.domElement.addEventListener('mousedown', (e) => {
       this.isDragging = true;
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
@@ -56,7 +57,9 @@ class Controls {
       this.cameraAngleY -= deltaX * 0.005;
       this.cameraAngleX += deltaY * 0.003;
 
+      // Clamp vertical elevation angle
       this.cameraAngleX = Math.max(0.05, Math.min(Math.PI / 2.5, this.cameraAngleX));
+
       this.previousMousePosition = { x: e.clientX, y: e.clientY };
     });
 
@@ -64,6 +67,7 @@ class Controls {
       this.isDragging = false;
     });
 
+    // Mouse Wheel Zoom
     this.domElement.addEventListener('wheel', (e) => {
       this.cameraDistance += e.deltaY * 0.005;
       this.cameraDistance = Math.max(3.5, Math.min(18.0, this.cameraDistance));
@@ -97,26 +101,34 @@ class Controls {
     if (window.soundEngine) window.soundEngine.playClick();
   }
 
+  // Pre-Game Showcase Camera: PERFECTLY FRAMED facing NaDream and the Feature Wall! (No clipping!)
   updateShowcaseCamera(characterPos, timeMs) {
-    const targetZ = characterPos ? characterPos.z : 5;
-    this.camera.position.set(0, 1.8, targetZ + 4.5);
-    this.camera.lookAt(0, 1.3, targetZ);
+    this.camera.position.set(0, 2.8, -8.0);
+    this.camera.lookAt(0, 3.0, -16.0);
   }
 
+  // 6-Second 180° Wall-Safe Preview Camera with Dynamic Multi-Phase Zoom (No Wall Clipping!)
   updatePhotoPreviewCamera(artPos, progress) {
+    // 180° Front Arc Pan facing the Wall (From -PI/2 to +PI/2)
     const arcAngle = (progress - 0.5) * Math.PI * 0.95;
+    
+    // Dynamic Multi-Phase Zoom Curve in 6 Seconds:
+    // 0.0s -> 2.0s: Smooth Zoom-in Close-up (Distance 4.8 -> 2.4)
+    // 2.0s -> 4.5s: 180° Pan Across Details (Distance 2.4 -> 2.8)
+    // 4.5s -> 6.0s: Smooth Zoom-out (Distance 2.8 -> 4.5)
     let zoomDist = 4.5;
     if (progress < 0.33) {
       const t = progress / 0.33;
-      zoomDist = 4.8 - t * 2.4;
+      zoomDist = 4.8 - t * 2.4; // Close-up 2.4
     } else if (progress < 0.75) {
       const t = (progress - 0.33) / 0.42;
       zoomDist = 2.4 + t * 0.4;
     } else {
       const t = (progress - 0.75) / 0.25;
-      zoomDist = 2.8 + t * 1.7;
+      zoomDist = 2.8 + t * 1.7; // Zoom out to 4.5
     }
 
+    // Determine wall facing direction from artPos.x
     const wallNormalDir = artPos.x < 0 ? 1 : -1;
 
     const camX = artPos.x + Math.cos(arcAngle) * zoomDist * wallNormalDir;
@@ -127,6 +139,7 @@ class Controls {
     this.camera.lookAt(artPos.x, artPos.y, artPos.z);
   }
 
+  // Grand Gift Box Spawn & Opening Zoom Cutscene Camera
   updateGiftBoxCutsceneCamera(boxPos, progress) {
     const orbitAngle = progress * Math.PI * 2.0;
     const distance = 6.5 * (1 - progress * 0.3);
@@ -148,27 +161,14 @@ class Controls {
     this.camera.lookAt(0, 2.8, doorZ - 2);
   }
 
-  // Smooth Dramatic Door Opening Camera Cutscene facing Secret Door N
+  // Dedicated Secret Door Opening Camera Cutscene (Pans to facing Secret Door as it slides open)
   updateDoorOpeningCamera(doorPos, progress) {
-    // Smooth camera glide from high view to facing the door
-    const startX = 0;
-    const startY = 4.5;
-    const startZ = doorPos.z + 12.0;
-
-    const targetX = 0;
-    const targetY = 3.2;
-    const targetZ = doorPos.z + 6.8;
-
-    const ease = progress < 0.5 
-      ? 2 * progress * progress 
-      : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-    const camX = startX + (targetX - startX) * ease;
-    const camY = startY + (targetY - startY) * ease;
-    const camZ = startZ + (targetZ - startZ) * ease;
+    const camX = doorPos.x + Math.sin(progress * Math.PI * 0.2) * 1.5;
+    const camY = 3.2;
+    const camZ = doorPos.z + 8.5 - progress * 1.5;
 
     this.camera.position.set(camX, camY, camZ);
-    this.camera.lookAt(doorPos.x, 3.2, doorPos.z);
+    this.camera.lookAt(doorPos.x, 3.0, doorPos.z);
   }
 
   updateCamera(characterPos, characterRotation) {

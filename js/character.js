@@ -270,36 +270,8 @@ class CharacterController {
     this.rightArm = rightArmGroup;
     this.group.add(rightArmGroup);
 
-    // Athletic Pro Badminton Sneakers (White sole, Cyan trim, Navy body, Gold stripes)
-    const createProSneakers = () => {
-      const g = new THREE.Group();
-
-      const soleMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
-      const sole = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.07, 0.40), soleMat);
-      sole.position.set(0, -0.88, 0.06);
-      g.add(sole);
-
-      const cyanMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4 });
-      const trim = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.03, 0.41), cyanMat);
-      trim.position.set(0, -0.91, 0.06);
-      g.add(trim);
-
-      const upperMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4 });
-      const upper = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.12, 0.36), upperMat);
-      upper.position.set(0, -0.81, 0.06);
-      g.add(upper);
-
-      const toe = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.10, 0.14), soleMat);
-      toe.position.set(0, -0.82, 0.17);
-      g.add(toe);
-
-      const goldMat = new THREE.MeshBasicMaterial({ color: 0xffd700 });
-      const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.04, 0.20), goldMat);
-      stripe.position.set(0, -0.82, 0.05);
-      g.add(stripe);
-
-      return g;
-    };
+    // 4. ELEGANT TAPERED LEGS & ATHLETIC SNEAKERS
+    const legSkinGeo = new THREE.CylinderGeometry(0.12, 0.09, 0.45, 16);
 
     // Left Leg & Black Shorts
     const leftLegGroup = new THREE.Group();
@@ -311,8 +283,14 @@ class CharacterController {
     legLeft.position.y = -0.58;
     leftLegGroup.add(legLeft);
 
-    // Left Pro Sneaker
-    leftLegGroup.add(createProSneakers());
+    // Athletic Sneaker
+    const sneakerMain = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.36), shoeMaterial);
+    sneakerMain.position.set(0, -0.84, 0.05);
+    leftLegGroup.add(sneakerMain);
+
+    const sneakerTrim = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.05, 0.37), shoeTrimMat);
+    sneakerTrim.position.set(0, -0.88, 0.05);
+    leftLegGroup.add(sneakerTrim);
 
     leftLegGroup.position.set(-0.24, 0.8, 0);
     this.leftLeg = leftLegGroup;
@@ -328,8 +306,13 @@ class CharacterController {
     legRight.position.y = -0.58;
     rightLegGroup.add(legRight);
 
-    // Right Pro Sneaker
-    rightLegGroup.add(createProSneakers());
+    const sneakerRight = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.14, 0.36), shoeMaterial);
+    sneakerRight.position.set(0, -0.84, 0.05);
+    rightLegGroup.add(sneakerRight);
+
+    const sneakerRightTrim = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.05, 0.37), shoeTrimMat);
+    sneakerRightTrim.position.set(0, -0.88, 0.05);
+    rightLegGroup.add(sneakerRightTrim);
 
     rightLegGroup.position.set(0.24, 0.8, 0);
     this.rightLeg = rightLegGroup;
@@ -343,11 +326,16 @@ class CharacterController {
   }
 
   setFloatingPose(elapsedTime) {
-    this.position.y = 0;
-    this.leftArm.rotation.x = Math.sin(elapsedTime * 2) * 0.1;
-    this.rightArm.rotation.x = -Math.sin(elapsedTime * 2) * 0.1;
-    this.leftLeg.rotation.x = 0;
-    this.rightLeg.rotation.x = 0;
+    const floatY = 2.2 + Math.sin(elapsedTime * 2.5) * 0.3;
+    this.position.y = floatY;
+
+    this.leftArm.rotation.z = Math.PI / 4 + Math.sin(elapsedTime * 2) * 0.15;
+    this.rightArm.rotation.z = -Math.PI / 4 - Math.sin(elapsedTime * 2) * 0.15;
+    this.leftArm.rotation.x = -0.2;
+    this.rightArm.rotation.x = -0.2;
+
+    this.leftLeg.rotation.x = 0.3 + Math.sin(elapsedTime * 1.8) * 0.1;
+    this.rightLeg.rotation.x = -0.3 - Math.sin(elapsedTime * 1.8) * 0.1;
 
     if (this.ponytail) {
       this.ponytail.rotation.x = -Math.PI / 6 + Math.sin(elapsedTime * 3) * 0.12;

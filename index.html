@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NaDream & Bank - Badminton Court Birthday Quest 🏸🎂</title>
   
+  <!-- HTTP No-Cache Headers (Prevents browser from caching old code) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,8 +18,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet with Cache-Buster v=900.0 -->
-  <link rel="stylesheet" href="css/styles.css?v=900.0">
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css?v=999.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -212,14 +217,27 @@
     </div>
   </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=900.0 -->
-  <script src="js/audio.js?v=900.0"></script>
-  <script src="js/character.js?v=900.0"></script>
-  <script src="js/npc_bank.js?v=900.0"></script>
-  <script src="js/court_world.js?v=900.0"></script>
-  <script src="js/minigames.js?v=900.0"></script>
-  <script src="js/quests.js?v=900.0"></script>
-  <script src="js/controls.js?v=900.0"></script>
-  <script src="js/main.js?v=900.0"></script>
+  <!-- Dynamic Timestamp Script Loader (Auto-refreshes code automatically on every refresh without Ctrl+F5!) -->
+  <script>
+    (function() {
+      const now = Date.now();
+      const scripts = [
+        'js/audio.js',
+        'js/character.js',
+        'js/npc_bank.js',
+        'js/court_world.js',
+        'js/minigames.js',
+        'js/quests.js',
+        'js/controls.js',
+        'js/main.js'
+      ];
+      scripts.forEach(function(src) {
+        const s = document.createElement('script');
+        s.src = src + '?t=' + now;
+        s.async = false;
+        document.body.appendChild(s);
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NaDream & Bank - Badminton Court Birthday Quest 🏸🎂</title>
   
-  <!-- HTTP No-Cache Headers (Prevents browser from caching old code) -->
+  <!-- HTTP No-Cache Headers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -18,8 +18,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="css/styles.css?v=999.0">
+  <!-- Custom Stylesheet with Cache-Buster v=1000.0 -->
+  <link rel="stylesheet" href="css/styles.css?v=1000.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -50,151 +50,115 @@
   <!-- 3D WebGL Canvas -->
   <canvas id="webgl-canvas"></canvas>
 
-  <!-- 3D Calendar Month Tearing & Date 20 Burst Cutscene Overlay (Z-INDEX 9999) -->
-  <div id="calendar-cutscene-overlay" class="calendar-cutscene-overlay hidden">
-    <!-- Month Name Badge (Thai) -->
-    <div id="calendar-month-title" class="calendar-month-title">
-      มกราคม 2569
-    </div>
-
-    <!-- Calendar Flip Card -->
-    <div id="calendar-card" class="calendar-card">
-      <div id="calendar-header-strip" class="calendar-header-strip">JANUARY 2569</div>
-      <div id="calendar-grid" class="calendar-grid">
-        <div class="day-head">อา</div><div class="day-head">จ</div><div class="day-head">อ</div><div class="day-head">พ</div><div class="day-head">พฤ</div><div class="day-head">ศ</div><div class="day-head">ส</div>
-        <!-- Days -->
-        <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
-        <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div>
-        <div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div>
-        <!-- DATE 20 SPECIAL BIRTHDAY HIGHLIGHT -->
-        <div id="date-20-highlight" class="day-cell date-20-highlight">20</div>
-        <div class="day-cell">21</div>
-        <div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div><div class="day-cell">27</div><div class="day-cell">28</div>
-        <div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+  <!-- Top Left HUD Logo & 5 Star Rating Badge -->
+  <div id="hud-top-left" class="hud-top-left">
+    <div class="character-card-frame">
+      <div class="character-name-title">NaDream</div>
+      <div class="stars-container-badge">
+        <i class="fa-solid fa-star gold-star"></i>
+        <i class="fa-solid fa-star gold-star"></i>
+        <i class="fa-solid fa-star gold-star"></i>
+        <i class="fa-solid fa-star gold-star"></i>
+        <i class="fa-solid fa-star gold-star"></i>
       </div>
+      <div class="portrait-box">
+        <img src="pic/เจ๊สมคิด.jpg" alt="NaDream" class="portrait-img">
+      </div>
+      <div class="title-ribbon">เจ๊สมคิด (★★★★★)</div>
     </div>
-
-    <!-- Tearing Flare Beam Burst -->
-    <div id="burst-flare" class="burst-flare hidden"></div>
   </div>
 
-  <!-- Game HUD -->
-  <div id="game-hud" class="game-hud">
-    <!-- Top Left: Simple Character Name (No Background Box/Border) -->
-    <div class="player-badge-simple">
-      <span class="player-name-clean">NaDream</span>
-    </div>
-
-    <!-- Top Right: Quest Tracker & Camera Toggle -->
-    <div class="top-right-controls">
-      <div class="top-buttons-row">
-        <button id="camera-toggle-btn" class="hud-btn" title="เปลี่ยนมุมมอง">
-          <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
-        </button>
+  <!-- Top Right Quest Tracker Widget -->
+  <div id="hud-top-right" class="hud-top-right">
+    <div class="quest-tracker-card">
+      <div class="quest-header">
+        <i class="fa-solid fa-scroll"></i>
+        <span class="quest-title-head">ภารกิจตามหา Bank</span>
+        <span id="quest-count" class="quest-badge">0/5</span>
       </div>
-      
-      <div class="quest-tracker">
-        <div class="tracker-header">
-          <i class="fa-solid fa-scroll text-gold"></i>
-          <span>ภารกิจตามหา Bank</span>
-          <span id="quest-count" class="quest-count-badge">0/5</span>
-        </div>
-        <div class="quest-progress-bar">
-          <div id="quest-progress-fill" class="quest-progress-fill" style="width: 0%;"></div>
-        </div>
-        <div id="current-quest-title" class="quest-current-desc">
-          📌 เดินตามลูกศรนำทางบนพื้นไปชมรูปศิลปะ #1
-        </div>
+      <div class="quest-progress-bg">
+        <div id="quest-progress-fill" class="quest-progress-fill"></div>
+      </div>
+      <div id="current-quest-title" class="quest-detail-text">
+        📌 เดินตามลูกศรนำทางบนพื้นไปชมรูปศิลปะ #1
       </div>
     </div>
+  </div>
 
-    <!-- Laptop / PC Desktop Controls Hint -->
-    <div class="controls-hint">
-      <div class="hint-key">W A S D</div> เดินตามมุมกล้อง &nbsp;|&nbsp; 
-      <div class="hint-key">SPACE</div> กระโดด &nbsp;|&nbsp; 
-      <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp;
-      <div class="hint-key">เมาส์ลาก</div> หมุนกล้องรอบตัวละคร
-    </div>
-
-    <!-- Action Prompt Overlay -->
-    <div id="action-prompt" class="action-prompt hidden">
-      <button id="action-prompt-btn" class="action-btn-pulse">
-        <span id="action-prompt-number" class="action-number">🎨</span>
-        <span id="action-prompt-text" class="action-text">ชมรูปผลงานศิลปะ</span>
-      </button>
-    </div>
-
-    <!-- Sound Toggle Button -->
-    <button id="sound-toggle-btn" class="sound-toggle-btn" title="เปิด/ปิด เสียง">
+  <!-- Top Right Camera Toggle & Mute Sound Button -->
+  <div class="top-controls-group">
+    <button id="camera-toggle-btn" class="btn-hud">
+      <i class="fa-solid fa-video"></i> <span id="camera-mode-text">มุมมอง 3rd Person</span>
+    </button>
+    <button id="sound-toggle-btn" class="btn-hud sound-btn">
       <i id="sound-icon" class="fa-solid fa-volume-high"></i>
     </button>
   </div>
 
-  <!-- Interactive 5-Star Photo Review Rating Modal Popup ("ความเท่ของรูป") -->
-  <div id="star-rating-modal" class="modal-backdrop hidden">
-    <div class="npc-dialog-card art-dialog-card rating-dialog-card">
-      <div class="npc-header">
-        <div class="npc-avatar">⭐</div>
-        <div class="npc-info">
-          <h2 id="star-title-text" class="npc-name">ชื่อรูปภาพ</h2>
-          <p class="npc-subtitle">✨ เลือกให้คะแนนความเท่ 1 - 5 ดาว ✨</p>
-        </div>
-        <button id="star-modal-close" class="modal-close">&times;</button>
-      </div>
-      
-      <div class="npc-body text-center">
-        <img id="star-photo-img" src="" alt="Art Gallery Photo" class="art-display-img">
-        
-        <div class="star-rating-box">
-          <div class="rating-label">🔥 คลิกเลือกดาวประเมินความเท่ของรูป 🔥</div>
-          <div id="stars-row" class="stars-row">
-            <i data-star="1" class="fa-solid fa-star star-icon active-star"></i>
-            <i data-star="2" class="fa-solid fa-star star-icon active-star"></i>
-            <i data-star="3" class="fa-solid fa-star star-icon active-star"></i>
-            <i data-star="4" class="fa-solid fa-star star-icon active-star"></i>
-            <i data-star="5" class="fa-solid fa-star star-icon active-star"></i>
-          </div>
-          <div id="rating-score-text" class="rating-score-text">⭐⭐⭐⭐⭐ 5 ดาว เท่ระดับเทพ!</div>
-        </div>
-      </div>
+  <!-- Bottom Controls Hint Bar -->
+  <div class="controls-hint-bar">
+    <span class="key-badge">W A S D</span> เดินตามมุมกล้อง |
+    <span class="key-badge">SPACE</span> กระโดด |
+    <span class="key-badge">V</span> สลับมุมมอง |
+    <span class="key-badge">เมาส์ลาก</span> หมุนกล้องรอบตัวละคร
+  </div>
 
-      <div class="npc-footer text-center">
-        <button id="star-confirm-btn" class="btn-primary btn-large-gold">
-          <i class="fa-solid fa-crown"></i> ยืนยันคะแนนรูปนี้เรียบร้อย! ✨
-        </button>
+  <!-- Interactive Action Prompt Overlay -->
+  <div id="action-prompt" class="action-prompt hidden">
+    <button id="action-prompt-btn" class="action-prompt-btn">
+      <span id="action-prompt-text">🎨 กดที่นี่เพื่อชมและรีวิวรูปภาพ!</span>
+    </button>
+  </div>
+
+  <!-- 1-5 Star Photo Rating Modal Popup -->
+  <div id="star-rating-modal" class="modal-backdrop hidden">
+    <div class="star-modal-card">
+      <button id="star-modal-close" class="modal-close-btn">&times;</button>
+      <div class="star-modal-header">
+        <h2>⭐ ให้คะแนนความเท่ของรูปภาพ ⭐</h2>
+        <p>เลือกจำนวนดาว (1-5 ดาว) เพื่อบันทึกคะแนน!</p>
       </div>
+      <div class="star-photo-container">
+        <img id="star-photo-img" src="" alt="Photo Review" class="star-review-img">
+        <div id="star-title-text" class="star-photo-title"></div>
+      </div>
+      <div class="rating-interactive-area">
+        <div id="stars-row" class="stars-row">
+          <i class="fa-solid fa-star star-icon" data-star="1"></i>
+          <i class="fa-solid fa-star star-icon" data-star="2"></i>
+          <i class="fa-solid fa-star star-icon" data-star="3"></i>
+          <i class="fa-solid fa-star star-icon" data-star="4"></i>
+          <i class="fa-solid fa-star star-icon" data-star="5"></i>
+        </div>
+        <div id="rating-score-text" class="rating-score-text">⭐⭐⭐⭐⭐ 5 ดาว เท่ระดับเทพ!</div>
+      </div>
+      <button id="star-confirm-btn" class="btn-confirm-stars">
+        ✨ ยืนยันการให้คะแนน
+      </button>
     </div>
   </div>
 
-  <!-- NPC Bank Speech Bubble Modal -->
+  <!-- NPC Bank Dialogue & Photo Wall Popup Modal -->
   <div id="npc-modal" class="modal-backdrop hidden">
-    <div class="npc-dialog-card">
+    <div class="dialogue-card">
+      <button id="npc-modal-close" class="modal-close-btn">&times;</button>
       <div class="npc-header">
-        <div class="npc-avatar">🏸</div>
-        <div class="npc-info">
-          <h2 class="npc-name">Bank <span class="npc-badge">Badminton Buddy</span></h2>
-          <p class="npc-subtitle">ผู้รอคอยที่ห้องโถงแชมเปียน</p>
-        </div>
-        <button id="npc-modal-close" class="modal-close">&times;</button>
-      </div>
-      
-      <div class="npc-body">
-        <div class="speech-bubble">
-          <h1 class="hbd-title">🎂 HAPPY BIRTHDAY! 🎂</h1>
-          <p class="hbd-message">
-            "สุขสันต์วันเกิดนะ <strong>NaDream</strong>! 🎉✨<br>
-            ขอให้มีความสุขมากๆ สุขภาพแข็งแรง ยิ้มเยอะๆ ในทุกๆ วัน<br>
-            สมหวังในสิ่งที่คิดและตั้งใจไว้ทุกเรื่องเลยนะ!"
-          </p>
+        <div class="npc-avatar-box">🏸</div>
+        <div>
+          <h2 class="npc-name">Bank (เจ้าของวันเกิด)</h2>
+          <p class="npc-role">เพื่อนร่วมทางแห่งความสุข & แบดมินตัน</p>
         </div>
       </div>
-
-      <div class="npc-footer">
-        <button id="replay-hbd-music" class="btn-secondary">
-          <i class="fa-solid fa-music"></i> ฟังเพลงวันเกิดอีกครั้ง
-        </button>
-        <button id="npc-close-btn" class="btn-primary">
-          <i class="fa-solid fa-heart"></i> ขอบคุณนะ! 💕
+      <div id="npc-dialogue-text" class="dialogue-body">
+        "สุขสันต์วันเกิดนะ NaDream! ขอบคุณมากๆ ที่มาร่วมผจญภัยในทัวร์นาเมนต์สนามแบดมินตันด้วยกันในวันนี้! 🎂🎉"
+      </div>
+      <div class="photo-wall-section">
+        <h3>📸 แกลเลอรีความประทับใจครบรอบวันเกิด</h3>
+        <div id="photo-gallery-grid" class="photo-grid"></div>
+      </div>
+      <div class="dialogue-footer">
+        <button id="npc-close-btn" class="btn-primary-glow">
+          ❤️ ขอบคุณสำหรับทริปสุดพิเศษนี้! (ปิดหน้าต่าง)
         </button>
       </div>
     </div>
@@ -217,27 +181,14 @@
     </div>
   </div>
 
-  <!-- Dynamic Timestamp Script Loader (Auto-refreshes code automatically on every refresh without Ctrl+F5!) -->
-  <script>
-    (function() {
-      const now = Date.now();
-      const scripts = [
-        'js/audio.js',
-        'js/character.js',
-        'js/npc_bank.js',
-        'js/court_world.js',
-        'js/minigames.js',
-        'js/quests.js',
-        'js/controls.js',
-        'js/main.js'
-      ];
-      scripts.forEach(function(src) {
-        const s = document.createElement('script');
-        s.src = src + '?t=' + now;
-        s.async = false;
-        document.body.appendChild(s);
-      });
-    })();
-  </script>
+  <!-- Standard Sequential Order Scripts with Cache-Buster v=1000.0 -->
+  <script src="js/audio.js?v=1000.0"></script>
+  <script src="js/character.js?v=1000.0"></script>
+  <script src="js/npc_bank.js?v=1000.0"></script>
+  <script src="js/court_world.js?v=1000.0"></script>
+  <script src="js/minigames.js?v=1000.0"></script>
+  <script src="js/quests.js?v=1000.0"></script>
+  <script src="js/controls.js?v=1000.0"></script>
+  <script src="js/main.js?v=1000.0"></script>
 </body>
 </html>

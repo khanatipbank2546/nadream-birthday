@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Main Entry Point - Mini-Game Engine & Grand Birthday Finale Cutscene
+   Main Entry Point - Guaranteed 3.0s Secret Door Opening Cutscene
    ========================================================================== */
 
 class Game {
@@ -7,7 +7,7 @@ class Game {
     this.canvas = document.getElementById('webgl-canvas');
     this.clock = new THREE.Clock();
 
-    // Game States: 'SHOWCASE', 'FLOATING', 'CALENDAR_TEAR', 'BURST_LAND', 'PLAYING', 'PHOTO_PREVIEW', 'GIFT_BOX_CUTSCENE', 'FINALE'
+    // Game States: 'SHOWCASE', 'FLOATING', 'CALENDAR_TEAR', 'BURST_LAND', 'PLAYING', 'PHOTO_PREVIEW', 'GIFT_BOX_CUTSCENE', 'DOOR_OPENING', 'FINALE'
     this.gameState = 'SHOWCASE';
     this.cutsceneTimer = 0;
     this.currentMonthIdx = 0;
@@ -231,7 +231,7 @@ class Game {
     if (window.soundEngine) window.soundEngine.playDoorUnlock();
   }
 
-  // Secret Door Opening Camera Cutscene (Pans to Door as panels slide open with glowing light!)
+  // Secret Door Opening Camera Cutscene (3.0s Dramatic Camera Pan & Door Panels Sliding Open Live!)
   startDoorOpeningCutscene(doorIndex, callback) {
     this.gameState = 'DOOR_OPENING';
     const door = this.courtWorld ? this.courtWorld.doors[doorIndex - 1] : null;
@@ -253,23 +253,19 @@ class Game {
   startGrandBirthdayFinale() {
     this.gameState = 'FINALE';
 
-    // 1. Dim Room Lighting Subtly
     if (this.scene) {
       this.scene.background = new THREE.Color(0x0a0d14);
       this.scene.fog = new THREE.FogExp2(0x0a0d14, 0.012);
     }
 
-    // 2. Open Secret Door #5
     if (this.courtWorld) {
       this.courtWorld.unlockBarrier(5);
     }
 
-    // 3. Play Birthday Music
     if (window.soundEngine) {
       window.soundEngine.startBGM();
     }
 
-    // 4. Bank NPC Walks Out Carrying Birthday Cake with Candlelight to NaDream!
     if (this.bankNPC && this.character) {
       const targetPos = new THREE.Vector3(
         this.character.position.x,
@@ -278,7 +274,6 @@ class Game {
       );
 
       this.bankNPC.walkToPlayer(targetPos, () => {
-        // Arrived! Open HBD Modal Popup!
         if (window.showNPCModal) {
           window.showNPCModal();
         }
@@ -361,13 +356,13 @@ class Game {
 
     } else if (this.gameState === 'DOOR_OPENING') {
       this.previewTimer += delta;
-      const progress = Math.min(1.0, this.previewTimer / 2.0); // 2.0s Secret Door Opening Cutscene!
+      const progress = Math.min(1.0, this.previewTimer / 3.0); // 3.0s Dramatic Secret Door Opening Cutscene!
 
       if (this.controls) {
         this.controls.updateDoorOpeningCamera(this.previewArtPos, progress);
       }
 
-      if (this.previewTimer >= 2.0) {
+      if (this.previewTimer >= 3.0) {
         this.gameState = 'PLAYING';
         if (this.previewCallback) {
           const cb = this.previewCallback;

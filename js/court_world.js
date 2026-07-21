@@ -1,5 +1,5 @@
 /* ==========================================================================
-   3D Indoor Badminton Complex - Guaranteed Photos & Unlit 3D Gold Stars
+   3D Indoor Badminton Complex - Reset Door openProgress & 2.5s Smooth Slide
    ========================================================================== */
 
 class CourtWorld {
@@ -122,7 +122,6 @@ class CourtWorld {
     wallMesh.position.set(0, 5.0, wallZ);
     this.photoGalleryWallGroup.add(wallMesh);
 
-    // Guaranteed 5 Pre-Game Feature Wall Photos (NO TITLES/PLAQUES, JUST FRAMED PHOTOS)
     const bgPhotos = [
       { x: 0, y: 5.6, w: 5.8, h: 3.2, path: 'background/11.jpg' },
       { x: -5.2, y: 6.0, w: 3.2, h: 2.4, path: 'background/12.jpg' },
@@ -146,7 +145,6 @@ class CourtWorld {
         picMesh.position.z = 0.05;
         pGroup.add(picMesh);
       }, undefined, () => {
-        // Fallback to pic/ photos if background/ has any issue
         this.textureLoader.load(encodeURI('pic/เจ๊สมคิด.jpg'), (tex) => {
           const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
           const picMesh = new THREE.Mesh(picGeo, picMat);
@@ -169,7 +167,6 @@ class CourtWorld {
   }
 
   initArtGalleryPhotos() {
-    // 10 Exact Thai Photo Filenames & Explicit Plaque Titles
     const photoItems = [
       { path: 'pic/เจ๊สมคิด.jpg', title: 'เจ๊สมคิด' },
       { path: 'pic/แช้มแรกป่ะ.jpg', title: 'แช้มแรกป่ะ' },
@@ -198,7 +195,6 @@ class CourtWorld {
     }
   }
 
-  // Create Extruded 3D Vector Gold Star Mesh (Ultra Glowing & Bright)
   create3DStarMesh() {
     const shape = new THREE.Shape();
     const points = 5;
@@ -244,7 +240,6 @@ class CourtWorld {
       artGroup.add(picMesh);
     });
 
-    // Plaque Mesh displaying exact Thai Title (e.g. "เจ๊สมคิด", "แช้มแรกป่ะ")
     const plaqueGeo = new THREE.BoxGeometry(2.8, 0.52, 0.08);
     let plaqueMesh = null;
 
@@ -286,7 +281,6 @@ class CourtWorld {
     spotlight.target = frameMesh;
     this.scene.add(spotlight);
 
-    // REAL 3D Extruded Gold Star Badge Row floating directly above the Frame!
     let starBadgeGroup = null;
 
     artGroup.position.set(xPos, yPos, zPos);
@@ -329,14 +323,12 @@ class CourtWorld {
     for (let r = 0; r < 5; r++) {
       const roomCenterZ = -r * roomDepth - roomDepth / 2;
 
-      // Photo Art Standing Pads
       const padLeft = this.createStandingPad(-16.0, 0.02, roomCenterZ, r * 2 + 1);
       this.checkpointPads.push(padLeft);
 
       const padRight = this.createStandingPad(16.0, 0.02, roomCenterZ, r * 2 + 2);
       this.checkpointPads.push(padRight);
 
-      // Dedicated Gift Box Floor Standing Pad in Room Center!
       const giftBoxPad = this.createStandingPad(0, 0.02, roomCenterZ, 100 + r + 1);
       this.giftBoxPads.push(giftBoxPad);
     }
@@ -675,8 +667,11 @@ class CourtWorld {
 
   unlockBarrier(index) {
     const door = this.doors[index - 1];
-    if (door && !door.userData.unlocked) {
+    if (door) {
       door.userData.unlocked = true;
+      door.userData.openProgress = 0; // Reset open progress to 0 so it animates fresh during camera cutscene!
+      if (door.userData.leftPanel) door.userData.leftPanel.position.x = -2.0;
+      if (door.userData.rightPanel) door.userData.rightPanel.position.x = 2.0;
     }
   }
 
@@ -711,14 +706,15 @@ class CourtWorld {
       }
     });
 
+    // Smooth door sliding opening over 2.5 seconds
     this.doors.forEach(door => {
       if (door.userData.unlocked && door.userData.openProgress < 1.0) {
-        door.userData.openProgress += 0.04;
-        const slideX = door.userData.openProgress * 3.6;
-        door.userData.leftPanel.position.x = -2.0 - slideX;
-        door.userData.rightPanel.position.x = 2.0 + slideX;
-
-        door.userData.lightBeam.intensity = door.userData.openProgress * 4.5;
+        door.userData.openProgress += 0.015;
+        const p = Math.min(1.0, door.userData.openProgress);
+        const slideX = p * 3.6;
+        if (door.userData.leftPanel) door.userData.leftPanel.position.x = -2.0 - slideX;
+        if (door.userData.rightPanel) door.userData.rightPanel.position.x = 2.0 + slideX;
+        if (door.userData.lightBeam) door.userData.lightBeam.intensity = p * 5.0;
       }
     });
   }

@@ -64,6 +64,7 @@ class Game {
       this.character = new window.CharacterController(this.scene);
       this.bankNPC = new window.BankNPC(this.scene, new THREE.Vector3(0, 0, -152));
       this.questManager = new window.QuestManager(this.courtWorld, this.bankNPC);
+      window.questManager = this.questManager;
       this.controls = new window.Controls(this.camera, this.canvas, this.character);
       
       // Global Mini-Game Engine

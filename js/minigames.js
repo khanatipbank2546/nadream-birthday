@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Mini-Games Engine - Instant 0ms Completion (No Popups / No Banners)
+   Mini-Games Engine - Instant 0ms Completion & Direct Force Complete Call
    ========================================================================== */
 
 class MiniGameEngine {
@@ -9,6 +9,7 @@ class MiniGameEngine {
     this.subtitleEl = null;
     this.containerEl = null;
     this.giveUpBtn = null;
+    this.closeBtn = null;
 
     this.onCompleteCallback = null;
     this.currentRoom = 1;
@@ -69,6 +70,11 @@ class MiniGameEngine {
 
     if (window.soundEngine) {
       if (!skipped) window.soundEngine.playQuestComplete();
+    }
+
+    // DIRECTLY FORCE COMPLETE GIFT BOX MISSION IN QUEST MANAGER!
+    if (window.questManager && window.questManager.forceCompleteGiftBox) {
+      window.questManager.forceCompleteGiftBox(this.currentRoom);
     }
 
     if (this.onCompleteCallback) {
@@ -177,7 +183,7 @@ class MiniGameEngine {
     }
 
     if (isComplete) {
-      // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
+      // INSTANT COMPLETION -> TRIGGER DOOR CUTSCENE & NEXT ROOM!
       this.finishMiniGame(false);
     }
   }
@@ -244,7 +250,6 @@ class MiniGameEngine {
             if (window.soundEngine) window.soundEngine.playClick();
 
             if (foundCount >= 5) {
-              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
               this.finishMiniGame(false);
             }
           }
@@ -336,7 +341,6 @@ class MiniGameEngine {
             lockBoard = false;
 
             if (matchedPairs >= 6) {
-              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
               this.finishMiniGame(false);
             }
           } else {
@@ -440,7 +444,6 @@ class MiniGameEngine {
             }
 
             if (isSolved) {
-              // INSTANT COMPLETION (0ms delay, NO POPUPS/BANNERS!)
               this.finishMiniGame(false);
             }
           }

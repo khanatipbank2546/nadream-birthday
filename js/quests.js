@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Quest Manager - Secret Door Cutscene & Immediate Next Room Arrow Rotation
+   Quest Manager - Guaranteed Gift Box Proximity & Secret Door Cutscenes
    ========================================================================== */
 
 class QuestManager {
@@ -43,6 +43,7 @@ class QuestManager {
   startRoomQuest(roomNum) {
     this.currentRoom = roomNum;
     this.roomSubState = 'ART_1';
+    this.isProcessingCutscene = false;
 
     // Hide all art pads, gift box pads, and gift boxes
     if (this.courtWorld.checkpointPads) this.courtWorld.checkpointPads.forEach(pad => pad.visible = false);
@@ -54,7 +55,6 @@ class QuestManager {
     if (this.courtWorld.checkpointPads && this.courtWorld.checkpointPads[pad1Index]) {
       this.courtWorld.checkpointPads[pad1Index].visible = true;
       const p = this.courtWorld.checkpointPads[pad1Index].userData;
-      // DIRECTLY UPDATE TARGET POS SO FLOOR ARROW IMMEDIATELY POINTS TO PAD #1 IN THIS ROOM!
       this.activeTargetPos.set(p.xPos, 0, p.zPos);
     }
 
@@ -75,7 +75,7 @@ class QuestManager {
       } else if (this.roomSubState === 'ART_2') {
         if (this.questTitleEl) this.questTitleEl.innerText = `📌 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint ฝั่งขวา เพื่อชมและให้คะแนนรูปภาพ #2`;
       } else if (this.roomSubState === 'GIFT_BOX') {
-        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินไปเหยียบจุด Checkpoint กล่องของขวัญกลางห้องเพื่อทำภารกิจด่าน!`;
+        if (this.questTitleEl) this.questTitleEl.innerText = `🎁 ห้องที่ ${this.currentRoom}: เดินเข้าใกล้กล่องของขวัญกลางห้องเพื่อทำภารกิจด่าน!`;
       }
     } else {
       if (this.questTitleEl) this.questTitleEl.innerText = `👑 ร่วมฉลองวันเกิด Happy Birthday กับ Bank! 🎂🎉`;
@@ -101,6 +101,54 @@ class QuestManager {
     }
   }
 
+  triggerGiftBoxMission(roomToComplete) {
+    if (window.game) {
+      window.game.startGiftBoxOpeningCutscene(roomToComplete, () => {
+        if (window.miniGameEngine) {
+          window.miniGameEngine.startMiniGame(roomToComplete, this.ratedPhotos, (skipped) => {
+            // Hide Gift Box & Standing Pad
+            if (this.courtWorld.questMarkers[roomToComplete - 1]) {
+              this.courtWorld.questMarkers[roomToComplete - 1].visible = false;
+            }
+            if (this.courtWorld.giftBoxPads[roomToComplete - 1]) {
+              this.courtWorld.giftBoxPads[roomToComplete - 1].visible = false;
+            }
+
+            if (roomToComplete <= 4) {
+              this.courtWorld.unlockBarrier(roomToComplete);
+
+              this.currentQuestIndex = roomToComplete;
+              this.currentRoom = roomToComplete + 1;
+
+              // START NEXT ROOM QUEST IMMEDIATELY
+              this.startRoomQuest(this.currentRoom);
+
+              // RUN SECRET DOOR OPENING CAMERA CUTSCENE!
+              if (window.game && window.game.startDoorOpeningCutscene) {
+                window.game.startDoorOpeningCutscene(roomToComplete, () => {
+                  this.isProcessingCutscene = false;
+                });
+              } else {
+                this.isProcessingCutscene = false;
+              }
+
+            } else if (roomToComplete === 5) {
+              this.currentQuestIndex = 5;
+              this.currentRoom = 6;
+              this.roomSubState = 'COMPLETE';
+              this.updateTrackerText();
+
+              if (window.game && window.game.startGrandBirthdayFinale) {
+                window.game.startGrandBirthdayFinale();
+              }
+              this.isProcessingCutscene = false;
+            }
+          });
+        }
+      });
+    }
+  }
+
   checkProximity(playerPos) {
     if (this.isProcessingCutscene) return;
 
@@ -112,7 +160,7 @@ class QuestManager {
         if (pad && pad.visible) {
           const dist = Math.hypot(playerPos.x - pad.userData.xPos, playerPos.z - pad.userData.zPos);
           
-          if (dist < 2.5) {
+          if (dist < 2.8) {
             pad.visible = false;
             this.hideActionPrompt();
             this.isProcessingCutscene = true;
@@ -139,7 +187,7 @@ class QuestManager {
               });
             }
             return;
-          } else if (dist < 5.0) {
+          } else if (dist < 5.5) {
             this.showActionPrompt(`🎨 เดินไปเหยียบจุด Checkpoint รูปภาพ #${artIdx + 1}`);
             this.isNearTarget = true;
             return;
@@ -152,66 +200,15 @@ class QuestManager {
         if (boxPad && boxPad.visible) {
           const dist = Math.hypot(playerPos.x - boxPad.userData.xPos, playerPos.z - boxPad.userData.zPos);
           
-          if (dist < 2.5) {
+          if (dist < 4.2) { // Expanded Proximity Distance for Instant Trigger!
             boxPad.visible = false;
             this.hideActionPrompt();
             this.isProcessingCutscene = true;
 
-            if (window.game) {
-              window.game.startGiftBoxOpeningCutscene(roomToComplete, () => {
-                // GIFT BOX CUTSCENE FINISHED -> START MINI-GAME MISSION!
-                if (window.miniGameEngine) {
-                  window.miniGameEngine.startMiniGame(roomToComplete, this.ratedPhotos, (skipped) => {
-                    // Hide Gift Box & Standing Pad
-                    if (this.courtWorld.questMarkers[roomToComplete - 1]) {
-                      this.courtWorld.questMarkers[roomToComplete - 1].visible = false;
-                    }
-                    if (this.courtWorld.giftBoxPads[roomToComplete - 1]) {
-                      this.courtWorld.giftBoxPads[roomToComplete - 1].visible = false;
-                    }
-
-                    if (roomToComplete <= 4) {
-                      this.courtWorld.unlockBarrier(roomToComplete);
-
-                      this.currentQuestIndex = roomToComplete;
-                      this.currentRoom = roomToComplete + 1;
-
-                      // IMMEDIATELY START NEXT ROOM QUEST SO ARROW POINTS TO NEXT ROOM'S CHECKPOINT PAD!
-                      this.startRoomQuest(this.currentRoom);
-
-                      // RUN SECRET DOOR OPENING CAMERA CUTSCENE!
-                      if (window.game && window.game.startDoorOpeningCutscene) {
-                        window.game.startDoorOpeningCutscene(roomToComplete, () => {
-                          this.isProcessingCutscene = false;
-                        });
-                      } else {
-                        this.isProcessingCutscene = false;
-                      }
-
-                    } else if (roomToComplete === 5) {
-                      this.currentQuestIndex = 5;
-                      this.currentRoom = 6;
-                      this.roomSubState = 'COMPLETE';
-                      this.updateTrackerText();
-
-                      if (window.game && window.game.startGrandBirthdayFinale) {
-                        window.game.startGrandBirthdayFinale();
-                      }
-                      this.isProcessingCutscene = false;
-                    }
-                  });
-                } else {
-                  this.courtWorld.unlockBarrier(roomToComplete);
-                  this.currentQuestIndex = roomToComplete;
-                  this.currentRoom = roomToComplete + 1;
-                  if (this.currentRoom <= 5) this.startRoomQuest(this.currentRoom);
-                  this.isProcessingCutscene = false;
-                }
-              });
-            }
+            this.triggerGiftBoxMission(roomToComplete);
             return;
-          } else if (dist < 5.0) {
-            this.showActionPrompt(`🎁 เดินไปเหยียบจุด Checkpoint กล่องของขวัญ #${roomToComplete}`);
+          } else if (dist < 8.0) {
+            this.showActionPrompt(`🎁 กดที่นี่เพื่อเปิดกล่องของขวัญและทำภารกิจด่านที่ #${roomToComplete}`);
             this.isNearTarget = true;
             return;
           }
@@ -284,49 +281,7 @@ class QuestManager {
         this.hideActionPrompt();
         this.isProcessingCutscene = true;
 
-        if (window.game) {
-          window.game.startGiftBoxOpeningCutscene(roomToComplete, () => {
-            if (window.miniGameEngine) {
-              window.miniGameEngine.startMiniGame(roomToComplete, this.ratedPhotos, (skipped) => {
-                // Hide Gift Box & Standing Pad
-                if (this.courtWorld.questMarkers[roomToComplete - 1]) {
-                  this.courtWorld.questMarkers[roomToComplete - 1].visible = false;
-                }
-                if (this.courtWorld.giftBoxPads[roomToComplete - 1]) {
-                  this.courtWorld.giftBoxPads[roomToComplete - 1].visible = false;
-                }
-
-                if (roomToComplete <= 4) {
-                  this.courtWorld.unlockBarrier(roomToComplete);
-
-                  this.currentQuestIndex = roomToComplete;
-                  this.currentRoom = roomToComplete + 1;
-
-                  this.startRoomQuest(this.currentRoom);
-
-                  if (window.game && window.game.startDoorOpeningCutscene) {
-                    window.game.startDoorOpeningCutscene(roomToComplete, () => {
-                      this.isProcessingCutscene = false;
-                    });
-                  } else {
-                    this.isProcessingCutscene = false;
-                  }
-
-                } else if (roomToComplete === 5) {
-                  this.currentQuestIndex = 5;
-                  this.currentRoom = 6;
-                  this.roomSubState = 'COMPLETE';
-                  this.updateTrackerText();
-
-                  if (window.game && window.game.startGrandBirthdayFinale) {
-                    window.game.startGrandBirthdayFinale();
-                  }
-                  this.isProcessingCutscene = false;
-                }
-              });
-            }
-          });
-        }
+        this.triggerGiftBoxMission(roomToComplete);
       }
     } else {
       if (window.showNPCModal) window.showNPCModal();
@@ -334,6 +289,8 @@ class QuestManager {
   }
 
   advanceRoomSubState() {
+    this.isProcessingCutscene = false; // Always clear cutscene flag when advancing substate!
+
     if (this.roomSubState === 'ART_1') {
       this.roomSubState = 'ART_2';
 

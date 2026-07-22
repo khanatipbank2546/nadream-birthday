@@ -248,7 +248,7 @@ class CharacterController {
     leftHand.position.y = -0.78;
     leftArmGroup.add(leftHand);
 
-    leftArmGroup.position.set(-0.52, 1.45, 0);
+    leftArmGroup.position.set(-0.46, 1.45, 0.05);
     this.leftArm = leftArmGroup;
     this.group.add(leftArmGroup);
 
@@ -266,7 +266,7 @@ class CharacterController {
     rightHand.position.y = -0.78;
     rightArmGroup.add(rightHand);
 
-    rightArmGroup.position.set(0.52, 1.45, 0);
+    rightArmGroup.position.set(0.46, 1.45, 0.05);
     this.rightArm = rightArmGroup;
     this.group.add(rightArmGroup);
 
@@ -329,10 +329,10 @@ class CharacterController {
     const floatY = 2.2 + Math.sin(elapsedTime * 2.5) * 0.3;
     this.position.y = floatY;
 
-    this.leftArm.rotation.z = -Math.PI / 12 - Math.sin(elapsedTime * 2) * 0.05;
-    this.rightArm.rotation.z = Math.PI / 12 + Math.sin(elapsedTime * 2) * 0.05;
-    this.leftArm.rotation.x = 0.05;
-    this.rightArm.rotation.x = 0.05;
+    this.leftArm.rotation.z = -Math.PI / 12;
+    this.rightArm.rotation.z = Math.PI / 12;
+    this.leftArm.rotation.x = -0.05;
+    this.rightArm.rotation.x = -0.05;
 
     this.leftLeg.rotation.x = 0.3 + Math.sin(elapsedTime * 1.8) * 0.1;
     this.rightLeg.rotation.x = -0.3 - Math.sin(elapsedTime * 1.8) * 0.1;
@@ -349,14 +349,14 @@ class CharacterController {
     this.position.y = startY * (1 - progress);
 
     if (progress < 0.7) {
-      this.leftArm.rotation.x = Math.PI * 0.8;
-      this.rightArm.rotation.x = Math.PI * 0.8;
+      this.leftArm.rotation.x = -0.4;
+      this.rightArm.rotation.x = -0.4;
       this.leftLeg.rotation.x = -0.4;
       this.rightLeg.rotation.x = 0.4;
     } else {
       const crouch = (1 - progress) / 0.3;
-      this.leftArm.rotation.x = -0.8;
-      this.rightArm.rotation.x = 0.8;
+      this.leftArm.rotation.x = -0.3 * crouch;
+      this.rightArm.rotation.x = -0.3 * crouch;
       this.leftLeg.rotation.x = 0.9 * crouch;
       this.rightLeg.rotation.x = 0.9 * crouch;
     }
@@ -444,8 +444,8 @@ class CharacterController {
       
       this.leftLeg.rotation.x = swing;
       this.rightLeg.rotation.x = -swing;
-      this.leftArm.rotation.x = -swing * 0.8;
-      this.rightArm.rotation.x = swing * 0.8;
+      this.leftArm.rotation.x = swing * 0.8;
+      this.rightArm.rotation.x = -swing * 0.8;
       this.leftArm.rotation.z = -Math.PI / 24;
       this.rightArm.rotation.z = Math.PI / 24;
 
@@ -456,8 +456,8 @@ class CharacterController {
       this.isMoving = false;
       this.leftLeg.rotation.x *= 0.8;
       this.rightLeg.rotation.x *= 0.8;
-      this.leftArm.rotation.x *= 0.8;
-      this.rightArm.rotation.x *= 0.8;
+      this.leftArm.rotation.x = this.leftArm.rotation.x * 0.8 + (-0.05) * 0.2;
+      this.rightArm.rotation.x = this.rightArm.rotation.x * 0.8 + (-0.05) * 0.2;
       this.leftArm.rotation.z = -Math.PI / 24;
       this.rightArm.rotation.z = Math.PI / 24;
     }

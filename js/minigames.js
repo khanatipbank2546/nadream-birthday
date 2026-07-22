@@ -80,6 +80,8 @@ class MiniGameEngine {
   }
 
   finishMiniGame(skipped = false) {
+    console.log("finishMiniGame triggered. room:", this.currentRoom, "skipped:", skipped);
+
     if (this.modalEl) {
       this.modalEl.classList.add('hidden');
       this.modalEl.style.display = 'none';
@@ -90,11 +92,15 @@ class MiniGameEngine {
     }
 
     if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
+      console.log("Calling forceCompleteGiftBox on questManager instance.");
       window.game.questManager.forceCompleteGiftBox(this.currentRoom);
-    } else if (this.onCompleteCallback) {
-      const cb = this.onCompleteCallback;
-      this.onCompleteCallback = null;
-      cb(skipped);
+    } else {
+      console.warn("questManager instance or forceCompleteGiftBox not found, falling back to callback.");
+      if (this.onCompleteCallback) {
+        const cb = this.onCompleteCallback;
+        this.onCompleteCallback = null;
+        cb(skipped);
+      }
     }
   }
 
@@ -203,7 +209,7 @@ class MiniGameEngine {
     if (isComplete) {
       setTimeout(() => {
         window.showQuestSuccessModal("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จแล้ว!", () => {
-          this.finishMiniGame(false);
+          window.miniGameEngine.finishMiniGame(false);
         });
       }, 300);
     }
@@ -275,7 +281,7 @@ class MiniGameEngine {
             if (foundCount >= 5) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 สุดยอด! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!", () => {
-                  this.finishMiniGame(false);
+                  window.miniGameEngine.finishMiniGame(false);
                 });
               }, 300);
             }
@@ -373,7 +379,7 @@ class MiniGameEngine {
             if (matchedPairs >= 6) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 เก่งมากๆ! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!", () => {
-                  this.finishMiniGame(false);
+                  window.miniGameEngine.finishMiniGame(false);
                 });
               }, 400);
             }
@@ -483,7 +489,7 @@ class MiniGameEngine {
             if (isSolved) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!", () => {
-                  this.finishMiniGame(false);
+                  window.miniGameEngine.finishMiniGame(false);
                 });
               }, 300);
             }

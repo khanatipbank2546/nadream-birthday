@@ -357,6 +357,7 @@ class QuestManager {
   }
 
   forceCompleteGiftBox(roomNum) {
+    console.log("forceCompleteGiftBox triggered inside QuestManager. roomNum:", roomNum);
     // Hide gift box & standing pad of completed room
     const boxPad = this.courtWorld.giftBoxPads[roomNum - 1];
     if (boxPad) boxPad.visible = false;

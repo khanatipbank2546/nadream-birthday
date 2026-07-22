@@ -440,8 +440,10 @@ class Game {
       }
 
     } else if (this.gameState === 'FINALE') {
-      if (this.controls && this.bankNPC) {
-        this.controls.updateShowcaseCamera(this.bankNPC.position, elapsedTime * 1000);
+      if (this.controls && this.bankNPC && this.character) {
+        this.character.update(delta, {}, null, 0, 0);
+        this.character.group.lookAt(this.bankNPC.position.x, this.character.group.position.y, this.bankNPC.position.z);
+        this.controls.updateFinaleCamera(this.bankNPC.position, this.character.position);
       }
 
     } else if (this.gameState === 'PLAYING') {

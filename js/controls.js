@@ -203,6 +203,16 @@ class Controls {
       this.camera.lookAt(characterPos.x, characterPos.y, characterPos.z);
     }
   }
+
+  updateFinaleCamera(bankPos, characterPos) {
+    // Cinematic over-the-shoulder camera placed behind Nadream, looking at Bank walking forward
+    const camX = characterPos.x - 1.2;
+    const camY = characterPos.y + 1.6;
+    const camZ = characterPos.z + 3.8;
+
+    this.camera.position.set(camX, camY, camZ);
+    this.camera.lookAt(bankPos.x, bankPos.y + 1.25, bankPos.z);
+  }
 }
 
 window.Controls = Controls;

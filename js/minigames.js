@@ -216,7 +216,7 @@ class MiniGameEngine {
   // ==========================================================================
   initSpotDifferenceState2() {
     if (this.titleEl) this.titleEl.innerText = "🔍 ภารกิจด่านที่ 2: จับผิดภาพ (5 จุด)";
-    if (this.subtitleEl) this.subtitleEl.innerText = "คลิกค้นหาจุดที่แตกต่างกัน 5 จุดบนรูปภาพ!";
+    if (this.subtitleEl) this.subtitleEl.innerText = "เปรียบเทียบภาพและคลิกหาจุดที่แตกต่างกัน 5 จุดบนภาพขวามือ!";
 
     const imgSrc = encodeURI("game/state2/จับผิดภาพ.jpg");
 
@@ -237,9 +237,29 @@ class MiniGameEngine {
         <div class="spot-header-status">
           🎯 ค้นพบจุดต่างแล้ว: <span id="spot-found-count" class="spot-counter">0 / 5</span> จุด
         </div>
-        <div class="spot-img-container" id="spot-img-container">
-          <img src="${imgSrc}" class="spot-diff-img" alt="Spot Difference">
-          <div class="spot-overlay-layer" id="spot-overlay-layer"></div>
+        <div class="spot-split-container">
+          <!-- Left Panel: Original -->
+          <div class="spot-panel original">
+            <div class="spot-panel-title">ภาพต้นฉบับ</div>
+            <div class="spot-img-container">
+              <img src="${imgSrc}" class="spot-diff-img" alt="Original">
+            </div>
+          </div>
+          <!-- Right Panel: Target (Interactive) -->
+          <div class="spot-panel target">
+            <div class="spot-panel-title">ภาพที่มีจุดต่าง (คลิกหาจุดต่างที่นี่)</div>
+            <div class="spot-img-container" id="spot-img-container">
+              <img src="${imgSrc}" class="spot-diff-img" alt="Target">
+              <!-- The 5 subtle differences -->
+              <div id="diff-item-1" class="diff-overlay-item"></div>
+              <div id="diff-item-2" class="diff-overlay-item"></div>
+              <div id="diff-item-3" class="diff-overlay-item"></div>
+              <div id="diff-item-4" class="diff-overlay-item"></div>
+              <div id="diff-item-5" class="diff-overlay-item"></div>
+              <!-- Click Overlay layer -->
+              <div class="spot-overlay-layer" id="spot-overlay-layer"></div>
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -263,6 +283,10 @@ class MiniGameEngine {
             foundSpots.add(spot.id);
             foundCount++;
             hitFound = true;
+
+            // Mark the visual overlay item as found
+            const diffItem = document.getElementById(`diff-item-${spot.id}`);
+            if (diffItem) diffItem.classList.add('found');
 
             // Render Green Target Circle
             const marker = document.createElement('div');

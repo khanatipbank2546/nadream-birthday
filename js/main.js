@@ -2,6 +2,44 @@
    Main Entry Point - Mini-Game Engine & Grand Birthday Finale Cutscene
    ========================================================================== */
 
+// On-Screen logger hook
+(function() {
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const originalError = console.error;
+
+  function appendToDebugConsole(message, type) {
+    const consoleEl = document.getElementById('debug-log-console');
+    if (!consoleEl) return;
+
+    const line = document.createElement('div');
+    line.className = `debug-log-line ${type}`;
+    line.innerText = `[${new Date().toLocaleTimeString()}] ${message}`;
+    consoleEl.appendChild(line);
+
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+
+    while (consoleEl.children.length > 50) {
+      consoleEl.removeChild(consoleEl.firstChild);
+    }
+  }
+
+  console.log = function(...args) {
+    originalLog.apply(console, args);
+    appendToDebugConsole(args.join(' '), 'log');
+  };
+
+  console.warn = function(...args) {
+    originalWarn.apply(console, args);
+    appendToDebugConsole(args.join(' '), 'warn');
+  };
+
+  console.error = function(...args) {
+    originalError.apply(console, args);
+    appendToDebugConsole(args.join(' '), 'error');
+  };
+})();
+
 class Game {
   constructor() {
     this.canvas = document.getElementById('webgl-canvas');
@@ -425,6 +463,15 @@ class Game {
 
     if (this.bankNPC) this.bankNPC.update(elapsedTime * 1000);
     if (this.courtWorld) this.courtWorld.update(elapsedTime * 1000);
+
+    // Update debug overlay values
+    const roomVal = document.getElementById('debug-room-val');
+    const substateVal = document.getElementById('debug-substate-val');
+    const gamestateVal = document.getElementById('debug-gamestate-val');
+    
+    if (roomVal && this.questManager) roomVal.innerText = this.questManager.currentRoom;
+    if (substateVal && this.questManager) substateVal.innerText = this.questManager.roomSubState;
+    if (gamestateVal) gamestateVal.innerText = this.gameState;
 
     if (this.renderer && this.scene && this.camera) {
       this.renderer.render(this.scene, this.camera);

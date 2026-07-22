@@ -80,7 +80,7 @@ class MiniGameEngine {
   }
 
   finishMiniGame(skipped = false) {
-    console.log("finishMiniGame triggered. room:", this.currentRoom, "skipped:", skipped);
+    console.log("finishMiniGame triggered. skipped:", skipped);
 
     if (this.modalEl) {
       this.modalEl.classList.add('hidden');
@@ -92,15 +92,11 @@ class MiniGameEngine {
     }
 
     if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
-      console.log("Calling forceCompleteGiftBox on questManager instance.");
-      window.game.questManager.forceCompleteGiftBox(this.currentRoom);
+      const roomNum = window.game.questManager.currentRoom;
+      console.log("Calling forceCompleteGiftBox on questManager instance for room:", roomNum);
+      window.game.questManager.forceCompleteGiftBox(roomNum);
     } else {
-      console.warn("questManager instance or forceCompleteGiftBox not found, falling back to callback.");
-      if (this.onCompleteCallback) {
-        const cb = this.onCompleteCallback;
-        this.onCompleteCallback = null;
-        cb(skipped);
-      }
+      console.warn("questManager instance or forceCompleteGiftBox not found.");
     }
   }
 

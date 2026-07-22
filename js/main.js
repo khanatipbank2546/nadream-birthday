@@ -154,33 +154,58 @@ class Game {
     ];
 
     const monthTitleEl = document.getElementById('calendar-month-title');
-    const headerStripEl = document.getElementById('calendar-header-strip');
-    const calendarCard = document.getElementById('calendar-card');
+    const tearHeaderEl = document.getElementById('calendar-header-strip');
+    const baseHeaderEl = document.getElementById('calendar-base-header');
+    
+    const baseCard = document.getElementById('calendar-base-card');
+    const tearSheet = document.getElementById('calendar-card');
+    
     const date20 = document.getElementById('date-20-highlight');
     const burstFlare = document.getElementById('burst-flare');
 
-    const tearInterval = setInterval(() => {
-      if (this.currentMonthIdx < months.length) {
-        const m = months[this.currentMonthIdx];
-        if (monthTitleEl) monthTitleEl.innerText = m.th;
-        if (headerStripEl) headerStripEl.innerText = m.en;
+    const updateCalendarText = (idx, targetTear, targetBase) => {
+      const curMonth = months[idx];
+      const nextMonth = months[idx + 1] || { en: 'JULY 20th 2569' };
 
-        if (calendarCard) {
-          calendarCard.classList.remove('flip-tear');
-          void calendarCard.offsetWidth;
-          calendarCard.classList.add('flip-tear');
-        }
+      if (monthTitleEl) monthTitleEl.innerText = curMonth.th;
+      if (targetTear) targetTear.innerText = curMonth.en;
+      if (targetBase) targetBase.innerText = nextMonth.en;
+    };
+
+    updateCalendarText(0, tearHeaderEl, baseHeaderEl);
+
+    const tearInterval = setInterval(() => {
+      if (this.currentMonthIdx < months.length - 1) {
         if (window.soundEngine) window.soundEngine.playCalendarTear();
+
+        if (tearSheet) {
+          tearSheet.classList.remove('ripping');
+          void tearSheet.offsetWidth;
+          tearSheet.classList.add('ripping');
+        }
+
         this.currentMonthIdx++;
+
+        setTimeout(() => {
+          if (tearSheet) {
+            tearSheet.classList.remove('ripping');
+          }
+          updateCalendarText(this.currentMonthIdx, tearHeaderEl, baseHeaderEl);
+        }, 380);
+
       } else {
         clearInterval(tearInterval);
 
         if (monthTitleEl) monthTitleEl.innerText = '✨ 20 กรกฎาคม 2569 (วันเกิด NaDream!) ✨';
-        if (headerStripEl) headerStripEl.innerText = 'JULY 20th 2569';
-        if (date20) date20.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (tearHeaderEl) tearHeaderEl.innerText = 'JULY 20th 2569';
+        
+        if (baseCard) baseCard.style.display = 'none';
 
         setTimeout(() => {
-          if (calendarCard) calendarCard.classList.add('shatter-burst');
+          if (tearSheet) {
+            tearSheet.classList.remove('ripping');
+            tearSheet.classList.add('shatter-burst');
+          }
           if (burstFlare) burstFlare.classList.remove('hidden');
           if (window.soundEngine) window.soundEngine.playLandingImpact();
           
@@ -195,9 +220,9 @@ class Game {
             this.gameState = 'PLAYING';
           }, 750);
 
-        }, 1000);
+        }, 1200);
       }
-    }, 400);
+    }, 700);
   }
 
   // 6-Second 180° Wall-Safe Preview Cutscene

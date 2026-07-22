@@ -13,8 +13,8 @@
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Custom Stylesheet with Cache-Buster v=9999.0 -->
-  <link rel="stylesheet" href="css/styles.css?v=9999.0">
+  <!-- Custom Stylesheet with Cache-Buster v=11000.0 -->
+  <link rel="stylesheet" href="css/styles.css?v=11000.0">
   
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -52,20 +52,33 @@
       มกราคม 2569
     </div>
 
-    <!-- Calendar Flip Card -->
-    <div id="calendar-card" class="calendar-card">
-      <div id="calendar-header-strip" class="calendar-header-strip">JANUARY 2569</div>
-      <div id="calendar-grid" class="calendar-grid">
-        <div class="day-head">อา</div><div class="day-head">จ</div><div class="day-head">อ</div><div class="day-head">พ</div><div class="day-head">พฤ</div><div class="day-head">ศ</div><div class="day-head">ส</div>
-        <!-- Days -->
-        <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
-        <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div>
-        <div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div>
-        <!-- DATE 20 SPECIAL BIRTHDAY HIGHLIGHT -->
-        <div id="date-20-highlight" class="day-cell date-20-highlight">20</div>
-        <div class="day-cell">21</div>
-        <div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div><div class="day-cell">27</div><div class="day-cell">28</div>
-        <div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+    <!-- Calendar 3D Container -->
+    <div class="calendar-container">
+      <!-- Base Card (Revealed underneath) -->
+      <div id="calendar-base-card" class="calendar-card base-card">
+        <div id="calendar-base-header" class="calendar-header-strip">FEBRUARY 2569</div>
+        <div class="calendar-grid">
+          <div class="day-head">อา</div><div class="day-head">จ</div><div class="day-head">อ</div><div class="day-head">พ</div><div class="day-head">พฤ</div><div class="day-head">ศ</div><div class="day-head">ส</div>
+          <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
+          <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div>
+          <div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div>
+          <div class="day-cell">20</div><div class="day-cell">21</div><div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div>
+          <div class="day-cell">27</div><div class="day-cell">28</div><div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+        </div>
+      </div>
+
+      <!-- Tear Sheet (Foreground paper being torn off) -->
+      <div id="calendar-card" class="calendar-card tear-sheet">
+        <div id="calendar-header-strip" class="calendar-header-strip">JANUARY 2569</div>
+        <div class="calendar-grid">
+          <div class="day-head">อา</div><div class="day-head">จ</div><div class="day-head">อ</div><div class="day-head">พ</div><div class="day-head">พฤ</div><div class="day-head">ศ</div><div class="day-head">ส</div>
+          <div class="day-cell">1</div><div class="day-cell">2</div><div class="day-cell">3</div><div class="day-cell">4</div><div class="day-cell">5</div><div class="day-cell">6</div><div class="day-cell">7</div>
+          <div class="day-cell">8</div><div class="day-cell">9</div><div class="day-cell">10</div><div class="day-cell">11</div><div class="day-cell">12</div><div class="day-cell">13</div><div class="day-cell">14</div>
+          <div class="day-cell">15</div><div class="day-cell">16</div><div class="day-cell">17</div><div class="day-cell">18</div><div class="day-cell">19</div>
+          <div id="date-20-highlight" class="day-cell date-20-highlight">20</div><div class="day-cell">21</div>
+          <div class="day-cell">22</div><div class="day-cell">23</div><div class="day-cell">24</div><div class="day-cell">25</div><div class="day-cell">26</div><div class="day-cell">27</div><div class="day-cell">28</div>
+          <div class="day-cell">29</div><div class="day-cell">30</div><div class="day-cell">31</div>
+        </div>
       </div>
     </div>
 
@@ -209,14 +222,14 @@
     </div>
   </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=9999.0 -->
-  <script src="js/audio.js?v=9999.0"></script>
-  <script src="js/character.js?v=9999.0"></script>
-  <script src="js/npc_bank.js?v=9999.0"></script>
-  <script src="js/court_world.js?v=9999.0"></script>
-  <script src="js/minigames.js?v=9999.0"></script>
-  <script src="js/quests.js?v=9999.0"></script>
-  <script src="js/controls.js?v=9999.0"></script>
-  <script src="js/main.js?v=9999.0"></script>
+  <!-- Standard Order Scripts with Cache-Buster v=11000.0 -->
+  <script src="js/audio.js?v=11000.0"></script>
+  <script src="js/character.js?v=11000.0"></script>
+  <script src="js/npc_bank.js?v=11000.0"></script>
+  <script src="js/court_world.js?v=11000.0"></script>
+  <script src="js/minigames.js?v=11000.0"></script>
+  <script src="js/quests.js?v=11000.0"></script>
+  <script src="js/controls.js?v=11000.0"></script>
+  <script src="js/main.js?v=11000.0"></script>
 </body>
 </html>

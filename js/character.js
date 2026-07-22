@@ -329,10 +329,10 @@ class CharacterController {
     const floatY = 2.2 + Math.sin(elapsedTime * 2.5) * 0.3;
     this.position.y = floatY;
 
-    this.leftArm.rotation.z = Math.PI / 4 + Math.sin(elapsedTime * 2) * 0.15;
-    this.rightArm.rotation.z = -Math.PI / 4 - Math.sin(elapsedTime * 2) * 0.15;
-    this.leftArm.rotation.x = -0.2;
-    this.rightArm.rotation.x = -0.2;
+    this.leftArm.rotation.z = -Math.PI / 12 - Math.sin(elapsedTime * 2) * 0.05;
+    this.rightArm.rotation.z = Math.PI / 12 + Math.sin(elapsedTime * 2) * 0.05;
+    this.leftArm.rotation.x = 0.05;
+    this.rightArm.rotation.x = 0.05;
 
     this.leftLeg.rotation.x = 0.3 + Math.sin(elapsedTime * 1.8) * 0.1;
     this.rightLeg.rotation.x = -0.3 - Math.sin(elapsedTime * 1.8) * 0.1;
@@ -364,6 +364,8 @@ class CharacterController {
     if (progress >= 1.0) {
       this.position.y = 0;
       this.isGrounded = true;
+      this.leftArm.rotation.z = -Math.PI / 24;
+      this.rightArm.rotation.z = Math.PI / 24;
     }
 
     this.group.position.copy(this.position);
@@ -444,6 +446,8 @@ class CharacterController {
       this.rightLeg.rotation.x = -swing;
       this.leftArm.rotation.x = -swing * 0.8;
       this.rightArm.rotation.x = swing * 0.8;
+      this.leftArm.rotation.z = -Math.PI / 24;
+      this.rightArm.rotation.z = Math.PI / 24;
 
       if (this.ponytail) {
         this.ponytail.rotation.x = Math.sin(this.walkCycle * 2) * 0.15;
@@ -454,6 +458,8 @@ class CharacterController {
       this.rightLeg.rotation.x *= 0.8;
       this.leftArm.rotation.x *= 0.8;
       this.rightArm.rotation.x *= 0.8;
+      this.leftArm.rotation.z = -Math.PI / 24;
+      this.rightArm.rotation.z = Math.PI / 24;
     }
 
     this.group.position.copy(this.position);

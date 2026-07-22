@@ -112,20 +112,20 @@ class Controls {
     // 180° Front Arc Pan facing the Wall (From -PI/2 to +PI/2)
     const arcAngle = (progress - 0.5) * Math.PI * 0.95;
     
-    // Dynamic Multi-Phase Zoom Curve in 6 Seconds (Zoomed out for better framing):
-    // 0.0s -> 2.0s: Smooth Zoom-in (Distance 6.0 -> 4.0)
-    // 2.0s -> 4.5s: 180° Pan Across Details (Distance 4.0 -> 4.5)
-    // 4.5s -> 6.0s: Smooth Zoom-out (Distance 4.5 -> 5.8)
-    let zoomDist = 5.8;
+    // Dynamic Multi-Phase Zoom Curve in 6 Seconds (Zoomed out further to capture name/title below):
+    // 0.0s -> 2.0s: Smooth Zoom-in (Distance 7.5 -> 5.2)
+    // 2.0s -> 4.5s: 180° Pan Across Details (Distance 5.2 -> 5.8)
+    // 4.5s -> 6.0s: Smooth Zoom-out (Distance 5.8 -> 7.0)
+    let zoomDist = 7.0;
     if (progress < 0.33) {
       const t = progress / 0.33;
-      zoomDist = 6.0 - t * 2.0; // Keep close-up at 4.0 (instead of 2.4)
+      zoomDist = 7.5 - t * 2.3; // Keep close-up at 5.2 (instead of 4.0)
     } else if (progress < 0.75) {
       const t = (progress - 0.33) / 0.42;
-      zoomDist = 4.0 + t * 0.5;
+      zoomDist = 5.2 + t * 0.6;
     } else {
       const t = (progress - 0.75) / 0.25;
-      zoomDist = 4.5 + t * 1.3; // Zoom out to 5.8
+      zoomDist = 5.8 + t * 1.2; // Zoom out to 7.0
     }
 
     // Determine wall facing direction from artPos.x

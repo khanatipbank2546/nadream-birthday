@@ -355,6 +355,41 @@ class QuestManager {
       this.updateTrackerText();
     }
   }
+
+  forceCompleteGiftBox(roomNum) {
+    // Hide gift box & standing pad of completed room
+    const boxPad = this.courtWorld.giftBoxPads[roomNum - 1];
+    if (boxPad) boxPad.visible = false;
+    const box = this.courtWorld.questMarkers[roomNum - 1];
+    if (box) box.visible = false;
+
+    if (roomNum <= 4) {
+      const doorToUnlock = roomNum;
+      this.currentQuestIndex++;
+      this.currentRoom = roomNum + 1;
+      this.startRoomQuest(this.currentRoom);
+
+      // Start door opening camera cutscene
+      if (window.game && window.game.startDoorOpeningCutscene) {
+        window.game.startDoorOpeningCutscene(doorToUnlock, () => {
+          this.isProcessingCutscene = false;
+        });
+      } else {
+        this.courtWorld.unlockBarrier(doorToUnlock);
+        this.isProcessingCutscene = false;
+      }
+    } else if (roomNum === 5) {
+      this.currentQuestIndex = 5;
+      this.currentRoom = 6;
+      this.roomSubState = 'COMPLETE';
+      this.updateTrackerText();
+
+      if (window.game && window.game.startGrandBirthdayFinale) {
+        window.game.startGrandBirthdayFinale();
+      }
+      this.isProcessingCutscene = false;
+    }
+  }
 }
 
 window.QuestManager = QuestManager;

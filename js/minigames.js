@@ -89,7 +89,9 @@ class MiniGameEngine {
       if (!skipped) window.soundEngine.playQuestComplete();
     }
 
-    if (this.onCompleteCallback) {
+    if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
+      window.game.questManager.forceCompleteGiftBox(this.currentRoom);
+    } else if (this.onCompleteCallback) {
       const cb = this.onCompleteCallback;
       this.onCompleteCallback = null;
       cb(skipped);

@@ -249,6 +249,23 @@ class SoundEngine {
     this.playNote(700, 'triangle', 0.08, 0.15);
   }
 
+  playQuestComplete() {
+    this.init();
+    if (this.isMuted || !this.ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    notes.forEach((freq, idx) => {
+      this.playNote(freq, 'triangle', 0.35, 0.22, idx * 0.08);
+    });
+  }
+
+  playDoorUnlock() {
+    this.init();
+    if (this.isMuted || !this.ctx) return;
+    this.playNote(300, 'triangle', 0.12, 0.18);
+    this.playNote(400, 'triangle', 0.12, 0.18, 0.08);
+    this.playNote(600, 'sine', 0.25, 0.22, 0.16);
+  }
+
   playHappyBirthday() {
     this.init();
     this.stopBGM();

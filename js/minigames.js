@@ -2,6 +2,28 @@
    Mini-Games Engine - State 1 to State 5 Missions & FIFA Card Reveal
    ========================================================================== */
 
+window.showQuestSuccessModal = function(message, onConfirm) {
+  const modal = document.getElementById('quest-success-modal');
+  const msgEl = document.getElementById('success-modal-message');
+  const confirmBtn = document.getElementById('success-confirm-btn');
+
+  if (modal && msgEl && confirmBtn) {
+    msgEl.innerText = message;
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.style.zIndex = '999999';
+
+    confirmBtn.onclick = function() {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      if (window.soundEngine) window.soundEngine.playClick();
+      if (onConfirm) onConfirm();
+    };
+  } else {
+    if (onConfirm) onConfirm();
+  }
+};
+
 class MiniGameEngine {
   constructor() {
     this.modalEl = null;
@@ -178,8 +200,9 @@ class MiniGameEngine {
 
     if (isComplete) {
       setTimeout(() => {
-        alert("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จแล้ว!");
-        this.finishMiniGame(false);
+        window.showQuestSuccessModal("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จแล้ว!", () => {
+          this.finishMiniGame(false);
+        });
       }, 300);
     }
   }
@@ -249,8 +272,9 @@ class MiniGameEngine {
 
             if (foundCount >= 5) {
               setTimeout(() => {
-                alert("🎉 สุดยอด! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!");
-                this.finishMiniGame(false);
+                window.showQuestSuccessModal("🎉 สุดยอด! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!", () => {
+                  this.finishMiniGame(false);
+                });
               }, 300);
             }
           }
@@ -346,8 +370,9 @@ class MiniGameEngine {
 
             if (matchedPairs >= 6) {
               setTimeout(() => {
-                alert("🎉 เก่งมากๆ! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!");
-                this.finishMiniGame(false);
+                window.showQuestSuccessModal("🎉 เก่งมากๆ! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!", () => {
+                  this.finishMiniGame(false);
+                });
               }, 400);
             }
           } else {
@@ -455,8 +480,9 @@ class MiniGameEngine {
 
             if (isSolved) {
               setTimeout(() => {
-                alert("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!");
-                this.finishMiniGame(false);
+                window.showQuestSuccessModal("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!", () => {
+                  this.finishMiniGame(false);
+                });
               }, 300);
             }
           }

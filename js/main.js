@@ -517,7 +517,7 @@ class Game {
           activeBarrierZ
         );
         
-        this.controls.updateCamera(this.character.position, this.character.rotation);
+        this.controls.updateCamera(this.character.position, this.character.rotation, activeBarrierZ);
         this.questManager.checkProximity(this.character.position);
         this.courtWorld.updatePathArrow(this.character.position, this.questManager.activeTargetPos);
       }

@@ -27,15 +27,11 @@ class Controls {
     this.joystickVector = { x: 0, y: 0 };
 
     this.initEventListeners();
-    this.initHUDControls();
   }
 
   initEventListeners() {
     window.addEventListener('keydown', (e) => {
       this.keysPressed[e.code] = true;
-      if (e.code === 'KeyV') {
-        this.toggleCameraMode();
-      }
       if (e.code === 'KeyP') {
         console.log("Cheat/Testing key 'P' pressed. Forcing completion of current room's gift box.");
         if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
@@ -80,32 +76,7 @@ class Controls {
     });
   }
 
-  initHUDControls() {
-    const cameraToggleBtn = document.getElementById('camera-toggle-btn');
-    const cameraText = document.getElementById('camera-mode-text');
 
-    if (cameraToggleBtn) {
-      cameraToggleBtn.addEventListener('click', () => {
-        this.toggleCameraMode();
-        if (cameraText) {
-          if (this.cameraMode === 'THIRD_PERSON') cameraText.innerText = 'มุมมอง 3rd Person';
-          else if (this.cameraMode === 'FIRST_PERSON') cameraText.innerText = 'มุมมอง 1st Person';
-          else cameraText.innerText = 'มุมมอง Top-Down';
-        }
-      });
-    }
-  }
-
-  toggleCameraMode() {
-    if (this.cameraMode === 'THIRD_PERSON') {
-      this.cameraMode = 'FIRST_PERSON';
-    } else if (this.cameraMode === 'FIRST_PERSON') {
-      this.cameraMode = 'TOP_DOWN';
-    } else {
-      this.cameraMode = 'THIRD_PERSON';
-    }
-    if (window.soundEngine) window.soundEngine.playClick();
-  }
 
   // Pre-Game Showcase Camera: PERFECTLY FRAMED facing NaDream and the Feature Wall! (No clipping!)
   updateShowcaseCamera(characterPos, timeMs) {
@@ -181,31 +152,30 @@ class Controls {
     this.camera.lookAt(doorPos.x, 3.0, doorPos.z);
   }
 
-  updateCamera(characterPos, characterRotation) {
-    if (this.cameraMode === 'THIRD_PERSON') {
-      const offsetX = Math.sin(this.cameraAngleY) * Math.cos(this.cameraAngleX) * this.cameraDistance;
-      const offsetY = Math.sin(this.cameraAngleX) * this.cameraDistance;
-      const offsetZ = Math.cos(this.cameraAngleY) * Math.cos(this.cameraAngleX) * this.cameraDistance;
+  updateCamera(characterPos, characterRotation, activeBarrierZ) {
+    const offsetX = Math.sin(this.cameraAngleY) * Math.cos(this.cameraAngleX) * this.cameraDistance;
+    const offsetY = Math.sin(this.cameraAngleX) * this.cameraDistance;
+    const offsetZ = Math.cos(this.cameraAngleY) * Math.cos(this.cameraAngleX) * this.cameraDistance;
 
-      this.camera.position.x = characterPos.x + offsetX;
-      this.camera.position.y = characterPos.y + 1.6 + offsetY;
-      this.camera.position.z = characterPos.z + offsetZ;
+    let camX = characterPos.x + offsetX;
+    let camY = characterPos.y + 1.6 + offsetY;
+    let camZ = characterPos.z + offsetZ;
 
-      const lookTargetY = characterPos.y + 1.4;
-      this.camera.lookAt(characterPos.x, lookTargetY, characterPos.z);
+    // Prevent camera clipping through walls, ceiling, floor, or locked divider doors:
+    // 1. Clamp X to stay inside stadium walls (walls are at x = -19.0 and x = 19.0)
+    camX = Math.max(-18.1, Math.min(18.1, camX));
 
-    } else if (this.cameraMode === 'FIRST_PERSON') {
-      const headY = characterPos.y + 1.82;
-      const fwdX = Math.sin(characterRotation);
-      const fwdZ = Math.cos(characterRotation);
+    // 2. Clamp Y to stay below the stadium ceiling height of 9.5 and above floor level
+    camY = Math.max(0.5, Math.min(8.8, camY));
 
-      this.camera.position.set(characterPos.x, headY, characterPos.z);
-      this.camera.lookAt(characterPos.x + fwdX * 10, headY, characterPos.z + fwdZ * 10);
+    // 3. Clamp Z to stay within the currently unlocked room boundaries
+    const minZ = (activeBarrierZ !== undefined && activeBarrierZ !== -9999) ? (activeBarrierZ + 0.6) : -165.0;
+    camZ = Math.max(minZ, Math.min(2.0, camZ));
 
-    } else if (this.cameraMode === 'TOP_DOWN') {
-      this.camera.position.set(characterPos.x, characterPos.y + 14.0, characterPos.z + 0.1);
-      this.camera.lookAt(characterPos.x, characterPos.y, characterPos.z);
-    }
+    this.camera.position.set(camX, camY, camZ);
+    
+    const lookTargetY = characterPos.y + 1.4;
+    this.camera.lookAt(characterPos.x, lookTargetY, characterPos.z);
   }
 }
 

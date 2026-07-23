@@ -393,6 +393,22 @@ class QuestManager {
       this.isProcessingCutscene = false;
     }
   }
+
+  reset() {
+    this.currentRoom = 1;
+    this.roomSubState = 'ART_1';
+    this.currentQuestIndex = 0;
+    this.isNearTarget = false;
+    this.isProcessingCutscene = false;
+    this.ratedPhotos = [];
+
+    if (this.courtWorld && this.courtWorld.resetWorld) {
+      this.courtWorld.resetWorld();
+    }
+
+    this.updateTrackerText();
+    this.startRoomQuest(1);
+  }
 }
 
 window.QuestManager = QuestManager;

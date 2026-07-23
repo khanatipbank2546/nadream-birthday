@@ -316,6 +316,11 @@ class CourtWorld {
 
         artGroup.add(starBadgeGroup);
         renderPlaqueTexture(count);
+      },
+      resetFrame: () => {
+        if (starBadgeGroup) artGroup.remove(starBadgeGroup);
+        starBadgeGroup = null;
+        renderPlaqueTexture(0);
       }
     };
 
@@ -719,6 +724,37 @@ class CourtWorld {
         door.userData.rightPanel.position.x = 2.0 + slideX;
 
         door.userData.lightBeam.intensity = door.userData.openProgress * 4.5;
+      }
+    });
+  }
+
+  resetWorld() {
+    // Reset doors
+    this.doors.forEach(door => {
+      door.userData.unlocked = false;
+      door.userData.openProgress = 0;
+      if (door.userData.leftPanel) door.userData.leftPanel.position.set(-2.0, 3.5, 0);
+      if (door.userData.rightPanel) door.userData.rightPanel.position.set(2.0, 3.5, 0);
+      if (door.userData.lightBeam) door.userData.lightBeam.intensity = 0;
+    });
+
+    // Reset gift boxes
+    this.questMarkers.forEach(box => {
+      box.visible = false;
+      box.userData.openingProgress = 0;
+      if (box.userData.lidGroup) {
+        box.userData.lidGroup.position.set(0, 0, 0);
+        box.userData.lidGroup.rotation.set(0, 0, 0);
+      }
+      if (box.userData.burstLight) {
+        box.userData.burstLight.intensity = 0;
+      }
+    });
+
+    // Reset art frames
+    this.artFrames.forEach(frame => {
+      if (frame.userData && frame.userData.resetFrame) {
+        frame.userData.resetFrame();
       }
     });
   }

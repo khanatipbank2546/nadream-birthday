@@ -116,8 +116,8 @@
     <div class="controls-hint">
       <div class="hint-key">W A S D</div> เดินตามมุมกล้อง &nbsp;|&nbsp; 
       <div class="hint-key">SPACE</div> กระโดด &nbsp;|&nbsp; 
-      <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp;
-      <div class="hint-key">เมาส์ลาก</div> หมุนกล้องรอบตัวละคร
+      <!-- <div class="hint-key">V</div> สลับมุมมอง &nbsp;|&nbsp; -->
+      <div class="hint-key">คลิ๊กเมาส์ซ้าย</div> หมุนกล้องรอบตัวละคร
     </div>
 
     <!-- Action Prompt Overlay -->
@@ -241,17 +241,30 @@
   <!-- Fade to Black Overlay -->
   <div id="black-overlay" class="black-overlay hidden"></div>
 
-  <!-- Ending "จบ" Text Screen -->
-  <div id="ending-text" class="ending-text hidden">จบ</div>
+  <!-- Ending Gallery UI Overlay -->
+  <div id="ending-gallery-ui" class="ending-gallery-ui hidden">
+    <div class="ending-gallery-card">
+      <h2 class="ending-gallery-title">💖 สรุปความทรงจำแสนพิเศษ 💖</h2>
+      <p class="ending-gallery-subtitle">ขอบคุณที่ร่วมเดินทางและแบ่งปันรอยยิ้มในวันเกิดปีนี้ด้วยกันนะ</p>
+      <div class="ending-gallery-buttons">
+        <button id="btn-back-lobby" class="btn-ending-lobby">
+          <i class="fa-solid fa-house"></i> กลับหน้าแรก (Lobby)
+        </button>
+        <button id="btn-play-again" class="btn-ending-restart">
+          <i class="fa-solid fa-rotate-right"></i> เล่นอีกครั้ง (Play Again)
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <!-- Standard Order Scripts with Cache-Buster v=46000.0 -->
-  <script src="js/audio.js?v=46000.0"></script>
-  <script src="js/character.js?v=46000.0"></script>
-  <script src="js/npc_bank.js?v=46000.0"></script>
-  <script src="js/court_world.js?v=46000.0"></script>
-  <script src="js/minigames.js?v=46000.0"></script>
-  <script src="js/quests.js?v=46000.0"></script>
-  <script src="js/controls.js?v=46000.0"></script>
-  <script src="js/main.js?v=46000.0"></script>
+  <!-- Standard Order Scripts with Cache-Buster v=47000.0 -->
+  <script src="js/audio.js?v=47000.0"></script>
+  <script src="js/character.js?v=47000.0"></script>
+  <script src="js/npc_bank.js?v=47000.0"></script>
+  <script src="js/court_world.js?v=47000.0"></script>
+  <script src="js/minigames.js?v=47000.0"></script>
+  <script src="js/quests.js?v=47000.0"></script>
+  <script src="js/controls.js?v=47000.0"></script>
+  <script src="js/main.js?v=47000.0"></script>
 </body>
 </html>

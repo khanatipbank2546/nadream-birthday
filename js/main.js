@@ -242,6 +242,14 @@ class Game {
       calendarOverlay.style.zIndex = '9999';
     }
 
+    const baseCard = document.getElementById('calendar-base-card');
+    if (baseCard) baseCard.style.display = 'block';
+
+    const tearSheet = document.getElementById('calendar-card');
+    if (tearSheet) {
+      tearSheet.classList.remove('shatter-burst', 'ripping');
+    }
+
     const months = [
       { th: 'มกราคม 2569', en: 'JANUARY 2569' },
       { th: 'กุมภาพันธ์ 2569', en: 'FEBRUARY 2569' },
@@ -255,9 +263,6 @@ class Game {
     const monthTitleEl = document.getElementById('calendar-month-title');
     const tearHeaderEl = document.getElementById('calendar-header-strip');
     const baseHeaderEl = document.getElementById('calendar-base-header');
-    
-    const baseCard = document.getElementById('calendar-base-card');
-    const tearSheet = document.getElementById('calendar-card');
     
     const date20 = document.getElementById('date-20-highlight');
     const burstFlare = document.getElementById('burst-flare');
@@ -414,6 +419,183 @@ class Game {
     if (window.soundEngine) {
       window.soundEngine.startBGM();
     }
+
+    // Create the beautiful circular photo gallery room
+    this.buildFinaleGallery();
+
+    // Setup Ending UI Buttons
+    const btnLobby = document.getElementById('btn-back-lobby');
+    const btnRestart = document.getElementById('btn-play-again');
+    if (btnLobby) {
+      btnLobby.onclick = () => {
+        if (window.soundEngine) window.soundEngine.playClick();
+        this.resetToLobby();
+      };
+    }
+    if (btnRestart) {
+      btnRestart.onclick = () => {
+        if (window.soundEngine) window.soundEngine.playClick();
+        this.restartGame();
+      };
+    }
+  }
+
+  buildFinaleGallery() {
+    if (this.finaleGalleryGroup) {
+      this.scene.remove(this.finaleGalleryGroup);
+    }
+    this.finaleGalleryGroup = new THREE.Group();
+
+    const centerX = 0;
+    const centerY = 2.0; // Raise slightly for beautiful framing
+    const centerZ = -120.0;
+    const radius = 5.8;
+
+    this.courtWorld.artFrames.forEach((frame, idx) => {
+      // Clone the frame so the original stays in its room
+      const cloned = frame.clone();
+
+      const angle = (idx / 10) * Math.PI * 2;
+      const x = centerX + Math.sin(angle) * radius;
+      const z = centerZ - Math.cos(angle) * radius;
+
+      cloned.position.set(x, centerY, z);
+      cloned.rotation.y = angle; // Face inward towards center
+      cloned.scale.set(0.7, 0.7, 0.7); // Make it slightly smaller to look elegant
+
+      this.finaleGalleryGroup.add(cloned);
+    });
+
+    // Start scaled down (invisible)
+    this.finaleGalleryGroup.scale.set(0.001, 0.001, 0.001);
+    this.scene.add(this.finaleGalleryGroup);
+  }
+
+  resetToLobby() {
+    // 1. Hide Ending Gallery UI & Wish Overlays
+    const endingUI = document.getElementById('ending-gallery-ui');
+    if (endingUI) {
+      endingUI.classList.add('hidden');
+      endingUI.style.opacity = '0';
+    }
+    const wishOverlay = document.getElementById('wish-overlay');
+    if (wishOverlay) {
+      wishOverlay.classList.add('hidden');
+      wishOverlay.style.opacity = '0';
+      wishOverlay.style.display = 'none';
+    }
+
+    // 2. Remove the gallery group from the scene
+    if (this.finaleGalleryGroup) {
+      this.scene.remove(this.finaleGalleryGroup);
+      this.finaleGalleryGroup = null;
+    }
+
+    // 3. Reset quest manager
+    if (this.questManager) {
+      this.questManager.reset();
+    }
+
+    // 4. Reset characters
+    if (this.character) {
+      this.character.position.set(0, 0, 0);
+      if (this.character.group) {
+        this.character.group.position.copy(this.character.position);
+        this.character.group.rotation.set(0, 0, 0);
+      }
+      this.character.velocityY = 0;
+      this.character.isGrounded = true;
+    }
+    if (this.bankNPC) {
+      this.bankNPC.position.set(0, 0, -152.0);
+      this.bankNPC.group.position.copy(this.bankNPC.position);
+      this.bankNPC.group.rotation.set(0, 0, 0);
+      if (this.bankNPC.cakeGroup) {
+        this.bankNPC.group.remove(this.bankNPC.cakeGroup);
+        this.bankNPC.cakeGroup = null;
+      }
+      if (this.bankNPC.leftArm) this.bankNPC.leftArm.rotation.set(0, 0, 0);
+      if (this.bankNPC.rightArm) this.bankNPC.rightArm.rotation.set(0, 0, 0);
+    }
+
+    // 5. Restore background & fog
+    if (this.scene) {
+      this.scene.background = new THREE.Color(0x1a202c);
+      this.scene.fog = new THREE.FogExp2(0x1a202c, 0.015);
+    }
+
+    // 6. Reset game state to SHOWCASE
+    this.gameState = 'SHOWCASE';
+
+    // 7. Show loading screen (Lobby)
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      loadingScreen.classList.remove('fade-out');
+      loadingScreen.style.opacity = '1';
+      loadingScreen.style.visibility = 'visible';
+      loadingScreen.style.pointerEvents = 'auto';
+    }
+
+    if (window.soundEngine) {
+      window.soundEngine.startBGM();
+    }
+  }
+
+  restartGame() {
+    // 1. Hide Ending Gallery UI & Wish Overlays
+    const endingUI = document.getElementById('ending-gallery-ui');
+    if (endingUI) {
+      endingUI.classList.add('hidden');
+      endingUI.style.opacity = '0';
+    }
+    const wishOverlay = document.getElementById('wish-overlay');
+    if (wishOverlay) {
+      wishOverlay.classList.add('hidden');
+      wishOverlay.style.opacity = '0';
+      wishOverlay.style.display = 'none';
+    }
+
+    // 2. Remove the gallery group from the scene
+    if (this.finaleGalleryGroup) {
+      this.scene.remove(this.finaleGalleryGroup);
+      this.finaleGalleryGroup = null;
+    }
+
+    // 3. Reset quest manager
+    if (this.questManager) {
+      this.questManager.reset();
+    }
+
+    // 4. Reset characters
+    if (this.character) {
+      this.character.position.set(0, 0, 0);
+      if (this.character.group) {
+        this.character.group.position.copy(this.character.position);
+        this.character.group.rotation.set(0, 0, 0);
+      }
+      this.character.velocityY = 0;
+      this.character.isGrounded = true;
+    }
+    if (this.bankNPC) {
+      this.bankNPC.position.set(0, 0, -152.0);
+      this.bankNPC.group.position.copy(this.bankNPC.position);
+      this.bankNPC.group.rotation.set(0, 0, 0);
+      if (this.bankNPC.cakeGroup) {
+        this.bankNPC.group.remove(this.bankNPC.cakeGroup);
+        this.bankNPC.cakeGroup = null;
+      }
+      if (this.bankNPC.leftArm) this.bankNPC.leftArm.rotation.set(0, 0, 0);
+      if (this.bankNPC.rightArm) this.bankNPC.rightArm.rotation.set(0, 0, 0);
+    }
+
+    // 5. Restore background & fog
+    if (this.scene) {
+      this.scene.background = new THREE.Color(0x1a202c);
+      this.scene.fog = new THREE.FogExp2(0x1a202c, 0.015);
+    }
+
+    // 6. Start the calendar tear intro cutscene directly!
+    this.startIntroCutscene();
   }
 
   animate() {
@@ -673,51 +855,72 @@ class Game {
       }
 
       // ================================================================
-      // Phase 4: Fade to Black & Silence (25.0s to 29.0s) [4 seconds]
+      // Phase 4: Gallery Reveal & Slow Continuous Orbit (25.0s to 28.0s) [3 seconds]
       // ================================================================
-      else if (this.finaleTimer >= 25.0 && this.finaleTimer < 29.0) {
-        const progress = (this.finaleTimer - 25.0) / 4.0;
+      else if (this.finaleTimer >= 25.0 && this.finaleTimer < 28.0) {
+        const progress = (this.finaleTimer - 25.0) / 3.0;
 
         // Hide wish overlay gradually
         const wishOverlay = document.getElementById('wish-overlay');
         if (wishOverlay) wishOverlay.style.opacity = (1 - progress).toString();
+        if (this.finaleTimer >= 27.5 && wishOverlay) wishOverlay.style.display = 'none';
 
-        // Fade in black overlay
-        const blackOverlay = document.getElementById('black-overlay');
-        if (blackOverlay) {
-          blackOverlay.classList.remove('hidden');
-          blackOverlay.style.display = 'block';
-          blackOverlay.style.opacity = progress.toString();
+        // Scale up the floating gallery group
+        if (this.finaleGalleryGroup) {
+          this.finaleGalleryGroup.scale.set(progress, progress, progress);
         }
 
-        // Fade out music volume
+        // Slowly fade in the ending gallery UI card
+        const endingUI = document.getElementById('ending-gallery-ui');
+        if (endingUI) {
+          endingUI.classList.remove('hidden');
+          endingUI.style.display = 'flex';
+          endingUI.style.opacity = progress.toString();
+        }
+
+        // Orbit camera around center midpoint (0, 1.8, -120.0)
+        const orbitAngle = this.finaleTimer * 0.05;
+        const camX = Math.sin(orbitAngle) * 8.5;
+        const camY = 2.4;
+        const camZ = -120.0 - Math.cos(orbitAngle) * 8.5;
+        this.camera.position.set(camX, camY, camZ);
+        this.camera.lookAt(0, 1.8, -120.0);
+
+        // Keep BGM volume at 0.2
         if (window.soundEngine && window.soundEngine.bgm) {
-          window.soundEngine.bgm.volume = Math.max(0, 0.3 * (1 - progress));
+          window.soundEngine.bgm.volume = 0.2;
         }
       }
 
       // ================================================================
-      // Phase 5: "จบ" Screen (29.0s onwards)
+      // Phase 5: Endless Orbit (28.0s onwards)
       // ================================================================
-      else if (this.finaleTimer >= 29.0) {
+      else if (this.finaleTimer >= 28.0) {
         const wishOverlay = document.getElementById('wish-overlay');
         if (wishOverlay) wishOverlay.style.display = 'none';
 
-        const blackOverlay = document.getElementById('black-overlay');
-        if (blackOverlay) {
-          blackOverlay.style.opacity = '1';
+        // Keep the gallery fully scaled
+        if (this.finaleGalleryGroup) {
+          this.finaleGalleryGroup.scale.set(1.0, 1.0, 1.0);
         }
+
+        const endingUI = document.getElementById('ending-gallery-ui');
+        if (endingUI) {
+          endingUI.classList.remove('hidden');
+          endingUI.style.display = 'flex';
+          endingUI.style.opacity = '1';
+        }
+
+        // Endless slow orbit around midpoint (0, 1.8, -120.0)
+        const orbitAngle = this.finaleTimer * 0.05;
+        const camX = Math.sin(orbitAngle) * 8.5;
+        const camY = 2.4;
+        const camZ = -120.0 - Math.cos(orbitAngle) * 8.5;
+        this.camera.position.set(camX, camY, camZ);
+        this.camera.lookAt(0, 1.8, -120.0);
 
         if (window.soundEngine && window.soundEngine.bgm) {
-          window.soundEngine.bgm.pause();
-        }
-
-        // Show "จบ" text
-        const endingText = document.getElementById('ending-text');
-        if (endingText) {
-          endingText.classList.remove('hidden');
-          endingText.style.display = 'block';
-          endingText.style.opacity = '1';
+          window.soundEngine.bgm.volume = 0.2;
         }
       }
 

@@ -60,26 +60,22 @@ class BankNPC {
     canvas.height = 128;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = 'rgba(15, 16, 22, 0.88)';
-    ctx.beginPath();
-    ctx.roundRect(16, 16, 480, 96, 48);
-    ctx.fill();
+    // 100% Transparent Background (No black box, No gold border)
+    ctx.clearRect(0, 0, 512, 128);
 
-    ctx.strokeStyle = '#00f5d4';
-    ctx.lineWidth = 6;
-    ctx.stroke();
-
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 12;
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 46px Arial, Prompt';
+    ctx.font = 'bold 48px Prompt, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🏸 Bank 🏸', 256, 64);
+    ctx.fillText('Bank', 256, 64);
 
     const texture = new THREE.CanvasTexture(canvas);
     const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(3.2, 0.8, 1);
-    sprite.position.set(0, 3.2, 0);
+    sprite.scale.set(2.8, 0.7, 1);
+    sprite.position.set(0, 2.9, 0);
     return sprite;
   }
 

@@ -1455,20 +1455,90 @@ html, body {
   opacity: 0;
 }
 
-.ending-text {
+/* Ending Gallery UI Overlay */
+.ending-gallery-ui {
   position: fixed;
-  top: 50%;
+  bottom: 8%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--font-thai);
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: #ffffff;
-  z-index: 100001;
-  pointer-events: none;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 580px;
+  z-index: 100002;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   opacity: 0;
-  transition: opacity 3s ease-in-out;
-  letter-spacing: 4px;
+  transition: opacity 1.5s ease-in-out;
+  pointer-events: auto;
+}
+
+.ending-gallery-card {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(20, 24, 36, 0.92), rgba(10, 12, 20, 0.92));
+  border: 2px solid var(--primary-gold);
+  border-radius: 24px;
+  padding: 24px 32px;
+  box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.05);
+  text-align: center;
+}
+
+.ending-gallery-title {
+  font-family: var(--font-thai);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary-gold);
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.ending-gallery-subtitle {
+  font-family: var(--font-thai);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.ending-gallery-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-ending-lobby, .btn-ending-restart {
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-family: var(--font-thai);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.btn-ending-lobby {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-ending-lobby:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-ending-restart {
+  background: linear-gradient(135deg, var(--primary-gold), #e6b800);
+  color: #0f121d;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.btn-ending-restart:hover {
+  background: linear-gradient(135deg, #ffe033, var(--primary-gold));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
 }
 
 

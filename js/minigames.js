@@ -527,7 +527,7 @@ class MiniGameEngine {
   // STATE 5: FIFA Ultimate Team Style Card Reveal (10 Rated Photos)
   // ==========================================================================
   initFIFACardRevealState5() {
-    if (this.titleEl) this.titleEl.innerText = "🏆 ภารกิจด่านที่ 5: สรุปผลรีวิวรูปภาพ (FIFA Ultimate Team Cards)";
+    if (this.titleEl) this.titleEl.innerText = "🏆 ภารกิจด่านที่ 5: สรุปผลรีวิวรูปภาพ";
     if (this.subtitleEl) this.subtitleEl.innerText = "เรียงลำดับการ์ดรูปภาพตามคะแนนดาวสูงไปหาน้อย และตามลำดับการให้คะแนน!";
 
     if (this.giveUpBtn) this.giveUpBtn.style.display = 'none';

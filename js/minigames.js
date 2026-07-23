@@ -80,8 +80,6 @@ class MiniGameEngine {
   }
 
   finishMiniGame(skipped = false) {
-    console.log("finishMiniGame triggered. skipped:", skipped);
-
     if (this.modalEl) {
       this.modalEl.classList.add('hidden');
       this.modalEl.style.display = 'none';
@@ -91,12 +89,10 @@ class MiniGameEngine {
       if (!skipped) window.soundEngine.playQuestComplete();
     }
 
-    if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
-      const roomNum = window.game.questManager.currentRoom;
-      console.log("Calling forceCompleteGiftBox on questManager instance for room:", roomNum);
-      window.game.questManager.forceCompleteGiftBox(roomNum);
-    } else {
-      console.warn("questManager instance or forceCompleteGiftBox not found.");
+    if (this.onCompleteCallback) {
+      const cb = this.onCompleteCallback;
+      this.onCompleteCallback = null;
+      cb(skipped);
     }
   }
 
@@ -205,7 +201,7 @@ class MiniGameEngine {
     if (isComplete) {
       setTimeout(() => {
         window.showQuestSuccessModal("🎉 ยอดเยี่ยมมาก! ต่อจิ๊กซอว์สำเร็จแล้ว!", () => {
-          window.miniGameEngine.finishMiniGame(false);
+          this.finishMiniGame(false);
         });
       }, 300);
     }
@@ -216,7 +212,7 @@ class MiniGameEngine {
   // ==========================================================================
   initSpotDifferenceState2() {
     if (this.titleEl) this.titleEl.innerText = "🔍 ภารกิจด่านที่ 2: จับผิดภาพ (5 จุด)";
-    if (this.subtitleEl) this.subtitleEl.innerText = "เปรียบเทียบภาพและคลิกหาจุดที่แตกต่างกัน 5 จุดบนภาพขวามือ!";
+    if (this.subtitleEl) this.subtitleEl.innerText = "คลิกค้นหาจุดที่แตกต่างกัน 5 จุดบนรูปภาพ!";
 
     const imgSrc = encodeURI("game/state2/จับผิดภาพ.jpg");
 
@@ -237,29 +233,9 @@ class MiniGameEngine {
         <div class="spot-header-status">
           🎯 ค้นพบจุดต่างแล้ว: <span id="spot-found-count" class="spot-counter">0 / 5</span> จุด
         </div>
-        <div class="spot-split-container">
-          <!-- Left Panel: Original -->
-          <div class="spot-panel original">
-            <div class="spot-panel-title">ภาพต้นฉบับ</div>
-            <div class="spot-img-container">
-              <img src="${imgSrc}" class="spot-diff-img" alt="Original">
-            </div>
-          </div>
-          <!-- Right Panel: Target (Interactive) -->
-          <div class="spot-panel target">
-            <div class="spot-panel-title">ภาพที่มีจุดต่าง (คลิกหาจุดต่างที่นี่)</div>
-            <div class="spot-img-container" id="spot-img-container">
-              <img src="${imgSrc}" class="spot-diff-img" alt="Target">
-              <!-- The 5 subtle differences -->
-              <div id="diff-item-1" class="diff-overlay-item"></div>
-              <div id="diff-item-2" class="diff-overlay-item"></div>
-              <div id="diff-item-3" class="diff-overlay-item"></div>
-              <div id="diff-item-4" class="diff-overlay-item"></div>
-              <div id="diff-item-5" class="diff-overlay-item"></div>
-              <!-- Click Overlay layer -->
-              <div class="spot-overlay-layer" id="spot-overlay-layer"></div>
-            </div>
-          </div>
+        <div class="spot-img-container" id="spot-img-container">
+          <img src="${imgSrc}" class="spot-diff-img" alt="Spot Difference">
+          <div class="spot-overlay-layer" id="spot-overlay-layer"></div>
         </div>
       </div>
     `;
@@ -284,10 +260,6 @@ class MiniGameEngine {
             foundCount++;
             hitFound = true;
 
-            // Mark the visual overlay item as found
-            const diffItem = document.getElementById(`diff-item-${spot.id}`);
-            if (diffItem) diffItem.classList.add('found');
-
             // Render Green Target Circle
             const marker = document.createElement('div');
             marker.className = 'spot-found-marker';
@@ -301,7 +273,7 @@ class MiniGameEngine {
             if (foundCount >= 5) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 สุดยอด! ค้นพบจุดต่างครบทั้ง 5 จุดเรียบร้อย!", () => {
-                  window.miniGameEngine.finishMiniGame(false);
+                  this.finishMiniGame(false);
                 });
               }, 300);
             }
@@ -399,7 +371,7 @@ class MiniGameEngine {
             if (matchedPairs >= 6) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 เก่งมากๆ! จับคู่การ์ดครบทั้ง 6 คู่เรียบร้อย!", () => {
-                  window.miniGameEngine.finishMiniGame(false);
+                  this.finishMiniGame(false);
                 });
               }, 400);
             }
@@ -509,7 +481,7 @@ class MiniGameEngine {
             if (isSolved) {
               setTimeout(() => {
                 window.showQuestSuccessModal("🎉 ยอดเยี่ยมเหลือล้น! เลื่อนบล็อคเรียงรูปภาพสำเร็จเรียบร้อย!", () => {
-                  window.miniGameEngine.finishMiniGame(false);
+                  this.finishMiniGame(false);
                 });
               }, 300);
             }
@@ -527,7 +499,7 @@ class MiniGameEngine {
   // STATE 5: FIFA Ultimate Team Style Card Reveal (10 Rated Photos)
   // ==========================================================================
   initFIFACardRevealState5() {
-    if (this.titleEl) this.titleEl.innerText = "🏆 ภารกิจด่านที่ 5: สรุปผลรีวิวรูปภาพ";
+    if (this.titleEl) this.titleEl.innerText = "🏆 ภารกิจด่านที่ 5: สรุปผลรีวิวรูปภาพ (FIFA Ultimate Team Cards)";
     if (this.subtitleEl) this.subtitleEl.innerText = "เรียงลำดับการ์ดรูปภาพตามคะแนนดาวสูงไปหาน้อย และตามลำดับการให้คะแนน!";
 
     if (this.giveUpBtn) this.giveUpBtn.style.display = 'none';

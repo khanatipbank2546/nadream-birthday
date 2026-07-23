@@ -36,12 +36,6 @@ class Controls {
       if (e.code === 'KeyV') {
         this.toggleCameraMode();
       }
-      if (e.code === 'KeyP') {
-        console.log("Cheat/Testing key 'P' pressed. Forcing completion of current room's gift box.");
-        if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
-          window.game.questManager.forceCompleteGiftBox(window.game.questManager.currentRoom);
-        }
-      }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -202,16 +196,6 @@ class Controls {
       this.camera.position.set(characterPos.x, characterPos.y + 14.0, characterPos.z + 0.1);
       this.camera.lookAt(characterPos.x, characterPos.y, characterPos.z);
     }
-  }
-
-  updateFinaleCamera(bankPos, characterPos) {
-    // Cinematic over-the-shoulder camera placed behind Nadream, looking at Bank walking forward
-    const camX = characterPos.x - 1.2;
-    const camY = characterPos.y + 1.6;
-    const camZ = characterPos.z + 3.8;
-
-    this.camera.position.set(camX, camY, camZ);
-    this.camera.lookAt(bankPos.x, bankPos.y + 1.25, bankPos.z);
   }
 }
 

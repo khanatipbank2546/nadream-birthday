@@ -99,6 +99,8 @@ class BankNPC {
     tier2.position.y = 0.5;
     cakeGroup.add(tier2);
 
+    const flameMeshes = [];
+
     // Candles with Glowing Flames
     for (let i = 0; i < 3; i++) {
       const angle = (i / 3) * Math.PI * 2;
@@ -117,13 +119,17 @@ class BankNPC {
         new THREE.MeshBasicMaterial({ color: 0xffa500 })
       );
       flameMesh.position.set(rx, 0.9, rz);
+      flameMesh.scale.set(0, 0, 0); // Start unlit
       cakeGroup.add(flameMesh);
+      flameMeshes.push(flameMesh);
     }
 
     // Warm Glowing Candlelight PointLight
-    const candleLight = new THREE.PointLight(0xffaa00, 3.5, 14);
+    const candleLight = new THREE.PointLight(0xffaa00, 0, 14); // Start with intensity 0
     candleLight.position.set(0, 1.0, 0);
     cakeGroup.add(candleLight);
+
+    cakeGroup.userData = { flameMeshes, candleLight };
 
     return cakeGroup;
   }

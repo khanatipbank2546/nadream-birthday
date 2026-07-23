@@ -376,37 +376,43 @@ class Game {
   // Grand Birthday Finale Cutscene (Room 5 Complete)
   startGrandBirthdayFinale() {
     this.gameState = 'FINALE';
+    this.finaleTimer = 0;
 
-    // 1. Dim Room Lighting Subtly
+    // Room 5 layout: roomDepth=28, r=4 -> roomCenterZ = -4*28 - 14 = -126
+    // Room 5 spans from z=-112 to z=-140
+    // NaDream stands near front of room, Bank starts at back of room and walks forward
+
+    // Teleport NaDream (player character) to front-center of Room 5, facing inward
+    if (this.character) {
+      this.character.position.set(0, 0, -118.0);
+      if (this.character.group) {
+        this.character.group.position.copy(this.character.position);
+        this.character.group.rotation.y = -Math.PI; // Face toward Bank (facing -z direction)
+        this.character.group.rotation.x = 0;
+      }
+    }
+
+    // Bank starts at back of Room 5 (z=-138) holding cake, walks forward to z=-122
+    if (this.bankNPC) {
+      this.bankNPC.position.set(0, 0, -138.0);
+      this.bankNPC.group.position.copy(this.bankNPC.position);
+      this.bankNPC.group.rotation.y = Math.PI; // Face toward NaDream (facing +z)
+      this.bankNPC.attachBirthdayCake();
+    }
+
+    // Reset cutscene triggers
+    this.candlesLitPlayed = false;
+    this.candleBlowPlayed = false;
+
+    // Dim Room Lighting Subtly for atmosphere
     if (this.scene) {
-      this.scene.background = new THREE.Color(0x0a0d14);
-      this.scene.fog = new THREE.FogExp2(0x0a0d14, 0.012);
+      this.scene.background = new THREE.Color(0x05070c);
+      this.scene.fog = new THREE.FogExp2(0x05070c, 0.015);
     }
 
-    // 2. Open Secret Door #5
-    if (this.courtWorld) {
-      this.courtWorld.unlockBarrier(5);
-    }
-
-    // 3. Play Birthday Music
+    // Play Birthday Music
     if (window.soundEngine) {
       window.soundEngine.startBGM();
-    }
-
-    // 4. Bank NPC Walks Out Carrying Birthday Cake with Candlelight to NaDream!
-    if (this.bankNPC && this.character) {
-      const targetPos = new THREE.Vector3(
-        this.character.position.x,
-        this.character.position.y,
-        this.character.position.z - 2.5
-      );
-
-      this.bankNPC.walkToPlayer(targetPos, () => {
-        // Arrived! Open HBD Modal Popup!
-        if (window.showNPCModal) {
-          window.showNPCModal();
-        }
-      });
     }
   }
 
@@ -502,8 +508,216 @@ class Game {
       }
 
     } else if (this.gameState === 'FINALE') {
-      if (this.controls && this.bankNPC) {
-        this.controls.updateShowcaseCamera(this.bankNPC.position, elapsedTime * 1000);
+      this.finaleTimer += delta;
+
+      // ================================================================
+      // Phase 0: Candle lighting close-up (0.0s to 3.0s)
+      // ================================================================
+      if (this.finaleTimer < 3.0) {
+        const progress = this.finaleTimer / 3.0;
+
+        // Animate candle flames scaling up and candlelight PointLight fading up
+        if (this.bankNPC && this.bankNPC.cakeGroup) {
+          const { flameMeshes, candleLight } = this.bankNPC.cakeGroup.userData;
+          if (flameMeshes && candleLight) {
+            if (this.finaleTimer < 1.0) {
+              flameMeshes.forEach(mesh => mesh.scale.set(0, 0, 0));
+              candleLight.intensity = 0;
+            } else if (this.finaleTimer >= 1.0 && this.finaleTimer < 2.0) {
+              const scaleProg = (this.finaleTimer - 1.0) / 1.0;
+              flameMeshes.forEach(mesh => mesh.scale.set(scaleProg, scaleProg, scaleProg));
+              candleLight.intensity = scaleProg * 4.0;
+
+              if (!this.candlesLitPlayed) {
+                if (window.soundEngine) {
+                  window.soundEngine.playNote(800, 'triangle', 0.15, 0.2);
+                  window.soundEngine.playNote(1000, 'sine', 0.15, 0.2, 0.08);
+                }
+                this.candlesLitPlayed = true;
+              }
+            } else {
+              flameMeshes.forEach(mesh => mesh.scale.set(1.0, 1.0, 1.0));
+              candleLight.intensity = 4.0;
+            }
+          }
+        }
+
+        // Camera: Close-up on Bank's cake at z=-138, slight zoom-out
+        // Bank is at z=-138, cake is held at ~chest height y≈1.3
+        const camX = 0.1 * (1 - progress);
+        const camY = 1.2 + progress * 0.3;   // 1.2 -> 1.5
+        const camZ = -135.5 + progress * 1.5; // -135.5 -> -134.0 (pulls back slightly)
+        this.camera.position.set(camX, camY, camZ);
+        this.camera.lookAt(0, 1.15, -137.5); // Look at the cake Bank is holding
+      }
+
+      // ================================================================
+      // Phase 1: Bank walks to NaDream (3.0s to 11.0s) [8 seconds]
+      // Bank moves from z=-138 to z=-122 (stops 4 units from NaDream at z=-118)
+      // ================================================================
+      else if (this.finaleTimer >= 3.0 && this.finaleTimer < 11.0) {
+        const progress = (this.finaleTimer - 3.0) / 8.0;
+
+        // Bank walks from z=-138 toward NaDream at z=-118, stops at z=-122
+        const bankZ = -138.0 + progress * 16.0; // -138 -> -122
+        if (this.bankNPC) {
+          this.bankNPC.position.set(0, 0, bankZ);
+          this.bankNPC.group.position.copy(this.bankNPC.position);
+          this.bankNPC.group.rotation.y = Math.PI; // Still facing +z toward NaDream
+
+          // Leg swing walking animation
+          this.bankNPC.walkCycle = (this.bankNPC.walkCycle || 0) + delta * 7.5;
+          const swing = Math.sin(this.bankNPC.walkCycle) * 0.4;
+          if (this.bankNPC.leftLeg) this.bankNPC.leftLeg.rotation.x = swing;
+          if (this.bankNPC.rightLeg) this.bankNPC.rightLeg.rotation.x = -swing;
+        }
+
+        // Side-view tracking camera: stays beside them, pans along
+        // Midpoint between Bank (bankZ) and NaDream (-118)
+        const midZ = (bankZ + (-118.0)) / 2.0;
+        const camX = 4.5;
+        const camY = 1.8;
+        const camZ = midZ + 2.0; // Slightly ahead of midpoint
+        this.camera.position.set(camX, camY, camZ);
+        this.camera.lookAt(0, 1.3, midZ);
+      }
+
+      // ================================================================
+      // Phase 2: NaDream blows candles (11.0s to 15.0s) [4 seconds]
+      // Bank is now stopped at z=-122, NaDream at z=-118
+      // ================================================================
+      else if (this.finaleTimer >= 11.0 && this.finaleTimer < 15.0) {
+        // Bank stands still at final position
+        if (this.bankNPC) {
+          this.bankNPC.position.set(0, 0, -122.0);
+          this.bankNPC.group.position.copy(this.bankNPC.position);
+          if (this.bankNPC.leftLeg) this.bankNPC.leftLeg.rotation.x = 0;
+          if (this.bankNPC.rightLeg) this.bankNPC.rightLeg.rotation.x = 0;
+        }
+
+        // Camera: Over Bank's shoulder, looking at NaDream
+        // Bank at z=-122, NaDream at z=-118 -> camera just behind Bank
+        this.camera.position.set(0.4, 1.55, -120.5);
+        this.camera.lookAt(0, 1.4, -118.0); // Look at NaDream's face
+
+        // 11.5s -> 12.2s: NaDream leans forward to blow
+        if (this.finaleTimer >= 11.5 && this.finaleTimer < 12.2) {
+          const leanProg = (this.finaleTimer - 11.5) / 0.7;
+          if (this.character && this.character.group) {
+            this.character.group.rotation.x = leanProg * 0.25;
+          }
+        }
+        // 12.2s -> 13.0s: Blow out candles!
+        else if (this.finaleTimer >= 12.2 && this.finaleTimer < 13.0) {
+          if (this.character && this.character.group) {
+            this.character.group.rotation.x = 0.25;
+          }
+
+          // Extinguish flames!
+          if (this.bankNPC && this.bankNPC.cakeGroup) {
+            const { flameMeshes, candleLight } = this.bankNPC.cakeGroup.userData;
+            if (flameMeshes && candleLight) {
+              const extinguishProg = Math.max(0, (13.0 - this.finaleTimer) / 0.8);
+              flameMeshes.forEach(mesh => mesh.scale.set(extinguishProg, extinguishProg, extinguishProg));
+              candleLight.intensity = extinguishProg * 4.0;
+            }
+          }
+
+          if (!this.candleBlowPlayed) {
+            if (window.soundEngine) {
+              window.soundEngine.playNote(150, 'sine', 0.45, 0.4);
+            }
+            this.candleBlowPlayed = true;
+          }
+        }
+        // 13.0s -> 15.0s: Stand back up, candles completely out
+        else {
+          if (this.character && this.character.group) {
+            const standProg = Math.max(0, (14.0 - this.finaleTimer) / 1.0);
+            this.character.group.rotation.x = standProg * 0.25;
+          }
+          if (this.bankNPC && this.bankNPC.cakeGroup) {
+            const { flameMeshes, candleLight } = this.bankNPC.cakeGroup.userData;
+            if (flameMeshes && candleLight) {
+              flameMeshes.forEach(mesh => mesh.scale.set(0, 0, 0));
+              candleLight.intensity = 0;
+            }
+          }
+        }
+      }
+
+      // ================================================================
+      // Phase 3: Wish text pops up (15.0s to 25.0s) [10 seconds]
+      // Orbit camera slowly around both characters
+      // ================================================================
+      else if (this.finaleTimer >= 15.0 && this.finaleTimer < 25.0) {
+        const progress = (this.finaleTimer - 15.0) / 10.0;
+        // Midpoint between NaDream(z=-118) and Bank(z=-122) = z=-120
+        const focusZ = -120.0;
+        const orbitAngle = progress * Math.PI * 0.25; // 45-degree orbit
+        const orbitR = 3.0;
+        const camX = Math.sin(orbitAngle) * orbitR;
+        const camY = 1.6;
+        const camZ = focusZ - Math.cos(orbitAngle) * orbitR;
+        this.camera.position.set(camX, camY, camZ);
+        this.camera.lookAt(0, 1.4, focusZ);
+
+        // Show the blessing text overlay
+        const wishOverlay = document.getElementById('wish-overlay');
+        if (wishOverlay) {
+          wishOverlay.classList.remove('hidden');
+          wishOverlay.style.display = 'flex';
+          wishOverlay.style.opacity = '1';
+        }
+      }
+
+      // ================================================================
+      // Phase 4: Fade to Black & Silence (25.0s to 29.0s) [4 seconds]
+      // ================================================================
+      else if (this.finaleTimer >= 25.0 && this.finaleTimer < 29.0) {
+        const progress = (this.finaleTimer - 25.0) / 4.0;
+
+        // Hide wish overlay gradually
+        const wishOverlay = document.getElementById('wish-overlay');
+        if (wishOverlay) wishOverlay.style.opacity = (1 - progress).toString();
+
+        // Fade in black overlay
+        const blackOverlay = document.getElementById('black-overlay');
+        if (blackOverlay) {
+          blackOverlay.classList.remove('hidden');
+          blackOverlay.style.display = 'block';
+          blackOverlay.style.opacity = progress.toString();
+        }
+
+        // Fade out music volume
+        if (window.soundEngine && window.soundEngine.bgm) {
+          window.soundEngine.bgm.volume = Math.max(0, 0.3 * (1 - progress));
+        }
+      }
+
+      // ================================================================
+      // Phase 5: "จบ" Screen (29.0s onwards)
+      // ================================================================
+      else if (this.finaleTimer >= 29.0) {
+        const wishOverlay = document.getElementById('wish-overlay');
+        if (wishOverlay) wishOverlay.style.display = 'none';
+
+        const blackOverlay = document.getElementById('black-overlay');
+        if (blackOverlay) {
+          blackOverlay.style.opacity = '1';
+        }
+
+        if (window.soundEngine && window.soundEngine.bgm) {
+          window.soundEngine.bgm.pause();
+        }
+
+        // Show "จบ" text
+        const endingText = document.getElementById('ending-text');
+        if (endingText) {
+          endingText.classList.remove('hidden');
+          endingText.style.display = 'block';
+          endingText.style.opacity = '1';
+        }
       }
 
     } else if (this.gameState === 'PLAYING') {

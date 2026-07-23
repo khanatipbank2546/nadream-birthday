@@ -498,7 +498,7 @@ class Game {
 
     // 4. Reset characters
     if (this.character) {
-      this.character.position.set(0, 0, 0);
+      this.character.position.set(0, 0, -14.0);
       if (this.character.group) {
         this.character.group.position.copy(this.character.position);
         this.character.group.rotation.set(0, 0, 0);
@@ -578,7 +578,7 @@ class Game {
 
     // 4. Reset characters
     if (this.character) {
-      this.character.position.set(0, 0, 0);
+      this.character.position.set(0, 0, -14.0);
       if (this.character.group) {
         this.character.group.position.copy(this.character.position);
         this.character.group.rotation.set(0, 0, 0);

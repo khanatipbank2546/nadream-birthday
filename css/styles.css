@@ -1235,6 +1235,7 @@ html, body {
 
 /* On-Screen Debug Overlay & Logger */
 #game-debug-overlay {
+  display: none !important;
   position: fixed;
   bottom: 20px;
   left: 20px;
@@ -1248,7 +1249,6 @@ html, body {
   font-size: 0.72rem;
   color: #e2e8f0;
   z-index: 100000;
-  display: flex;
   flex-direction: column;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   pointer-events: auto;

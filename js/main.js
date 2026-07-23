@@ -164,9 +164,65 @@ class Game {
 
       if (progress >= 100) {
         clearInterval(interval);
+        this.prewarmShaders();
         if (startBtn) startBtn.classList.remove('hidden');
       }
     }, 50);
+  }
+
+  prewarmShaders() {
+    console.log("DEBUG: Pre-warming WebGL shaders...");
+    const tempVisibleElements = [];
+
+    if (this.courtWorld) {
+      // Temporarily make hidden items visible for the compilation step
+      if (this.courtWorld.questMarkers) {
+        this.courtWorld.questMarkers.forEach(el => {
+          if (!el.visible) {
+            el.visible = true;
+            tempVisibleElements.push(el);
+          }
+        });
+      }
+      if (this.courtWorld.giftBoxPads) {
+        this.courtWorld.giftBoxPads.forEach(el => {
+          if (!el.visible) {
+            el.visible = true;
+            tempVisibleElements.push(el);
+          }
+        });
+      }
+      if (this.courtWorld.doors) {
+        this.courtWorld.doors.forEach(el => {
+          if (!el.visible) {
+            el.visible = true;
+            tempVisibleElements.push(el);
+          }
+        });
+      }
+      if (this.courtWorld.checkpointPads) {
+        this.courtWorld.checkpointPads.forEach(el => {
+          if (!el.visible) {
+            el.visible = true;
+            tempVisibleElements.push(el);
+          }
+        });
+      }
+    }
+
+    if (this.renderer && this.scene && this.camera) {
+      try {
+        this.renderer.compile(this.scene, this.camera);
+        console.log("DEBUG: WebGL shaders pre-warmed successfully!");
+      } catch (err) {
+        console.error("DEBUG: WebGL shader pre-warming failed:", err);
+      }
+    }
+
+    // Restore visibility back to hidden
+    tempVisibleElements.forEach(el => {
+      el.visible = false;
+    });
   }
 
   startIntroCutscene() {

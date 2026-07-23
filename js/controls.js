@@ -147,15 +147,18 @@ class Controls {
 
   // Grand Gift Box Spawn & Opening Zoom Cutscene Camera
   updateGiftBoxCutsceneCamera(boxPos, progress) {
-    const orbitAngle = progress * Math.PI * 2.0;
-    const distance = 6.5 * (1 - progress * 0.3);
+    // Beautiful slow front-facing arc (144 degrees sweep) to prevent clipping behind the box
+    const startAngle = -Math.PI * 0.4;
+    const endAngle = Math.PI * 0.4;
+    const orbitAngle = startAngle + progress * (endAngle - startAngle);
+    const distance = 7.0 * (1 - progress * 0.25); // Slightly larger distance for better framing
 
     const camX = boxPos.x + Math.sin(orbitAngle) * distance;
-    const camY = boxPos.y + 1.8 + Math.sin(progress * Math.PI) * 0.6;
+    const camY = boxPos.y + 1.6 + Math.sin(progress * Math.PI) * 0.5;
     const camZ = boxPos.z + Math.cos(orbitAngle) * distance;
 
     this.camera.position.set(camX, camY, camZ);
-    this.camera.lookAt(boxPos.x, boxPos.y + 0.5, boxPos.z);
+    this.camera.lookAt(boxPos.x, boxPos.y + 0.4, boxPos.z);
   }
 
   updateCutsceneCamera(doorZ, progress) {

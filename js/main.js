@@ -282,7 +282,7 @@ class Game {
       if (this.gameState === 'GIFT_BOX_SPAWN') {
         this.gameState = 'PLAYING';
       }
-    }, 1500);
+    }, 2200); // Slower spawn cutscene (2.2 seconds)
   }
 
   startGiftBoxOpeningCutscene(roomNum, callback) {
@@ -396,14 +396,14 @@ class Game {
 
     } else if (this.gameState === 'GIFT_BOX_SPAWN') {
       this.previewTimer += delta;
-      const progress = Math.min(1.0, this.previewTimer / 1.5);
+      const progress = Math.min(1.0, this.previewTimer / 2.2); // Slower orbit (2.2s)
       if (this.controls) {
         this.controls.updateGiftBoxCutsceneCamera(this.previewArtPos, progress);
       }
 
     } else if (this.gameState === 'GIFT_BOX_OPENING') {
       this.giftBoxTimer += delta;
-      const progress = Math.min(1.0, this.giftBoxTimer / 1.8);
+      const progress = Math.min(1.0, this.giftBoxTimer / 2.5); // Slower opening (2.5s)
 
       if (this.courtWorld) {
         this.courtWorld.animateGiftBoxOpening(this.giftBoxRoomIdx, progress);
@@ -413,7 +413,7 @@ class Game {
         this.controls.updateGiftBoxCutsceneCamera(boxPos, progress);
       }
 
-      if (this.giftBoxTimer >= 1.8) {
+      if (this.giftBoxTimer >= 2.5) { // Slower opening limit (2.5s)
         this.gameState = 'PLAYING';
         if (this.giftBoxCallback) {
           const cb = this.giftBoxCallback;

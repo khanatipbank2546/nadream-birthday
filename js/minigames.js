@@ -139,6 +139,7 @@ class MiniGameEngine {
       slot.className = 'jigsaw-slot';
       slot.dataset.slotIndex = i;
 
+      // Click to place
       slot.onclick = () => {
         if (selectedPieceIndex !== null && boardState[i] === null) {
           const pieceEl = document.querySelector(`.jigsaw-piece[data-piece-index="${selectedPieceIndex}"]`);
@@ -148,11 +149,38 @@ class MiniGameEngine {
             pieceEl.classList.remove('selected');
             selectedPieceIndex = null;
             if (window.soundEngine) window.soundEngine.playClick();
-
             this.checkJigsawCompletion(boardState);
           }
         }
       };
+
+      // HTML5 Drag and Drop events
+      slot.ondragover = (e) => {
+        e.preventDefault();
+      };
+      slot.ondrop = (e) => {
+        e.preventDefault();
+        const pieceIdStr = e.dataTransfer.getData('text/plain');
+        if (pieceIdStr !== "" && boardState[i] === null) {
+          const pieceId = parseInt(pieceIdStr, 10);
+          const pieceEl = document.querySelector(`.jigsaw-piece[data-piece-index="${pieceId}"]`);
+          if (pieceEl) {
+            // Remove from previous slot if it was on board
+            const parentSlot = pieceEl.parentElement;
+            if (parentSlot && parentSlot.classList.contains('jigsaw-slot')) {
+              const oldSlotIdx = parseInt(parentSlot.dataset.slotIndex, 10);
+              boardState[oldSlotIdx] = null;
+            }
+            slot.appendChild(pieceEl);
+            boardState[i] = pieceId;
+            pieceEl.classList.remove('selected');
+            selectedPieceIndex = null;
+            if (window.soundEngine) window.soundEngine.playClick();
+            this.checkJigsawCompletion(boardState);
+          }
+        }
+      };
+
       boardEl.appendChild(slot);
     }
 
@@ -165,14 +193,25 @@ class MiniGameEngine {
       piece.className = 'jigsaw-piece';
       piece.dataset.pieceIndex = idx;
       piece.style.backgroundImage = `url("${imgSrc}")`;
+      piece.setAttribute('draggable', 'true');
       
       const col = idx % cols;
       const row = Math.floor(idx / cols);
       piece.style.backgroundPosition = `${(col / (cols - 1)) * 100}% ${(row / (rows - 1)) * 100}%`;
 
+      // HTML5 Drag events
+      piece.ondragstart = (e) => {
+        e.dataTransfer.setData('text/plain', idx.toString());
+        selectedPieceIndex = idx;
+        piece.classList.add('selected');
+      };
+      piece.ondragend = () => {
+        piece.classList.remove('selected');
+      };
+
+      // Click event
       piece.onclick = (e) => {
         e.stopPropagation();
-        // If piece is already placed on board, remove it back to tray
         const parentSlot = piece.parentElement;
         if (parentSlot && parentSlot.classList.contains('jigsaw-slot')) {
           const slotIdx = parseInt(parentSlot.dataset.slotIndex, 10);
@@ -182,7 +221,6 @@ class MiniGameEngine {
           return;
         }
 
-        // Select piece
         document.querySelectorAll('.jigsaw-piece').forEach(p => p.classList.remove('selected'));
         selectedPieceIndex = idx;
         piece.classList.add('selected');
@@ -191,6 +229,28 @@ class MiniGameEngine {
 
       trayEl.appendChild(piece);
     });
+
+    // Tray Dragover & Drop to return pieces back to tray
+    trayEl.ondragover = (e) => {
+      e.preventDefault();
+    };
+    trayEl.ondrop = (e) => {
+      e.preventDefault();
+      const pieceIdStr = e.dataTransfer.getData('text/plain');
+      if (pieceIdStr !== "") {
+        const pieceId = parseInt(pieceIdStr, 10);
+        const pieceEl = document.querySelector(`.jigsaw-piece[data-piece-index="${pieceId}"]`);
+        if (pieceEl) {
+          const parentSlot = pieceEl.parentElement;
+          if (parentSlot && parentSlot.classList.contains('jigsaw-slot')) {
+            const slotIdx = parseInt(parentSlot.dataset.slotIndex, 10);
+            boardState[slotIdx] = null;
+          }
+          trayEl.appendChild(pieceEl);
+          selectedPieceIndex = null;
+        }
+      }
+    };
   }
 
   checkJigsawCompletion(boardState) {

@@ -547,6 +547,10 @@ html, body {
   padding: 16px;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .modal-backdrop.hidden, .action-prompt.hidden, .start-btn.hidden, .calendar-cutscene-overlay.hidden, .burst-flare.hidden {
   display: none !important;
 }

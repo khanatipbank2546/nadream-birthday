@@ -36,6 +36,12 @@ class Controls {
       if (e.code === 'KeyV') {
         this.toggleCameraMode();
       }
+      if (e.code === 'KeyP') {
+        console.log("Cheat/Testing key 'P' pressed. Forcing completion of current room's gift box.");
+        if (window.game && window.game.questManager && window.game.questManager.forceCompleteGiftBox) {
+          window.game.questManager.forceCompleteGiftBox(window.game.questManager.currentRoom);
+        }
+      }
     });
 
     window.addEventListener('keyup', (e) => {

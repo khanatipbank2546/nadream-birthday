@@ -544,7 +544,12 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
       modal.classList.add('hidden');
       modal.style.display = 'none';
       if (window.soundEngine) window.soundEngine.playQuestComplete();
-      if (onConfirmCallback) onConfirmCallback(currentRating);
+      
+      // Delay callback slightly to allow the browser to paint the hidden modal first,
+      // avoiding any WebGL shader compilation stutters blocking the modal close animation.
+      setTimeout(() => {
+        if (onConfirmCallback) onConfirmCallback(currentRating);
+      }, 100);
     };
 
     if (confirmBtn) confirmBtn.onclick = handleConfirm;

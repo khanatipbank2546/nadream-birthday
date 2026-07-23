@@ -120,21 +120,22 @@ class QuestManager {
             const artFrame = this.courtWorld.artFrames[artIdx];
             if (artFrame && window.game) {
               window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
-                if (artFrame.userData.addStarBadge) {
-                  artFrame.userData.addStarBadge(5);
-                }
-                this.recordPhotoRating(artFrame, 5);
-
-                this.isProcessingCutscene = false;
-                this.advanceRoomSubState();
-
                 if (window.showStarRatingModal) {
                   window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
                     if (artFrame.userData.addStarBadge) {
                       artFrame.userData.addStarBadge(ratedScore || 5);
                     }
                     this.recordPhotoRating(artFrame, ratedScore || 5);
+                    this.advanceRoomSubState();
+                    this.isProcessingCutscene = false;
                   });
+                } else {
+                  if (artFrame.userData.addStarBadge) {
+                    artFrame.userData.addStarBadge(5);
+                  }
+                  this.recordPhotoRating(artFrame, 5);
+                  this.advanceRoomSubState();
+                  this.isProcessingCutscene = false;
                 }
               });
             }
@@ -249,21 +250,22 @@ class QuestManager {
           this.isProcessingCutscene = true;
 
           window.game.startPhotoPreviewCutscene(artFrame.userData, () => {
-            if (artFrame.userData.addStarBadge) {
-              artFrame.userData.addStarBadge(5);
-            }
-            this.recordPhotoRating(artFrame, 5);
-
-            this.isProcessingCutscene = false;
-            this.advanceRoomSubState();
-
             if (window.showStarRatingModal) {
               window.showStarRatingModal(artFrame.userData.imagePath, artFrame.userData.cleanTitle, (ratedScore) => {
                 if (artFrame.userData.addStarBadge) {
                   artFrame.userData.addStarBadge(ratedScore || 5);
                 }
                 this.recordPhotoRating(artFrame, ratedScore || 5);
+                this.advanceRoomSubState();
+                this.isProcessingCutscene = false;
               });
+            } else {
+              if (artFrame.userData.addStarBadge) {
+                artFrame.userData.addStarBadge(5);
+              }
+              this.recordPhotoRating(artFrame, 5);
+              this.advanceRoomSubState();
+              this.isProcessingCutscene = false;
             }
           });
         }

@@ -140,7 +140,12 @@ class Game {
         window.soundEngine.startBGM();
         window.soundEngine.playClick();
       }
-      if (loadingScreen) loadingScreen.classList.add('fade-out');
+      if (loadingScreen) {
+        loadingScreen.classList.add('fade-out');
+        loadingScreen.style.opacity = '';
+        loadingScreen.style.visibility = '';
+        loadingScreen.style.pointerEvents = '';
+      }
       
       if (this.courtWorld) {
         this.courtWorld.hidePhotoGalleryWall();
@@ -536,9 +541,9 @@ class Game {
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
       loadingScreen.classList.remove('fade-out');
-      loadingScreen.style.opacity = '1';
-      loadingScreen.style.visibility = 'visible';
-      loadingScreen.style.pointerEvents = 'auto';
+      loadingScreen.style.opacity = '';
+      loadingScreen.style.visibility = '';
+      loadingScreen.style.pointerEvents = '';
     }
 
     if (window.soundEngine) {

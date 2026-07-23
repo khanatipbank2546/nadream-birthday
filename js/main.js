@@ -212,8 +212,13 @@ class Game {
 
     if (this.renderer && this.scene && this.camera) {
       try {
+        // Compile standard shaders
         this.renderer.compile(this.scene, this.camera);
-        console.log("DEBUG: WebGL shaders pre-warmed successfully!");
+        
+        // Force a render pass to compile dynamic lights, shadows, and link programs!
+        this.renderer.render(this.scene, this.camera);
+        
+        console.log("DEBUG: WebGL shaders pre-warmed and rendered successfully!");
       } catch (err) {
         console.error("DEBUG: WebGL shader pre-warming failed:", err);
       }
@@ -408,7 +413,8 @@ class Game {
   animate() {
     requestAnimationFrame(() => this.animate());
 
-    const delta = this.clock.getDelta();
+    let delta = this.clock.getDelta();
+    if (delta > 0.05) delta = 0.05; // Cap delta to prevent frame skips during stutters
     const elapsedTime = this.clock.getElapsedTime();
 
     if (this.gameState === 'SHOWCASE') {

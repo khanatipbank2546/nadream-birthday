@@ -11,26 +11,39 @@ class SoundEngine {
   }
 
   init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
+    try {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          this.ctx = new AudioCtx();
+        }
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    } catch (e) {
+      console.warn("AudioContext failed to initialize:", e);
     }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
+
     if (!this.bgmAudio) {
-      this.bgmAudio = new Audio();
-      this.bgmAudio.src = "music/Happy birthday (Bulan Sutena cover) lofi remix.mp4";
-      this.bgmAudio.loop = true;
-      this.bgmAudio.volume = 0.5;
+      try {
+        this.bgmAudio = new Audio();
+        this.bgmAudio.src = "music/newSong.mp4?v=35000.0";
+        this.bgmAudio.loop = true;
+        this.bgmAudio.volume = 0.3; // Lowered volume as requested
+      } catch (err) {
+        console.error("Audio element failed to initialize:", err);
+      }
     }
   }
 
   toggleMute() {
     this.isMuted = !this.isMuted;
-    if (this.bgmAudio) {
-      this.bgmAudio.muted = this.isMuted;
-    }
+    try {
+      if (this.bgmAudio) {
+        this.bgmAudio.muted = this.isMuted;
+      }
+    } catch (e) {}
     if (this.isMuted) {
       this.stopBGM();
     } else {
@@ -94,22 +107,31 @@ class SoundEngine {
   // Play target BGM audio file
   startBGM() {
     if (this.isMuted) return;
-    this.init();
-    if (this.isBGMPlaying) return;
-    this.isBGMPlaying = true;
+    try {
+      this.init();
+      if (this.isBGMPlaying) return;
+      this.isBGMPlaying = true;
 
-    if (this.bgmAudio) {
-      this.bgmAudio.muted = false;
-      this.bgmAudio.play().catch(e => {
-        console.warn("Failed to play BGM audio file:", e);
-      });
+      if (this.bgmAudio) {
+        this.bgmAudio.muted = false;
+        this.bgmAudio.volume = 0.3; // Ensure volume is 0.3
+        this.bgmAudio.play().catch(e => {
+          console.warn("Failed to play BGM audio file:", e);
+        });
+      }
+    } catch (e) {
+      console.error("startBGM exception caught:", e);
     }
   }
 
   stopBGM() {
     this.isBGMPlaying = false;
-    if (this.bgmAudio) {
-      this.bgmAudio.pause();
+    try {
+      if (this.bgmAudio) {
+        this.bgmAudio.pause();
+      }
+    } catch (e) {
+      console.error("stopBGM exception caught:", e);
     }
   }
 

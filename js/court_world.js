@@ -168,6 +168,12 @@ class CourtWorld {
     }
   }
 
+  showPhotoGalleryWall() {
+    if (this.photoGalleryWallGroup) {
+      this.scene.add(this.photoGalleryWallGroup);
+    }
+  }
+
   initArtGalleryPhotos() {
     // 10 Exact Thai Photo Filenames & Explicit Plaque Titles
     const photoItems = [
@@ -234,19 +240,33 @@ class CourtWorld {
     
     this.textureLoader.load(encodeURI(imagePath), (tex) => {
       const picMat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+      
       const picMesh = new THREE.Mesh(picGeo, picMat);
       picMesh.position.z = 0.07;
       artGroup.add(picMesh);
+
+      // Back Picture (for double-sided view)
+      const picMeshBack = new THREE.Mesh(picGeo, picMat);
+      picMeshBack.position.z = -0.07;
+      picMeshBack.rotation.y = Math.PI; // Face backwards
+      artGroup.add(picMeshBack);
     }, undefined, () => {
       const fallbackMat = new THREE.MeshBasicMaterial({ color: 0x3a86ff, side: THREE.DoubleSide });
+      
       const picMesh = new THREE.Mesh(picGeo, fallbackMat);
       picMesh.position.z = 0.07;
       artGroup.add(picMesh);
+
+      const picMeshBack = new THREE.Mesh(picGeo, fallbackMat);
+      picMeshBack.position.z = -0.07;
+      picMeshBack.rotation.y = Math.PI;
+      artGroup.add(picMeshBack);
     });
 
     // Plaque Mesh displaying exact Thai Title (e.g. "เจ๊สมคิด", "แช้มแรกป่ะ")
     const plaqueGeo = new THREE.BoxGeometry(2.8, 0.52, 0.08);
     let plaqueMesh = null;
+    let plaqueMeshBack = null;
 
     const renderPlaqueTexture = (starsScore = 0) => {
       const plaqueCanvas = document.createElement('canvas');
@@ -272,14 +292,24 @@ class CourtWorld {
         plaqueMesh.material.map = plaqueTex;
         plaqueMesh.material.needsUpdate = true;
       }
+      if (plaqueMeshBack) {
+        plaqueMeshBack.material.map = plaqueTex;
+        plaqueMeshBack.material.needsUpdate = true;
+      }
       return plaqueTex;
     };
 
     const initialPlaqueTex = renderPlaqueTexture(0);
     const plaqueMat = new THREE.MeshStandardMaterial({ map: initialPlaqueTex });
+    
     plaqueMesh = new THREE.Mesh(plaqueGeo, plaqueMat);
     plaqueMesh.position.set(0, -2.3, 0.06);
     artGroup.add(plaqueMesh);
+
+    plaqueMeshBack = new THREE.Mesh(plaqueGeo, plaqueMat);
+    plaqueMeshBack.position.set(0, -2.3, -0.06);
+    plaqueMeshBack.rotation.y = Math.PI; // Face backwards
+    artGroup.add(plaqueMeshBack);
 
     const spotlight = new THREE.SpotLight(0xfffae6, 1.6, 14, Math.PI / 4, 0.4);
     spotlight.position.set(xPos > 0 ? xPos - 2 : xPos + 2, yPos + 3, zPos);

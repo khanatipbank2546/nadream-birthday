@@ -524,6 +524,11 @@ class Game {
       this.scene.fog = new THREE.FogExp2(0x1a202c, 0.015);
     }
 
+    // Restore Lobby Photo Wall
+    if (this.courtWorld && this.courtWorld.showPhotoGalleryWall) {
+      this.courtWorld.showPhotoGalleryWall();
+    }
+
     // 6. Reset game state to SHOWCASE
     this.gameState = 'SHOWCASE';
 
@@ -542,6 +547,11 @@ class Game {
   }
 
   restartGame() {
+    // Hide Lobby Photo Wall if visible
+    if (this.courtWorld && this.courtWorld.hidePhotoGalleryWall) {
+      this.courtWorld.hidePhotoGalleryWall();
+    }
+
     // 1. Hide Ending Gallery UI & Wish Overlays
     const endingUI = document.getElementById('ending-gallery-ui');
     if (endingUI) {
@@ -878,11 +888,11 @@ class Game {
           endingUI.style.opacity = progress.toString();
         }
 
-        // Orbit camera around center midpoint (0, 1.8, -120.0)
+        // Orbit camera around center midpoint (0, 1.8, -120.0) - Zoomed out
         const orbitAngle = this.finaleTimer * 0.05;
-        const camX = Math.sin(orbitAngle) * 8.5;
-        const camY = 2.4;
-        const camZ = -120.0 - Math.cos(orbitAngle) * 8.5;
+        const camX = Math.sin(orbitAngle) * 11.5;
+        const camY = 2.7;
+        const camZ = -120.0 - Math.cos(orbitAngle) * 11.5;
         this.camera.position.set(camX, camY, camZ);
         this.camera.lookAt(0, 1.8, -120.0);
 
@@ -911,11 +921,11 @@ class Game {
           endingUI.style.opacity = '1';
         }
 
-        // Endless slow orbit around midpoint (0, 1.8, -120.0)
+        // Endless slow orbit around midpoint (0, 1.8, -120.0) - Zoomed out
         const orbitAngle = this.finaleTimer * 0.05;
-        const camX = Math.sin(orbitAngle) * 8.5;
-        const camY = 2.4;
-        const camZ = -120.0 - Math.cos(orbitAngle) * 8.5;
+        const camX = Math.sin(orbitAngle) * 11.5;
+        const camY = 2.7;
+        const camZ = -120.0 - Math.cos(orbitAngle) * 11.5;
         this.camera.position.set(camX, camY, camZ);
         this.camera.lookAt(0, 1.8, -120.0);
 

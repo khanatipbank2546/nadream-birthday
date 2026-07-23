@@ -396,7 +396,7 @@ class Game {
     if (this.bankNPC) {
       this.bankNPC.position.set(0, 0, -138.0);
       this.bankNPC.group.position.copy(this.bankNPC.position);
-      this.bankNPC.group.rotation.y = Math.PI; // Face toward NaDream (facing +z)
+      this.bankNPC.group.rotation.y = 0; // Face toward NaDream (facing +z)
       this.bankNPC.attachBirthdayCake();
     }
 
@@ -563,7 +563,7 @@ class Game {
         if (this.bankNPC) {
           this.bankNPC.position.set(0, 0, bankZ);
           this.bankNPC.group.position.copy(this.bankNPC.position);
-          this.bankNPC.group.rotation.y = Math.PI; // Still facing +z toward NaDream
+          this.bankNPC.group.rotation.y = 0; // Facing +z toward NaDream (walking forwards!)
 
           // Leg swing walking animation
           this.bankNPC.walkCycle = (this.bankNPC.walkCycle || 0) + delta * 7.5;
@@ -591,6 +591,7 @@ class Game {
         if (this.bankNPC) {
           this.bankNPC.position.set(0, 0, -122.0);
           this.bankNPC.group.position.copy(this.bankNPC.position);
+          this.bankNPC.group.rotation.y = 0; // still facing player
           if (this.bankNPC.leftLeg) this.bankNPC.leftLeg.rotation.x = 0;
           if (this.bankNPC.rightLeg) this.bankNPC.rightLeg.rotation.x = 0;
         }
@@ -600,17 +601,17 @@ class Game {
         this.camera.position.set(0.4, 1.55, -120.5);
         this.camera.lookAt(0, 1.4, -118.0); // Look at NaDream's face
 
-        // 11.5s -> 12.2s: NaDream leans forward to blow
+        // 11.5s -> 12.2s: NaDream leans forward to blow (negative rotation.x to lean forward)
         if (this.finaleTimer >= 11.5 && this.finaleTimer < 12.2) {
           const leanProg = (this.finaleTimer - 11.5) / 0.7;
           if (this.character && this.character.group) {
-            this.character.group.rotation.x = leanProg * 0.25;
+            this.character.group.rotation.x = -leanProg * 0.25;
           }
         }
         // 12.2s -> 13.0s: Blow out candles!
         else if (this.finaleTimer >= 12.2 && this.finaleTimer < 13.0) {
           if (this.character && this.character.group) {
-            this.character.group.rotation.x = 0.25;
+            this.character.group.rotation.x = -0.25;
           }
 
           // Extinguish flames!
@@ -634,7 +635,7 @@ class Game {
         else {
           if (this.character && this.character.group) {
             const standProg = Math.max(0, (14.0 - this.finaleTimer) / 1.0);
-            this.character.group.rotation.x = standProg * 0.25;
+            this.character.group.rotation.x = -standProg * 0.25;
           }
           if (this.bankNPC && this.bankNPC.cakeGroup) {
             const { flameMeshes, candleLight } = this.bankNPC.cakeGroup.userData;

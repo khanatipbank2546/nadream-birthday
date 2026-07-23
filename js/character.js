@@ -431,11 +431,55 @@ class CharacterController {
       const nextX = this.position.x + moveDirX * this.speed;
       const nextZ = this.position.z + moveDirZ * this.speed;
 
+      // Room divider walls are located at:
+      const wallZs = [-28.0, -56.0, -84.0, -112.0, -140.0];
+      const wallThickness = 0.4;
+      const doorOpenHalfWidth = 3.6;
+
+      // 1. Check & Update X Position
+      let canMoveX = false;
       if (nextX >= -17.5 && nextX <= 17.5) {
+        canMoveX = true;
+        // If we are currently close to any room divider wall, clamp X to the door opening
+        for (const w of wallZs) {
+          if (Math.abs(this.position.z - w) < wallThickness) {
+            if (nextX < -doorOpenHalfWidth || nextX > doorOpenHalfWidth) {
+              canMoveX = false;
+              break;
+            }
+          }
+        }
+      }
+      if (canMoveX) {
         this.position.x = nextX;
       }
 
-      if (nextZ > activeBarrierZ) {
+      // 2. Check & Update Z Position
+      let canMoveZ = true;
+      if (nextZ <= activeBarrierZ) {
+        canMoveZ = false;
+      } else {
+        // If outside door opening, prevent crossing the wall Z boundaries
+        if (this.position.x < -doorOpenHalfWidth || this.position.x > doorOpenHalfWidth) {
+          for (const w of wallZs) {
+            const currentDist = this.position.z - w;
+            const nextDist = nextZ - w;
+            
+            // Crossing from one side to the other
+            if ((currentDist >= -wallThickness && nextDist < -wallThickness) || 
+                (currentDist <= wallThickness && nextDist > wallThickness)) {
+              canMoveZ = false;
+              break;
+            }
+            // If already inside the wall, don't allow moving deeper into it
+            if (Math.abs(nextDist) < wallThickness && Math.abs(nextDist) < Math.abs(currentDist)) {
+              canMoveZ = false;
+              break;
+            }
+          }
+        }
+      }
+      if (canMoveZ) {
         this.position.z = nextZ;
       }
 

@@ -282,7 +282,7 @@ class Game {
       if (this.gameState === 'GIFT_BOX_SPAWN') {
         this.gameState = 'PLAYING';
       }
-    }, 2200); // Slower spawn cutscene (2.2 seconds)
+    }, 3500); // Slower spawn cutscene (3.5 seconds)
   }
 
   startGiftBoxOpeningCutscene(roomNum, callback) {
@@ -396,7 +396,7 @@ class Game {
 
     } else if (this.gameState === 'GIFT_BOX_SPAWN') {
       this.previewTimer += delta;
-      const progress = Math.min(1.0, this.previewTimer / 2.2); // Slower orbit (2.2s)
+      const progress = Math.min(1.0, this.previewTimer / 3.5); // Slower orbit (3.5s)
       if (this.controls) {
         this.controls.updateGiftBoxCutsceneCamera(this.previewArtPos, progress);
       }
@@ -544,12 +544,7 @@ window.showStarRatingModal = function(imagePath, cleanTitleText, onConfirmCallba
       modal.classList.add('hidden');
       modal.style.display = 'none';
       if (window.soundEngine) window.soundEngine.playQuestComplete();
-      
-      // Delay callback slightly to allow the browser to paint the hidden modal first,
-      // avoiding any WebGL shader compilation stutters blocking the modal close animation.
-      setTimeout(() => {
-        if (onConfirmCallback) onConfirmCallback(currentRating);
-      }, 100);
+      if (onConfirmCallback) onConfirmCallback(currentRating);
     };
 
     if (confirmBtn) confirmBtn.onclick = handleConfirm;
